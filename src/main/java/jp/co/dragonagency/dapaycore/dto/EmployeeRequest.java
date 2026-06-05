@@ -7,7 +7,7 @@ package jp.co.dragonagency.dapaycore.dto;
 public class EmployeeRequest {
 
     private String mode;
-    private String userId;
+    private String employeeNumber;
     private String email;
     private String employeeName;
     private String employeeNameKana;
@@ -26,12 +26,12 @@ public class EmployeeRequest {
         this.mode = mode;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getEmployeeNumber() {
+        return employeeNumber;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmployeeNumber(String employeeNumber) {
+        this.employeeNumber = employeeNumber;
     }
 
     public String getEmail() {

@@ -10,7 +10,7 @@ import jp.co.dragonagency.dapaycore.model.Employee;
 
 /**
  * 社員マスタ (m_employee) の永続化を担うリポジトリ。
- * 主キーはユーザー ID (user_id) を表す String 型とする。
+ * 主キーは社員番号 (employee_number) を表す String 型とする。
  */
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, String> {
@@ -24,18 +24,18 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
     Optional<Employee> findByEmail(String email);
 
     /**
-     * 全社員をユーザー ID の昇順で取得する。
+     * 全社員を社員番号の昇順で取得する。
      *
      * @return 社員の一覧
      */
-    List<Employee> findAllByOrderByUserIdAsc();
+    List<Employee> findAllByOrderByEmployeeNumberAsc();
 
     /**
-     * ユーザー ID が最大の社員を 1 件取得する。新規登録時の自動採番に使用する。
+     * 社員番号が最大の社員を 1 件取得する。新規登録時の自動採番に使用する。
      *
-     * @return ユーザー ID が最大の社員。社員が存在しない場合は空
+     * @return 社員番号が最大の社員。社員が存在しない場合は空
      */
-    Optional<Employee> findFirstByOrderByUserIdDesc();
+    Optional<Employee> findFirstByOrderByEmployeeNumberDesc();
 
     /**
      * 指定したメールアドレスの社員が存在するかどうかを返す。
@@ -46,12 +46,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
     boolean existsByEmail(String email);
 
     /**
-     * 指定したユーザー ID 以外で、指定したメールアドレスの社員が存在するか返す。
+     * 指定した社員番号以外で、指定したメールアドレスの社員が存在するか返す。
      * 編集時に自分自身を除外してメールアドレスの重複を判定するために使用する。
      *
      * @param email メールアドレス
-     * @param userId 除外するユーザー ID
+     * @param employeeNumber 除外する社員番号
      * @return 存在する場合は true
      */
-    boolean existsByEmailAndUserIdNot(String email, String userId);
+    boolean existsByEmailAndEmployeeNumberNot(String email, String employeeNumber);
 }

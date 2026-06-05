@@ -54,7 +54,7 @@ public class EmployeeController {
     /**
      * 社員情報を削除する。管理者以外の要求は拒否する。
      *
-     * @param request 削除対象のユーザー ID を含む要求
+     * @param request 削除対象の社員番号を含む要求
      * @param session ログイン状態と権限を保持するセッション
      * @return 処理結果
      */
@@ -69,16 +69,16 @@ public class EmployeeController {
         if (!isAdministrator(session)) {
             return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
         }
-        return employeeService.deleteEmployee(request.getUserId());
+        return employeeService.deleteEmployee(request.getEmployeeNumber());
     }
 
     /**
-     * 操作中のログインユーザの user_id を取得する。
-     * セッションにはログイン時のユーザIDが保持されているため、
-     * そのユーザIDで社員を引き当てて存在を確認したうえで返す。
+     * 操作中のログインユーザの社員番号を取得する。
+     * セッションにはログイン時の社員番号が保持されているため、
+     * その社員番号で社員を引き当てて存在を確認したうえで返す。
      *
      * @param session ログイン状態を保持するセッション
-     * @return ログインユーザの user_id。特定できない場合は null
+     * @return ログインユーザの社員番号。特定できない場合は null
      */
     private String getLoginUserId(HttpSession session) {
         Object loginUserId =
@@ -86,11 +86,12 @@ public class EmployeeController {
         if (loginUserId == null) {
             return null;
         }
-        Employee loginUser = employeeService.findByUserId(loginUserId.toString());
+        Employee loginUser =
+                employeeService.findByEmployeeNumber(loginUserId.toString());
         if (loginUser == null) {
             return null;
         }
-        return loginUser.getUserId();
+        return loginUser.getEmployeeNumber();
     }
 
     /**

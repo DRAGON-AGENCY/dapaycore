@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.co.dragonagency.dapaycore.dto.EmployeeRequest;
 import jp.co.dragonagency.dapaycore.dto.EmployeeResponse;
+import jp.co.dragonagency.dapaycore.dto.LoginResult;
 import jp.co.dragonagency.dapaycore.model.Employee;
 import jp.co.dragonagency.dapaycore.repository.EmployeeRepository;
 
@@ -25,9 +26,12 @@ public class EmployeeService {
     private static final String AUTHORITY_ADMINISTRATOR = "01";
     private static final String AUTHORITY_OPERATOR = "02";
     private static final String AUTHORITY_VIEWER = "03";
-    private static final String USER_ID_PREFIX = "user";
-    private static final int USER_ID_NUMBER_DIGITS = 3;
-    private static final int FIRST_USER_ID_NUMBER = 1;
+    private static final String EMPLOYEE_NUMBER_PREFIX = "user";
+    private static final int EMPLOYEE_NUMBER_DIGITS = 3;
+    private static final int FIRST_EMPLOYEE_NUMBER = 1;
+
+    // パスワードを連続して間違えられる上限。これに達するとロック扱いとする
+    private static final int MAX_PASSWORD_ERROR_COUNT = 5;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9._+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$");
@@ -61,14 +65,8 @@ public class EmployeeService {
             "入力されたメールアドレスは既に登録されています。";
     private static final String MESSAGE_NAME_REQUIRED =
             "社員名を入力してください。";
-    private static final String MESSAGE_KANA_REQUIRED =
-            "社員名 (カナ) を入力してください。";
-    private static final String MESSAGE_DEPARTMENT_REQUIRED =
-            "部署を入力してください。";
     private static final String MESSAGE_AUTHORITY_INVALID =
             "権限コードが正しくありません。";
-    private static final String MESSAGE_PHONE_REQUIRED =
-            "電話番号を入力してください。";
     private static final String MESSAGE_PHONE_FORMAT =
             "電話番号は半角数字とハイフンで入力してください。";
     private static final String MESSAGE_FAX_FORMAT =
@@ -86,6 +84,10 @@ public class EmployeeService {
             "パスワード入力間違い回数は 0 以上で入力してください。";
     private static final String MESSAGE_EMPLOYEE_NOT_FOUND =
             "対象の社員が見つかりません。";
+    private static final String MESSAGE_LOGIN_FAILED =
+            "社員番号またはパスワードが正しくありません";
+    private static final String MESSAGE_ACCOUNT_LOCKED =
+            "アカウントがロックされています。管理者にお問い合わせください";
 
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
@@ -98,12 +100,12 @@ public class EmployeeService {
     }
 
     /**
-     * 全社員をユーザー ID の昇順で取得する。
+     * 全社員を社員番号の昇順で取得する。
      *
      * @return 社員の一覧
      */
     public List<Employee> findAllEmployees() {
-        return employeeRepository.findAllByOrderByUserIdAsc();
+        return employeeRepository.findAllByOrderByEmployeeNumberAsc();
     }
 
     /**
@@ -120,16 +122,59 @@ public class EmployeeService {
     }
 
     /**
-     * ユーザー ID を指定して社員を 1 件取得する。
+     * 社員番号を指定して社員を 1 件取得する。
      *
-     * @param userId ユーザー ID
+     * @param employeeNumber 社員番号
      * @return 該当する社員。存在しない場合は null
      */
-    public Employee findByUserId(String userId) {
-        if (userId == null || userId.isBlank()) {
+    public Employee findByEmployeeNumber(String employeeNumber) {
+        if (employeeNumber == null || employeeNumber.isBlank()) {
             return null;
         }
-        return employeeRepository.findById(userId).orElse(null);
+        return employeeRepository.findById(employeeNumber).orElse(null);
+    }
+
+    /**
+     * 社員番号とパスワードでログイン認証を行う。
+     * パスワードは BCrypt のハッシュと照合する。連続して
+     * 一定回数間違えた場合はアカウントをロック扱いとし、
+     * 認証に成功した場合は間違い回数を 0 に戻す。
+     *
+     * @param employeeNumber 社員番号
+     * @param rawPassword 入力されたパスワード (平文)
+     * @return 認証結果
+     */
+    @Transactional
+    public LoginResult login(String employeeNumber, String rawPassword) {
+        String number = trimToEmpty(employeeNumber);
+        if (number.isEmpty() || rawPassword == null || rawPassword.isEmpty()) {
+            return new LoginResult(false, MESSAGE_LOGIN_FAILED, null, null);
+        }
+        Employee employee = employeeRepository.findById(number).orElse(null);
+        if (employee == null) {
+            return new LoginResult(false, MESSAGE_LOGIN_FAILED, null, null);
+        }
+        // 既にロック上限に達している場合は照合せずロックを通知する
+        if (employee.getPasswordErrorCount() >= MAX_PASSWORD_ERROR_COUNT) {
+            return new LoginResult(false, MESSAGE_ACCOUNT_LOCKED, null, null);
+        }
+        if (!passwordEncoder.matches(rawPassword, employee.getPassword())) {
+            int nextErrorCount = employee.getPasswordErrorCount() + 1;
+            employee.setPasswordErrorCount(nextErrorCount);
+            employeeRepository.save(employee);
+            if (nextErrorCount >= MAX_PASSWORD_ERROR_COUNT) {
+                return new LoginResult(false, MESSAGE_ACCOUNT_LOCKED, null, null);
+            }
+            return new LoginResult(false, MESSAGE_LOGIN_FAILED, null, null);
+        }
+        // 認証成功。間違い回数が残っていれば 0 に戻す (変化時のみ更新する)
+        if (employee.getPasswordErrorCount() != 0) {
+            employee.setPasswordErrorCount(0);
+            employeeRepository.save(employee);
+        }
+        return new LoginResult(
+                true, null, employee.getEmployeeNumber(),
+                employee.getAuthorityCode());
     }
 
     /**
@@ -137,7 +182,7 @@ public class EmployeeService {
      * 入力値を検査し、問題があれば失敗結果とメッセージを返す。
      *
      * @param request 画面から送信された社員情報
-     * @param loginUserId 操作中のログインユーザの user_id (更新者として記録する)
+     * @param loginUserId 操作中のログインユーザの社員番号 (更新者として記録する)
      * @return 処理結果
      */
     @Transactional
@@ -157,8 +202,7 @@ public class EmployeeService {
         String password = request.getPassword();
 
         String validationMessage = validateInput(
-                email, employeeName, employeeNameKana, department,
-                authorityCode, phoneNumber, faxNumber,
+                email, employeeName, authorityCode, phoneNumber, faxNumber,
                 request.getPasswordErrorCount());
         if (validationMessage != null) {
             return new EmployeeResponse(false, validationMessage);
@@ -172,26 +216,26 @@ public class EmployeeService {
                     request.getPasswordErrorCount(), loginUserId);
         }
         return updateEmployee(
-                trimToEmpty(request.getUserId()), email, employeeName,
+                trimToEmpty(request.getEmployeeNumber()), email, employeeName,
                 employeeNameKana, department, authorityCode, phoneNumber,
                 faxNumber, password, request.getPasswordErrorCount(),
                 loginUserId);
     }
 
     /**
-     * ユーザー ID を指定して社員を削除する。
+     * 社員番号を指定して社員を削除する。
      *
-     * @param userId ユーザー ID
+     * @param employeeNumber 社員番号
      * @return 処理結果
      */
     @Transactional
-    public EmployeeResponse deleteEmployee(String userId) {
-        String targetUserId = trimToEmpty(userId);
-        if (targetUserId.isEmpty()
-                || !employeeRepository.existsById(targetUserId)) {
+    public EmployeeResponse deleteEmployee(String employeeNumber) {
+        String targetEmployeeNumber = trimToEmpty(employeeNumber);
+        if (targetEmployeeNumber.isEmpty()
+                || !employeeRepository.existsById(targetEmployeeNumber)) {
             return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
         }
-        employeeRepository.deleteById(targetUserId);
+        employeeRepository.deleteById(targetEmployeeNumber);
         return new EmployeeResponse(true, null);
     }
 
@@ -212,7 +256,7 @@ public class EmployeeService {
         }
 
         Employee employee = new Employee();
-        employee.setUserId(generateNextUserId());
+        employee.setEmployeeNumber(generateNextEmployeeNumber());
         employee.setEmail(email);
         employee.setEmployeeName(employeeName);
         employee.setEmployeeNameKana(employeeNameKana);
@@ -226,7 +270,7 @@ public class EmployeeService {
         LocalDateTime now = LocalDateTime.now();
         employee.setCreatedAt(now);
         employee.setUpdatedAt(now);
-        // 更新者として操作中のログインユーザの user_id を記録する
+        // 更新者として操作中のログインユーザの社員番号を記録する
         employee.setUpdateUserId(loginUserId);
 
         employeeRepository.save(employee);
@@ -237,18 +281,20 @@ public class EmployeeService {
      * 既存社員を更新する。パスワードは空欄の場合に現状を維持する。
      */
     private EmployeeResponse updateEmployee(
-            String userId, String email, String employeeName,
+            String employeeNumber, String email, String employeeName,
             String employeeNameKana, String department, String authorityCode,
             String phoneNumber, String faxNumber, String password,
             int passwordErrorCount, String loginUserId) {
-        if (userId.isEmpty()) {
+        if (employeeNumber.isEmpty()) {
             return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
         }
-        Employee employee = employeeRepository.findById(userId).orElse(null);
+        Employee employee =
+                employeeRepository.findById(employeeNumber).orElse(null);
         if (employee == null) {
             return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
         }
-        if (employeeRepository.existsByEmailAndUserIdNot(email, userId)) {
+        if (employeeRepository.existsByEmailAndEmployeeNumberNot(
+                email, employeeNumber)) {
             return new EmployeeResponse(false, MESSAGE_EMAIL_DUPLICATED);
         }
 
@@ -276,7 +322,7 @@ public class EmployeeService {
         }
 
         // 更新日時にシステム日時を、更新者に操作中のログインユーザの
-        // user_id を設定する
+        // 社員番号を設定する
         employee.setUpdatedAt(LocalDateTime.now());
         employee.setUpdateUserId(loginUserId);
 
@@ -290,9 +336,8 @@ public class EmployeeService {
      * @return 問題があればエラーメッセージ。問題が無ければ null
      */
     private String validateInput(
-            String email, String employeeName, String employeeNameKana,
-            String department, String authorityCode, String phoneNumber,
-            String faxNumber, int passwordErrorCount) {
+            String email, String employeeName, String authorityCode,
+            String phoneNumber, String faxNumber, int passwordErrorCount) {
         if (email.isEmpty()) {
             return MESSAGE_EMAIL_REQUIRED;
         }
@@ -302,19 +347,13 @@ public class EmployeeService {
         if (employeeName.isEmpty()) {
             return MESSAGE_NAME_REQUIRED;
         }
-        if (employeeNameKana.isEmpty()) {
-            return MESSAGE_KANA_REQUIRED;
-        }
-        if (department.isEmpty()) {
-            return MESSAGE_DEPARTMENT_REQUIRED;
-        }
         if (!isValidAuthorityCode(authorityCode)) {
             return MESSAGE_AUTHORITY_INVALID;
         }
-        if (phoneNumber.isEmpty()) {
-            return MESSAGE_PHONE_REQUIRED;
-        }
-        if (!PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches()) {
+        // 社員名 (カナ)・部署・電話番号は任意項目。
+        // 電話番号は入力された場合のみ形式を検査する
+        if (!phoneNumber.isEmpty()
+                && !PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches()) {
             return MESSAGE_PHONE_FORMAT;
         }
         // FAX は任意項目のため、入力された場合のみ形式を検査する
@@ -369,32 +408,33 @@ public class EmployeeService {
     }
 
     /**
-     * 既存の最大ユーザー ID を基に、次のユーザー ID を採番する。
+     * 既存の最大社員番号を基に、次の社員番号を採番する。
      * 形式は「user」+ 0 埋め 3 桁の連番 (例: user011)。
      *
-     * @return 新しいユーザー ID
+     * @return 新しい社員番号
      */
-    private String generateNextUserId() {
+    private String generateNextEmployeeNumber() {
         Optional<Employee> latest =
-                employeeRepository.findFirstByOrderByUserIdDesc();
-        int nextNumber = FIRST_USER_ID_NUMBER;
+                employeeRepository.findFirstByOrderByEmployeeNumberDesc();
+        int nextNumber = FIRST_EMPLOYEE_NUMBER;
         if (latest.isPresent()) {
-            nextNumber = extractUserIdNumber(latest.get().getUserId()) + 1;
+            nextNumber =
+                    extractEmployeeNumber(latest.get().getEmployeeNumber()) + 1;
         }
         return String.format(
-                "%s%0" + USER_ID_NUMBER_DIGITS + "d",
-                USER_ID_PREFIX, nextNumber);
+                "%s%0" + EMPLOYEE_NUMBER_DIGITS + "d",
+                EMPLOYEE_NUMBER_PREFIX, nextNumber);
     }
 
     /**
-     * ユーザー ID から末尾の数値部分を取り出す。
+     * 社員番号から末尾の数値部分を取り出す。
      * 数値として解釈できない場合は 0 を返す。
      *
-     * @param userId ユーザー ID
+     * @param employeeNumber 社員番号
      * @return 数値部分
      */
-    private int extractUserIdNumber(String userId) {
-        String digits = userId.replaceAll("\\D", "");
+    private int extractEmployeeNumber(String employeeNumber) {
+        String digits = employeeNumber.replaceAll("\\D", "");
         if (digits.isEmpty()) {
             return 0;
         }

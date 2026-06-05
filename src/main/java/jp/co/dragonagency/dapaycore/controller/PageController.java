@@ -45,6 +45,14 @@ public class PageController {
     }
 
     /**
+     * 加盟店一覧画面を表示する。運用管理ポータルの「加盟店管理」から表示する。
+     */
+    @GetMapping("/member_list.html")
+    public String showMemberList() {
+        return "member_list";
+    }
+
+    /**
      * パスワード再設定画面を表示する。
      */
     @GetMapping("/password_reset.html")
@@ -66,6 +74,14 @@ public class PageController {
     @GetMapping("/merchant_application_form.html")
     public String showMerchantApplicationForm() {
         return "merchant_application_form";
+    }
+
+    /**
+     * 申込内容照会画面を表示する。登録済みの申込内容を読み取り専用で表示する。
+     */
+    @GetMapping("/merchant_application_inquiry.html")
+    public String showMerchantApplicationInquiry() {
+        return "merchant_application_inquiry";
     }
 
     /**

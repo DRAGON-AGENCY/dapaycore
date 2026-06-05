@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSRF トークン。ログイン要求のヘッダーに設定して送信する。 -->
+<meta name="csrf-token" th:content="${csrfToken}" content="">
 <title>運用管理 ログイン｜mPOSなび</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +23,7 @@
     --text-soft: #0c447c;
     --border: rgba(20,45,80,0.10);
     --border-strong: rgba(20,45,80,0.24);
-    --accent: #1b66b3;
+    --accent: #0b5fd0;
     --accent-strong: #0c447c;
     --accent-line: #3d8ddd;
     --warn-soft: #fdf0dd;
@@ -107,7 +109,7 @@
 </head>
 <body>
   <main class="card">
-    <h2 class="sr-only">運用管理システムのログイン画面。ユーザIDとパスワードを入力してログインします。</h2>
+    <h2 class="sr-only">運用管理システムのログイン画面。社員番号とパスワードを入力してログインします。</h2>
     <form id="loginForm" novalidate>
       <div class="brand">
         <span class="badge"><i class="ti ti-settings-cog" aria-hidden="true"></i></span>
@@ -119,8 +121,8 @@
       <div class="divider"></div>
 
       <div class="field">
-        <label for="userid">ユーザID</label>
-        <input type="text" id="userid" placeholder="例: admin001" autocomplete="username">
+        <label for="employeeNumber">社員番号</label>
+        <input type="text" id="employeeNumber" placeholder="例: user001" autocomplete="username">
       </div>
 
       <div class="field">
@@ -131,6 +133,11 @@
         </div>
         <div class="forgot"><a href="password_reset.html">パスワードを忘れた場合</a></div>
       </div>
+
+      <div id="login-error" role="alert"
+           style="display:none; margin:0 0 14px; padding:10px 14px;
+                  border-radius:7px; background:#fbeaea;
+                  border:1px solid #f0c4c4; color:#c64a4a; font-size:13px;"></div>
 
       <button type="submit" class="btn-login"><i class="ti ti-lock"></i>ログイン</button>
 
@@ -158,10 +165,121 @@
     toggle.setAttribute('aria-label', show ? 'パスワードを非表示' : 'パスワードを表示');
   });
 
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
+  // CSRF トークン。ログイン要求のヘッダーに設定して送信する。
+  const csrfToken = document
+      .querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  const loginForm = document.getElementById('loginForm');
+  const loginButton = loginForm.querySelector('.btn-login');
+  const loginError = document.getElementById('login-error');
+  const employeeNumberInput = document.getElementById('employeeNumber');
+
+  function showLoginError(message) {
+    loginError.textContent = message;
+    loginError.style.display = 'block';
+  }
+
+  function hideLoginError() {
+    loginError.style.display = 'none';
+  }
+
+  // 社員番号の入力チェック。問題があればメッセージを返す (問題なければ null)。
+  // 半角のみ許可し、空白 (前後・途中) は許可しない。
+  function validateEmployeeNumber(value) {
+    if (value === '') {
+      return '社員番号を入力してください';
+    }
+    if (/\s/.test(value)) {
+      return '空白は使用できません';
+    }
+    if (!/^[\x21-\x7E]+$/.test(value)) {
+      return '半角で入力してください';
+    }
+    return null;
+  }
+
+  // パスワードの入力チェック。問題があればメッセージを返す (問題なければ null)。
+  // 前後の空白は許可せず、8～20文字であることを必須とする。
+  function validatePassword(value) {
+    if (value === '') {
+      return 'パスワードを入力してください';
+    }
+    if (value !== value.trim()) {
+      return '前後の空白は使用できません';
+    }
+    if (value.length < 8 || value.length > 20) {
+      return 'パスワードは8～20文字で入力してください';
+    }
+    return null;
+  }
+
+  // ★モック運用中★ 社員番号・パスワードのチェックを無効化し、自由にログインできるようにしています。
+  // 入力内容に関わらず、ポータルの権限制御が正しく働くよう管理者(user001)でセッションを確立して遷移します。
+  // 本番化する際は、下の「本番用」ブロックのコメントを解除し、このモック処理を削除してください。
+  loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    // ここで認証APIを呼び出してください。認証成功後に運用管理ポータルへ遷移します。
-    window.location.href = 'operation_management_portal.html';
+    hideLoginError();
+    loginButton.disabled = true;
+
+    // モック：固定の管理者アカウントでログインし、認証結果に関わらずポータルへ遷移する
+    fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({ employeeNumber: 'user001', password: 'password' })
+    })
+      .then(function () {
+        window.location.href = 'operation_management_portal.html';
+      })
+      .catch(function () {
+        window.location.href = 'operation_management_portal.html';
+      });
+
+    /* ===== 本番用：入力チェック＋入力値での認証（モック中は無効化） =====
+    const employeeNumber = employeeNumberInput.value;
+    const password = pw.value;
+
+    const employeeNumberMessage = validateEmployeeNumber(employeeNumber);
+    if (employeeNumberMessage !== null) {
+      showLoginError(employeeNumberMessage);
+      employeeNumberInput.focus();
+      return;
+    }
+    const passwordMessage = validatePassword(password);
+    if (passwordMessage !== null) {
+      showLoginError(passwordMessage);
+      pw.focus();
+      return;
+    }
+
+    loginButton.disabled = true;
+    fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({
+        employeeNumber: employeeNumber,
+        password: password
+      })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          window.location.href = 'operation_management_portal.html';
+          return;
+        }
+        showLoginError(data.message);
+        loginButton.disabled = false;
+      })
+      .catch(() => {
+        showLoginError('通信エラーが発生しました。時間をおいて再度お試しください。');
+        loginButton.disabled = false;
+      });
+    ===== ここまで本番用 ===== */
   });
 </script>
 </body>

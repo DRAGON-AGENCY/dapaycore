@@ -16,8 +16,8 @@ import jakarta.persistence.Table;
 public class Employee {
 
     @Id
-    @Column(name = "user_id")
-    private String userId;
+    @Column(name = "employee_number")
+    private String employeeNumber;
 
     @Column(name = "email")
     private String email;
@@ -55,12 +55,12 @@ public class Employee {
     @Column(name = "update_user_id")
     private String updateUserId;
 
-    public String getUserId() {
-        return userId;
+    public String getEmployeeNumber() {
+        return employeeNumber;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmployeeNumber(String employeeNumber) {
+        this.employeeNumber = employeeNumber;
     }
 
     public String getEmail() {
@@ -162,7 +162,7 @@ public class Employee {
     @Override
     public String toString() {
         return "Employee{"
-                + "userId=" + userId
+                + "employeeNumber=" + employeeNumber
                 + ", email=" + email
                 + ", passwordErrorCount=" + passwordErrorCount
                 + "}";

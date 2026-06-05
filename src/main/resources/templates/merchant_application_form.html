@@ -23,7 +23,7 @@
     --text-ok: #1f8a6d;
     --border: rgba(20,45,80,0.10);
     --border-strong: rgba(20,45,80,0.24);
-    --accent: #1b66b3;
+    --accent: #0b5fd0;
     --accent-strong: #0c447c;
     --accent-line: #3d8ddd;
     --ok: #2aa583;
@@ -103,7 +103,8 @@
 
   /* ---------- stepper ---------- */
   .stepper { display: flex; align-items: flex-start; overflow-x: auto; padding: 2px 0 16px; border-bottom: 0.5px solid var(--border); scrollbar-width: thin; }
-  .stepper .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 66px; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+  .stepper .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 66px; cursor: default; background: none; border: none; font-family: inherit; padding: 0; }
+  .stepper .step:disabled { opacity: 1; }
   .stepper .dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; flex: 0 0 auto; transition: all .2s; }
   .stepper .dot.done { background: var(--ok); color: #fff; }
   .stepper .dot.active { background: var(--accent); color: #fff; box-shadow: 0 0 0 4px rgba(61,141,221,0.22); }
@@ -130,9 +131,9 @@
 
   /* card grouping */
   .card { border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-surface); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; }
-  .card-h { display: flex; align-items: center; gap: 9px; padding: 12px 16px; background: var(--bg-soft-2); border-bottom: 0.5px solid var(--border); font-size: 13px; font-weight: 700; color: var(--text-soft); }
-  .card-h i { font-size: 17px; }
-  .card-h .badge { margin-left: auto; font-size: 11px; font-weight: 500; color: var(--text-tertiary); }
+  .card-h { display: flex; align-items: center; gap: 9px; padding: 13px 16px; background: var(--accent); border-bottom: 0.5px solid transparent; font-size: var(--fs-base); font-weight: 700; color: #ffffff; }
+  .card-h i { font-size: 17px; color: #ffffff; }
+  .card-h .badge { margin-left: auto; font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.85); }
   .card-b { padding: 16px; }
 
   .field { margin-bottom: 15px; }
@@ -140,6 +141,9 @@
   .field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
   .field .help { font-size: 11.5px; font-weight: 400; color: var(--text-tertiary); margin-left: 2px; }
   .req { color: var(--text-danger); font-size: 12px; }
+  /* 必須マーク：ラベルの「*」を赤い「必須」バッジで分かりやすく表示する */
+  span.req { display: inline-flex; align-items: center; vertical-align: middle; font-size: 0; }
+  span.req::before { content: "必須"; font-size: 11px; font-weight: 700; line-height: 1.5; color: #fff; background: #d9685e; padding: 2px 9px; border-radius: 999px; letter-spacing: .06em; }
   .grid2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
   .grid2 .field { margin-bottom: 0; }
   .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
@@ -208,6 +212,22 @@
   .drop.filled .fname { color: var(--text-ok); font-weight: 500; }
   .drop input[type="file"] { display: none; }
 
+  /* 本人確認書類の例 */
+  .idsample-intro { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 12px; }
+  .idsample-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  @media (max-width: 720px) { .idsample-grid { grid-template-columns: 1fr; } }
+  .idsample { display: flex; flex-direction: column; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-surface); }
+  .idsample > h4 { margin: 0; padding: 9px 12px; font-size: 13px; font-weight: 700; color: var(--text-soft); background: var(--bg-soft-2); border-bottom: 0.5px solid var(--border); }
+  .idsample .imgs { display: flex; gap: 10px; padding: 12px; flex-wrap: wrap; }
+  .idsample figure { flex: 1; min-width: 120px; margin: 0; text-align: center; }
+  .idsample figure img { width: 100%; height: auto; border: 0.5px solid var(--border); border-radius: 4px; background: #fff; }
+  .idsample figure svg { width: 100%; height: auto; display: block; }
+  .idsample figure .noimg { display: none; padding: 22px 8px; border: 1px dashed var(--border-strong); border-radius: 4px; color: var(--text-tertiary); font-size: 12px; background: var(--bg-secondary); }
+  .idsample figcaption { font-size: 11px; color: var(--text-tertiary); margin-top: 5px; }
+  .idsample ul { margin: 0; padding: 2px 14px 14px 30px; }
+  .idsample li { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 3px 0; }
+  .idsample-credit { font-size: 11px; color: var(--text-tertiary); line-height: 1.6; margin-top: 12px; }
+
   /* note / banner */
   .note { display: flex; align-items: flex-start; gap: 9px; background: var(--bg-soft); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; margin-top: 4px; }
   .note i { font-size: 18px; color: var(--accent); flex: 0 0 auto; margin-top: 1px; }
@@ -269,6 +289,21 @@
   .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-sm { height: 42px; padding: 0 14px; white-space: nowrap; }
 
+  /* 最終確認: カテゴリ別の確認リスト */
+  .review-edit { margin-left: auto; height: 32px; padding: 0 14px; font-size: 12.5px; }
+  .review-edit i { font-size: 15px; }
+  .rv-list { display: grid; grid-template-columns: minmax(150px, 250px) 1fr; margin: 0; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .rv-list dt { font-size: 12.5px; color: var(--text-secondary); font-weight: 600; padding: 11px 14px; background: var(--bg-soft-2); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; }
+  .rv-list dd { font-size: 13.5px; color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; word-break: break-word; }
+  .rv-list dt:nth-last-of-type(1), .rv-list dd:nth-last-of-type(1) { border-bottom: none; }
+  .rv-list dd.rv-na { color: var(--text-tertiary); }
+  .rv-empty { font-size: 13px; color: var(--text-tertiary); margin: 0; }
+  @media (max-width: 560px) {
+    .rv-list { grid-template-columns: 1fr; }
+    .rv-list dt { border-bottom: none; padding-bottom: 3px; }
+    .rv-list dd { padding-top: 3px; }
+  }
+
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
   @media (max-width: 760px) {
@@ -287,7 +322,7 @@
 </head>
 <body>
 <main class="wrap">
-  <h2 class="sr-only">キャッシュレス決済 加盟店申込の8ステップ入力フォーム。事前確認、取引形態、決済種類、法人情報、口座情報、店舗情報、書類情報、発送申込の順に入力します。</h2>
+  <h2 class="sr-only">キャッシュレス決済 加盟店申込の9ステップ入力フォーム。事前確認、取引形態、決済種類、法人情報、口座情報、店舗情報、書類情報、発送申込、最終確認の順に進みます。</h2>
   <form class="shell" id="wizard" novalidate>
 
     <div class="main">
@@ -297,7 +332,6 @@
           <span class="t">
             申込登録
           </span>
-          <span class="s"><i class="ti ti-cloud-check" aria-hidden="true"></i>下書き保存済み</span>
         </div>
         <nav class="stepper" id="stepper" aria-label="入力ステップ"></nav>
       </div>
@@ -398,11 +432,11 @@
               <h2>取引形態</h2>
               <p class="desc">特定商取引法に該当する取引形態を確認し、事業区分をご入力ください。</p>
             </div>
-            <span class="legend"><span class="req">*</span> 必須</span>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
           </div>
 
           <div class="card">
-            <div class="card-h"><i class="ti ti-gavel" aria-hidden="true"></i>特定商取引法に該当する取引形態 <span class="req" style="font-size:12px;">*</span></div>
+            <div class="card-h"><i class="ti ti-gavel" aria-hidden="true"></i>特定商取引法に該当する取引形態 <span class="req">*</span></div>
             <div class="card-b">
               <div class="opt-grid" id="txGrid">
                 <label class="opt"><input type="checkbox">①訪問販売</label>
@@ -499,7 +533,15 @@
               <h2>法人情報</h2>
               <p class="desc">申込者・代表者・担当者の情報をご入力ください。登記内容・本人確認書類のとおりに入力してください。</p>
             </div>
-            <span class="legend"><span class="req">*</span> 必須</span>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>入力内容は登記簿・本人確認書類と一致している必要があります。相違があると審査に時間がかかります。</p>
+            </div>
           </div>
 
           <!-- 申込者情報 -->
@@ -507,7 +549,7 @@
             <div class="card-h"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>申込者情報</div>
             <div class="card-b">
               <div class="field">
-                <label>法人番号 <span class="req">*</span> <span class="help">13桁。確認で国税庁データから自動取得</span></label>
+                <label>法人番号 <span class="req">*</span></label>
                 <div class="input-row">
                   <input type="text" placeholder="例）1234567890123">
                   <button type="button" class="btn btn-ghost btn-sm" id="houjinLookup"><i class="ti ti-search"></i>確認</button>
@@ -703,7 +745,6 @@
             </div>
           </div>
 
-          <div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>入力内容は登記簿・本人確認書類と一致している必要があります。相違があると審査に時間がかかります。</span></div>
         </section>
 
         <!-- STEP 5: 口座情報 -->
@@ -714,7 +755,15 @@
               <h2>口座情報</h2>
               <p class="desc">売上金の入金先口座をご入力ください。法人名義の口座が原則です。</p>
             </div>
-            <span class="legend"><span class="req">*</span> 必須</span>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>口座名義は通帳の表記どおり（カナ・記号含む）にご入力ください。相違があると入金できません。</p>
+            </div>
           </div>
 
           <div class="card">
@@ -738,7 +787,6 @@
             </div>
           </div>
 
-          <div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>口座名義は通帳の表記どおり（カナ・記号含む）にご入力ください。相違があると入金できません。</span></div>
         </section>
 
         <!-- STEP 6: 店舗情報 -->
@@ -749,7 +797,7 @@
               <h2>店舗情報</h2>
               <p class="desc">決済を導入する店舗ごとの情報をご入力ください。</p>
             </div>
-            <span class="legend"><span class="req">*</span> 必須</span>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
           </div>
 
           <div class="note warn" style="margin-bottom:14px;">
@@ -930,38 +978,191 @@
             </div>
           </div>
 
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">必要書類のご確認</span>
+              <p>各利用決済サービスの申請にあたり、下記の資料のご提出が必要となります。</p>
+
+              <span class="ghead">① 法人・個人事業主共通</span>
+              <p>一覧をご確認のうえ、該当する場合は、営業許可関連書類、本人確認書類のスキャンデータもしくは写真を、JPEG・PDF など画像データでアップロードしてください。</p>
+              <p class="small">※一覧に記載のない許可証につきましても、審査により追加でご提出をお願いする場合がございます。あらかじめご了承ください。</p>
+
+              <span class="ghead">② 個人事業主対象</span>
+              <p>本人確認書類のご提出をお願いします。なお、ご提出いただく資料は現住所が記載された有効期限内のものを、表面・裏面の両方とも JPEG・PDF など画像データでアップロードしてください。</p>
+
+              <span class="ghead">③ 開店前のお申込みで許可書等がご準備できない場合</span>
+              <p>以下のものをご提出ください。ご提出がございませんと、審査を進められない可能性がございます。</p>
+              <ul>
+                <li>ご利用予定の店舗の店舗名・屋号・住所のわかる開業届、店舗図面・設計書（いずれかの書類で可）＋店舗で販売予定の商材の分かる資料（メニュー表など）</li>
+              </ul>
+              <p class="small">※審査の進捗によって、別途、記載のもの以外の資料を追加でご提出いただく可能性がございます。</p>
+
+              <span class="ghead">④ イベント出店でご利用の際、開催前で WEB に情報がない場合</span>
+              <ul>
+                <li>屋号名・法人名などがどの場所に設営するか図示・記載されたイベント会場図面（いずれかの書類で可）、または詳細がわかる資料</li>
+              </ul>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-b">
               <label class="drop">
-                <span class="dico"><i class="ti ti-file-text"></i></span>
-                <span class="meta"><span class="t">登記簿謄本（履歴事項全部証明書） <span class="req">*</span></span><span class="s">発行から3か月以内</span></span>
+                <span class="dico"><i class="ti ti-certificate"></i></span>
+                <span class="meta"><span class="t">営業許可関連書類（許可証）</span><span class="s">① 該当する場合・JPEG／PDF</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-id"></i></span>
+                <span class="meta"><span class="t">本人確認書類（表面） <span class="req">*</span></span><span class="s">　①② 有効期限内・現住所記載のもの</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png">
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-id"></i></span>
-                <span class="meta"><span class="t">代表者の本人確認書類 <span class="req">*</span></span><span class="s">運転免許証・マイナンバーカード等</span></span>
+                <span class="meta"><span class="t">本人確認書類（裏面）</span><span class="s">② 個人事業主は表裏の両方をご提出</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png">
               </label>
               <label class="drop">
-                <span class="dico"><i class="ti ti-certificate"></i></span>
-                <span class="meta"><span class="t">許認可証</span><span class="s">該当業種のみ</span></span>
+                <span class="dico"><i class="ti ti-file-text"></i></span>
+                <span class="meta"><span class="t">開業届・店舗図面・設計書 など</span><span class="s">　③ 開店前で許可証が準備できない場合（いずれか）</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png">
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
               <label class="drop">
-                <span class="dico"><i class="ti ti-photo"></i></span>
-                <span class="meta"><span class="t">店舗の外観・内観写真 <span class="req">*</span></span><span class="s">対面取引の場合</span></span>
+                <span class="dico"><i class="ti ti-clipboard-list"></i></span>
+                <span class="meta"><span class="t">販売予定の商材がわかる資料</span><span class="s">　③ メニュー表など</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".jpg,.jpeg,.png" multiple>
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
               <label class="drop">
-                <span class="dico"><i class="ti ti-notebook"></i></span>
-                <span class="meta"><span class="t">通帳の写し <span class="req">*</span></span><span class="s">口座番号・名義が確認できるページ</span></span>
+                <span class="dico"><i class="ti ti-map"></i></span>
+                <span class="meta"><span class="t">イベント会場図面 など</span><span class="s">　④ イベント出店・開催前で WEB 情報がない場合</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png">
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
+            </div>
+          </div>
+
+          <div class="card idsample-card">
+            <div class="card-h"><i class="ti ti-photo" aria-hidden="true"></i>本人確認書類の例</div>
+            <div class="card-b">
+              <p class="idsample-intro">有効期限内・現住所が記載されたものをご用意ください。記載事項の全体が鮮明に写るように撮影・スキャンしてください。</p>
+              <div class="idsample-grid">
+
+                <div class="idsample">
+                  <h4>運転免許証</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="運転免許証（表面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="14" font-weight="700" fill="#0c447c">運転免許証</text>
+                        <rect x="232" y="52" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="86" r="16" fill="#b7c2d0"/>
+                        <path d="M244 136a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="63" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名</text>
+                        <rect x="20" y="68" width="150" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="93" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="98" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="111" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="135" font-family="sans-serif" font-size="9" fill="#8a97a6">生年月日</text>
+                        <rect x="62" y="127" width="95" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="154" width="284" height="16" rx="3" fill="#fbe9c7"/>
+                        <text x="27" y="166" font-family="sans-serif" font-size="9" fill="#9a7b2a">有効期限</text>
+                      </svg>
+                      <figcaption>表面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>有効期限・公安委員会名・公印が確認できるよう全体を撮影してください。</li>
+                    <li>裏面に記載（変更履歴など）がある場合は、裏面も提出が必要です。</li>
+                  </ul>
+                </div>
+
+                <div class="idsample">
+                  <h4>在留カード</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="在留カードのイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v24H3z" fill="#e9f1fb"/>
+                        <text x="16" y="23" font-family="sans-serif" font-size="13" font-weight="700" fill="#0c447c">在留カード</text>
+                        <text x="16" y="34" font-family="sans-serif" font-size="7" fill="#5a7aa0">RESIDENCE CARD</text>
+                        <rect x="232" y="54" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="88" r="16" fill="#b7c2d0"/>
+                        <path d="M244 138a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="64" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名 / NAME</text>
+                        <rect x="20" y="69" width="160" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="92" font-family="sans-serif" font-size="9" fill="#8a97a6">国籍・地域</text>
+                        <rect x="20" y="97" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="118" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="123" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="146" font-family="sans-serif" font-size="9" fill="#8a97a6">在留資格</text>
+                        <rect x="62" y="138" width="110" height="9" rx="3" fill="#d7dde6"/>
+                        <g><rect x="20" y="158" width="30" height="22" rx="3" fill="#d9b24a"/><rect x="24" y="162" width="22" height="14" rx="2" fill="none" stroke="#b8923a"/><line x1="35" y1="158" x2="35" y2="180" stroke="#b8923a"/><line x1="20" y1="169" x2="50" y2="169" stroke="#b8923a"/></g>
+                      </svg>
+                      <figcaption>表面・裏面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>有効期限内のものをご提出ください。</li>
+                    <li>住所等の記載がある裏面も、表面とあわせて提出が必要です。</li>
+                  </ul>
+                </div>
+
+                <div class="idsample">
+                  <h4>マイナンバーカード</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="マイナンバーカード（表面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="12" font-weight="700" fill="#0c447c">マイナンバーカード</text>
+                        <rect x="232" y="52" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="86" r="16" fill="#b7c2d0"/>
+                        <path d="M244 136a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="63" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名</text>
+                        <rect x="20" y="68" width="150" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="93" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="98" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="111" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="135" font-family="sans-serif" font-size="9" fill="#8a97a6">生年月日</text>
+                        <rect x="62" y="127" width="95" height="9" rx="3" fill="#d7dde6"/>
+                        <g><rect x="20" y="152" width="30" height="22" rx="3" fill="#d9b24a"/><rect x="24" y="156" width="22" height="14" rx="2" fill="none" stroke="#b8923a"/><line x1="35" y1="152" x2="35" y2="174" stroke="#b8923a"/><line x1="20" y1="163" x2="50" y2="163" stroke="#b8923a"/></g>
+                      </svg>
+                      <figcaption>表面</figcaption>
+                    </figure>
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="マイナンバーカード（裏面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="11" font-weight="700" fill="#0c447c">マイナンバーカード（裏面）</text>
+                        <text x="20" y="66" font-family="sans-serif" font-size="9" fill="#8a97a6">個人番号</text>
+                        <rect x="20" y="72" width="184" height="26" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <text x="30" y="91" font-family="sans-serif" font-size="15" letter-spacing="4" fill="#aeb9c6">●●●● ●●●● ●●●●</text>
+                        <text x="20" y="120" font-family="sans-serif" font-size="8" fill="#c0392b">提出時は個人番号を隠してください</text>
+                        <g transform="translate(236,96)">
+                          <rect width="64" height="64" fill="#ffffff" stroke="#cfd6e0"/>
+                          <rect x="6" y="6" width="16" height="16" fill="#1b2733"/><rect x="10" y="10" width="8" height="8" fill="#ffffff"/><rect x="12" y="12" width="4" height="4" fill="#1b2733"/>
+                          <rect x="42" y="6" width="16" height="16" fill="#1b2733"/><rect x="46" y="10" width="8" height="8" fill="#ffffff"/><rect x="48" y="12" width="4" height="4" fill="#1b2733"/>
+                          <rect x="6" y="42" width="16" height="16" fill="#1b2733"/><rect x="10" y="46" width="8" height="8" fill="#ffffff"/><rect x="12" y="48" width="4" height="4" fill="#1b2733"/>
+                          <rect x="28" y="8" width="4" height="4" fill="#1b2733"/><rect x="34" y="14" width="4" height="4" fill="#1b2733"/><rect x="28" y="28" width="4" height="4" fill="#1b2733"/><rect x="40" y="34" width="4" height="4" fill="#1b2733"/><rect x="48" y="40" width="4" height="4" fill="#1b2733"/><rect x="30" y="46" width="4" height="4" fill="#1b2733"/><rect x="40" y="52" width="4" height="4" fill="#1b2733"/><rect x="52" y="50" width="4" height="4" fill="#1b2733"/>
+                        </g>
+                      </svg>
+                      <figcaption>裏面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>顔写真・氏名・住所・生年月日が記載された表面をご提出ください。</li>
+                    <li>裏面の個人番号（マイナンバー）が写らないようご注意ください（提出不要）。</li>
+                  </ul>
+                </div>
+
+              </div>
+              <p class="idsample-credit">※イラストは記載位置を示す見本です。実物の券面とは異なります。</p>
             </div>
           </div>
         </section>
@@ -972,48 +1173,75 @@
             <span class="num">8</span>
             <div class="htext">
               <h2>発送申込</h2>
-              <p class="desc">決済端末の発送先と希望納品日をご入力ください。</p>
+              <p class="desc">決済端末のお届け先・受取人をご入力ください。</p>
             </div>
-            <span class="legend"><span class="req">*</span> 必須</span>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
           </div>
 
           <div class="card">
-            <div class="card-h"><i class="ti ti-device-mobile" aria-hidden="true"></i>端末</div>
+            <div class="card-h"><i class="ti ti-truck-delivery" aria-hidden="true"></i>お届け先</div>
             <div class="card-b">
-              <div class="grid2">
-                <div class="field"><label>端末種別 <span class="req">*</span></label>
-                  <select><option>選択してください</option><option>据置型</option><option>モバイル型</option><option>イベントレンタル</option></select>
+              <div class="addr" data-addr="delivery">
+                <div class="sub-h"><i class="ti ti-map-pin"></i>住所</div>
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input type="text" data-f="zip" placeholder="4500002" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
                 </div>
-                <div class="field"><label>台数 <span class="req">*</span></label><input type="number" placeholder="1" value="1"></div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）名古屋市中村区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）ナゴヤシナカムラク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）名駅"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）メイエキ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="5-23-17"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="5-23-17"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）名駅フォレストビル3F"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）メイエキフォレストビル3カイ"></div>
+                </div>
+
+                <div class="sub-h"><i class="ti ti-phone"></i>電話番号</div>
+                <div class="field">
+                  <label>電話番号 <span class="req">*</span></label>
+                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="052-569-5230"></div>
+                </div>
+
+                <div class="sub-h"><i class="ti ti-user"></i>受取人</div>
+                <div class="field">
+                  <label>受取人 <span class="req">*</span></label>
+                  <input type="text" data-f="receiver" placeholder="例）青山 浩子" style="max-width:280px;">
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-h"><i class="ti ti-truck-delivery" aria-hidden="true"></i>発送先・納品</div>
-            <div class="card-b">
-              <div class="field">
-                <label>発送先 <span class="req">*</span></label>
-                <div class="seg" data-single>
-                  <label class="opt"><input type="radio" name="shipto">店舗</label>
-                  <label class="opt"><input type="radio" name="shipto">本社</label>
-                  <label class="opt"><input type="radio" name="shipto">その他</label>
-                </div>
-              </div>
-              <div class="field" style="margin-top:15px;">
-                <label>発送先住所 <span class="req">*</span></label>
-                <div class="input-row" style="margin-bottom:8px;">
-                  <input type="text" placeholder="郵便番号" style="max-width:160px;">
-                  <button type="button" class="btn btn-ghost btn-sm"><i class="ti ti-map-pin"></i>住所を自動入力</button>
-                </div>
-                <input type="text" placeholder="都道府県市区町村・番地・建物名">
-              </div>
-              <div class="grid2" style="margin-top:15px;">
-                <div class="field"><label>希望納品日 <span class="req">*</span></label><input type="date"></div>
-                <div class="field"><label>受取担当者 <span class="req">*</span></label><input type="text" placeholder="担当 花子"></div>
-              </div>
+          <div class="note"><i class="ti ti-circle-check" aria-hidden="true"></i><span>「最終確認」を押すと、入力内容の確認画面へ進みます。</span></div>
+        </section>
+
+        <!-- STEP 9: 最終確認 -->
+        <section class="panel" data-step="8">
+          <div class="step-head">
+            <span class="num">9</span>
+            <div class="htext">
+              <h2>最終確認</h2>
+              <p class="desc">入力・選択した内容をカテゴリごとに確認できます。修正する場合は各カテゴリの「修正」を押してください。</p>
             </div>
           </div>
+
+          <div id="reviewArea"></div>
 
           <div class="note"><i class="ti ti-circle-check" aria-hidden="true"></i><span>「登録する」を押すと申請内容が確定し、審査・発送手続きが開始されます。</span></div>
         </section>
@@ -1031,15 +1259,19 @@
 </main>
 
 <script>
-  const steps = ["事前確認", "取引形態", "決済種類", "法人情報", "口座情報", "店舗情報", "書類情報", "発送申込"];
+  const steps = ["事前確認", "取引形態", "決済種類", "法人情報", "口座情報", "店舗情報", "書類情報", "発送申込", "最終確認"];
   const total = steps.length;
   let current = 0;
+  // 最終確認画面の「修正」から各ステップへ移動したかどうか。
+  // true のときに「戻る」を押すと最終確認画面へ戻す。
+  let cameFromReview = false;
 
   const stepperEl = document.getElementById('stepper');
   const panels = Array.from(document.querySelectorAll('.panel'));
   const backBtn = document.getElementById('back');
   const nextBtn = document.getElementById('next');
   const progEl = document.getElementById('prog');
+  const reviewArea = document.getElementById('reviewArea');
 
   function buildStepper() {
     stepperEl.innerHTML = '';
@@ -1060,7 +1292,9 @@
 
       step.appendChild(dot);
       step.appendChild(txt);
-      step.addEventListener('click', () => goTo(i));
+      // ステッパーのページ名クリックによる遷移は廃止（表示のみ）。
+      // 遷移は「次へ進む」「戻る」、最終確認の「修正」からのみ行う。
+      step.disabled = true;
       stepperEl.appendChild(step);
 
       if (i < steps.length - 1) {
@@ -1073,8 +1307,24 @@
 
   function render() {
     panels.forEach(p => p.classList.toggle('show', Number(p.dataset.step) === current));
-    backBtn.disabled = current === 0;
-    nextBtn.innerHTML = current === total - 1 ? '<i class="ti ti-check"></i>登録する' : '次へ進む<i class="ti ti-arrow-right"></i>';
+    // 事前確認(先頭)では通常「戻る」を非表示にする。ただし最終確認の
+    // 「修正」から来た場合は表示し、押下で最終確認画面へ戻れるようにする
+    if (current === 0 && !cameFromReview) {
+      backBtn.style.display = 'none';
+    } else {
+      backBtn.style.display = '';
+      backBtn.disabled = false;
+    }
+    if (current === total - 1) {
+      nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+    } else if (current === total - 2) {
+      // 発送申込 の次は最終確認画面へ進む
+      nextBtn.innerHTML = '最終確認<i class="ti ti-arrow-right"></i>';
+    } else {
+      nextBtn.innerHTML = '次へ進む<i class="ti ti-arrow-right"></i>';
+    }
+    // 最終確認ステップを表示する直前に、入力内容の確認リストを組み立てる
+    if (current === total - 1) buildReview();
     progEl.textContent = 'ステップ ' + (current + 1) + ' / ' + total + '：' + steps[current];
     buildStepper();
     document.querySelector('.panel-area').scrollTop = 0;
@@ -1087,7 +1337,179 @@
     render();
   }
 
-  backBtn.addEventListener('click', () => goTo(current - 1));
+  backBtn.addEventListener('click', () => {
+    if (cameFromReview) {
+      // 最終確認の「修正」から来た場合は、最終確認画面へ戻す
+      cameFromReview = false;
+      goTo(total - 1);
+    } else {
+      goTo(current - 1);
+    }
+  });
+
+  // ---- 最終確認: 各カテゴリ (ステップ) の入力・選択内容を収集する ----
+
+  // 項目ラベルを取得する (必須マークや補足を含む表示テキスト)
+  function reviewLabelText(field) {
+    const label = field.querySelector(':scope > label');
+    if (!label) return '';
+    return label.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // 単一入力欄 (テキスト・選択など) の値を取得する。該当しなければ null
+  function reviewFieldValue(field) {
+    const select = field.querySelector('select');
+    if (select) {
+      const opt = select.options[select.selectedIndex];
+      return opt ? opt.text.trim() : '';
+    }
+    const input = field.querySelector(
+        'input[type="text"], input[type="tel"], input[type="email"],'
+        + ' input[type="number"], input[type="date"]');
+    if (input) return input.value.trim();
+    const textarea = field.querySelector('textarea');
+    if (textarea) return textarea.value.trim();
+    return null;
+  }
+
+  // 1 つのパネル (カテゴリ) から確認用の「ラベル: 値」の一覧を作る。
+  // showAllItems が true のカテゴリ (事前確認・取引形態・決済種類) では、
+  // チェック・選択されていない項目も「未選択／未確認」として表示する。
+  function collectPanelValues(panel, showAllItems) {
+    const rows = [];
+    // 単一入力項目 (テキスト・選択)。未入力は「未入力」として表示する
+    panel.querySelectorAll('.field').forEach(field => {
+      const value = reviewFieldValue(field);
+      if (value === null) return;
+      rows.push({
+        label: reviewLabelText(field),
+        value: value === '' ? '未入力' : value,
+        na: value === ''
+      });
+    });
+
+    if (showAllItems) {
+      // 選択肢 (チェックボックス・ラジオ) を未選択も含めて全件表示
+      panel.querySelectorAll('.opt').forEach(opt => {
+        const input = opt.querySelector(
+            'input[type="checkbox"], input[type="radio"]');
+        if (!input) return;
+        rows.push({
+          label: opt.textContent.replace(/\s+/g, ' ').trim(),
+          value: input.checked ? '選択' : '未選択',
+          na: !input.checked
+        });
+      });
+      // 同意・確認 (規約等) を未確認も含めて全件表示。各項目は必須扱い
+      panel.querySelectorAll('.a-row').forEach(row => {
+        const input = row.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        const name = row.querySelector('.aname');
+        rows.push({
+          label: name ? name.textContent.trim() : '確認事項',
+          value: input.checked ? '確認済み' : '未確認',
+          na: !input.checked
+        });
+      });
+      panel.querySelectorAll('.attest').forEach(att => {
+        const input = att.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        rows.push({
+          label: '権限者による確認',
+          value: input.checked ? '確認済み' : '未確認',
+          na: !input.checked
+        });
+      });
+    } else {
+      // その他のカテゴリ：チェックされた項目のみ集約して表示
+      const selectedOptions = [];
+      panel.querySelectorAll('.opt input:checked').forEach(input => {
+        const opt = input.closest('.opt');
+        if (opt) {
+          selectedOptions.push(opt.textContent.replace(/\s+/g, ' ').trim());
+        }
+      });
+      if (selectedOptions.length) {
+        rows.push({ label: '選択項目', value: selectedOptions.join('、') });
+      }
+      const agreed = [];
+      panel.querySelectorAll(
+          '.a-row input[type="checkbox"]:checked, .attest input:checked'
+      ).forEach(input => {
+        const row = input.closest('.a-row');
+        const name = row ? row.querySelector('.aname') : null;
+        agreed.push(name ? name.textContent.trim() : '確認済み');
+      });
+      if (agreed.length) {
+        rows.push({ label: '同意・確認', value: agreed.join('、') });
+      }
+    }
+
+    // 添付ファイル (共通)
+    panel.querySelectorAll('.drop').forEach(drop => {
+      const fileInput = drop.querySelector('input[type="file"]');
+      const title = drop.querySelector('.meta .t');
+      const label = title ? title.textContent.trim() : '書類';
+      let value = '未選択';
+      if (fileInput && fileInput.files && fileInput.files.length) {
+        value = fileInput.files.length > 1
+            ? fileInput.files.length + ' 件選択' : fileInput.files[0].name;
+      }
+      rows.push({ label: label, value: value, na: value === '未選択' });
+    });
+    return rows;
+  }
+
+  // 最終確認パネルへ、カテゴリ別カード (修正ボタン付き) を組み立てる
+  function buildReview() {
+    if (!reviewArea) return;
+    reviewArea.innerHTML = '';
+    // 最終確認 (最後のステップ) 自身は除外して、各カテゴリを並べる
+    for (let i = 0; i < total - 1; i++) {
+      const panel = panels.find(p => Number(p.dataset.step) === i);
+      if (!panel) continue;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const head = document.createElement('div');
+      head.className = 'card-h';
+      head.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i>'
+          + '<span>' + (i + 1) + '. ' + steps[i] + '</span>';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'btn btn-ghost btn-sm review-edit';
+      editBtn.innerHTML = '<i class="ti ti-edit"></i>修正';
+      // 修正後に「戻る」で最終確認画面へ戻れるようにフラグを立てる
+      editBtn.addEventListener('click', () => { cameFromReview = true; goTo(i); });
+      head.appendChild(editBtn);
+
+      const body = document.createElement('div');
+      body.className = 'card-b';
+      // 事前確認(0)・取引形態(1)・決済種類(2) は未設定項目も表示する
+      const rows = collectPanelValues(panel, i <= 2);
+      if (!rows.length) {
+        body.innerHTML = '<p class="rv-empty">入力・選択された項目はありません。</p>';
+      } else {
+        const dl = document.createElement('dl');
+        dl.className = 'rv-list';
+        rows.forEach(r => {
+          const dt = document.createElement('dt');
+          dt.textContent = r.label || '—';
+          const dd = document.createElement('dd');
+          dd.textContent = r.value;
+          if (r.na) dd.classList.add('rv-na');
+          dl.appendChild(dt);
+          dl.appendChild(dd);
+        });
+        body.appendChild(dl);
+      }
+
+      card.appendChild(head);
+      card.appendChild(body);
+      reviewArea.appendChild(card);
+    }
+  }
 
   // 取引形態：「①〜⑥に該当しない」と①〜⑥の排他
   const txNone = document.getElementById('txNone');
@@ -1110,6 +1532,8 @@
   document.getElementById('wizard').addEventListener('submit', (e) => {
     e.preventDefault();
     if (current < total - 1) {
+      // 通常の前進操作のため、最終確認からの修正フラグは解除する
+      cameFromReview = false;
       goTo(current + 1);
     } else {
       // ここで全ステップの入力値を収集し、登録APIへ送信してください。

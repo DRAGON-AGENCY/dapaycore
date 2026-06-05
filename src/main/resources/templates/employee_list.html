@@ -16,24 +16,24 @@
 </noscript>
 <style>
   :root {
-    /* === 色トークン (他画面と統一) === */
-    --bg-page: #ffffff;
+    /* === 色トークン (申込登録画面に合わせた青系) === */
+    --bg-page: #eef2f7;
     --bg-card: #ffffff;
-    --bg-search: #eef3fa;
-    --bg-label: #ede8db;
-    --bg-label-soft: #f5f2eb;
+    --bg-search: #f3f7fc;
+    --bg-soft: #e9f1fb;
     --bg-white: #ffffff;
-    --bg-hover: #faf8f2;
-    --border-color: #e8e4da;
-    --border-input: #d8d4c8;
-    --border-table: #e5e2d8;
-    --text-main: #2a2a2a;
-    --text-sub: #4a4a4a;
-    --text-muted: #8a8a8a;
-    --text-label: #5a5a5a;
-    --text-subtle: #9a9a9a;
-    --accent-blue: #3a6db5;
-    --accent-blue-light: #e3edfb;
+    --bg-hover: #f4f6fa;
+    --border-color: rgba(20, 45, 80, 0.10);
+    --border-input: rgba(20, 45, 80, 0.24);
+    --border-table: rgba(20, 45, 80, 0.10);
+    --text-main: #1b2733;
+    --text-sub: #5a6675;
+    --text-muted: #93a0af;
+    --text-label: #5a6675;
+    --text-subtle: #93a0af;
+    --text-soft: #0c447c;
+    --accent-blue: #0b5fd0;
+    --accent-blue-light: #e9f1fb;
     --accent-blue-border: #b9d0ec;
 
     /* === フォントトークン === */
@@ -101,13 +101,13 @@
   }
 
   body::-webkit-scrollbar-thumb {
-    background: #c9c4b4;
+    background: #b7c2d0;
     border: 3px solid var(--bg-page);
     border-radius: 8px;
   }
 
   body::-webkit-scrollbar-thumb:hover {
-    background: #aea892;
+    background: #9aa7b8;
   }
 
   /* ヘッダー */
@@ -134,7 +134,7 @@
 
   .btn-back:hover {
     background-color: var(--bg-hover);
-    border-color: #c4bfae;
+    border-color: var(--border-input);
   }
 
   .page-title {
@@ -150,7 +150,7 @@
   /* 検索エリア */
   .search-box {
     background-color: var(--bg-search);
-    border: 1px solid #dde5f0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px 18px;
     margin-bottom: 14px;
@@ -163,6 +163,31 @@
     color: var(--text-label);
     margin-bottom: 8px;
     letter-spacing: 0.03em;
+  }
+
+  /* 絞込み対象 (社員番号・社員名) のチェックボックス行 */
+  .search-targets {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 10px;
+  }
+
+  .search-targets .check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-xs);
+    color: var(--text-sub);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .search-targets .check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
   }
 
   .search-row {
@@ -186,7 +211,7 @@
   .search-input:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px rgba(58, 109, 181, 0.15);
+    box-shadow: 0 0 0 2px rgba(27, 102, 179, 0.15);
   }
 
   .btn {
@@ -222,23 +247,18 @@
     background-color: var(--bg-hover);
   }
 
-  /* 新規登録ツールバー */
-  .toolbar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-  }
-
+  /* 新規登録ボタン (絞込み UI の右端に配置するプライマリボタン) */
   .btn-new {
-    background-color: #faeeda;
-    border: 1px solid #ecd9b0;
-    color: #8a5a1a;
+    margin-left: auto;
+    background-color: var(--accent-blue);
+    border: 1px solid var(--accent-blue);
+    color: #ffffff;
     font-weight: 600;
   }
 
   .btn-new:hover {
-    background-color: #f3e2c4;
-    border-color: #c08a3e;
+    background-color: var(--text-soft);
+    border-color: var(--text-soft);
   }
 
   /* 結果ヘッダー */
@@ -288,7 +308,7 @@
   .per-page-select:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px rgba(58, 109, 181, 0.15);
+    box-shadow: 0 0 0 2px rgba(27, 102, 179, 0.15);
   }
 
   /* ページネーション */
@@ -325,7 +345,7 @@
 
   .page-btn:hover:not(:disabled):not(.is-active) {
     background-color: var(--bg-hover);
-    border-color: #c4bfae;
+    border-color: var(--border-input);
   }
 
   .page-btn:disabled {
@@ -363,7 +383,7 @@
 
   .data-scroll {
     overflow-y: auto;
-    /* テーブルが幅にあふれたときは横スクロールで全列 (FAX まで) 表示する */
+    /* テーブルが幅にあふれたときは横スクロールで全列を表示する */
     overflow-x: auto;
     max-height: 560px;
   }
@@ -379,44 +399,43 @@
   }
 
   .data-scroll::-webkit-scrollbar-thumb {
-    background: #c9c4b4;
+    background: #b7c2d0;
     border: 3px solid var(--bg-page);
     border-radius: 8px;
   }
 
   .data-scroll::-webkit-scrollbar-thumb:hover {
-    background: #aea892;
+    background: #9aa7b8;
   }
 
   .data-table {
     width: 100%;
     /* 画面が狭くても各列が読める最小幅を確保し、 */
     /* これ以下では .data-scroll の横スクロールで全列を表示する */
-    min-width: 920px;
+    min-width: 720px;
     border-collapse: collapse;
     table-layout: fixed;
   }
 
   /* 列幅は比率指定にして画面幅に合わせて自動調整する (合計100%) */
-  .data-table col.c-email { width: 22%; }
-  .data-table col.c-name { width: 17%; }
-  .data-table col.c-kana { width: 20%; }
-  .data-table col.c-dept { width: 14%; }
-  .data-table col.c-tel { width: 14%; }
-  .data-table col.c-fax { width: 13%; }
+  .data-table col.c-number { width: 16%; }
+  .data-table col.c-name { width: 22%; }
+  .data-table col.c-kana { width: 26%; }
+  .data-table col.c-dept { width: 18%; }
+  .data-table col.c-tel { width: 18%; }
 
   .data-table thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: #FAEEDA;
-    color: var(--text-label);
-    font-weight: 600;
+    background-color: var(--accent-blue);
+    color: #ffffff;
+    font-weight: 700;
     font-size: var(--fs-sm);
     text-align: left;
     padding: 10px 16px;
-    border-bottom: 1px solid var(--border-table);
-    border-right: 1px solid var(--border-table);
+    border-bottom: 1px solid var(--accent-blue);
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
     white-space: nowrap;
     letter-spacing: 0.02em;
   }
@@ -443,18 +462,13 @@
     border-right: none;
   }
 
-  /* 部署列 (4列目) と電話番号列の間の縦線を消す */
-  .data-table thead th:nth-child(4),
-  .data-table tbody td:nth-child(4) {
-    border-right: none;
-  }
-
   .data-table tbody tr:last-child td {
     border-bottom: none;
   }
 
-  .data-table tbody td.email {
+  .data-table tbody td.number {
     font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 
   .data-table tbody td.name {
@@ -465,15 +479,9 @@
     color: var(--text-sub);
   }
 
-  .data-table tbody td.tel,
-  .data-table tbody td.fax {
+  .data-table tbody td.tel {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-  }
-
-  .data-table tbody td.fax.empty {
-    color: var(--text-subtle);
-    font-family: var(--font-jp);
   }
 
   .data-table tbody tr.data-row:hover td {
@@ -513,25 +521,31 @@
       権限がありません。
     </div>
 
-    <!-- 新規登録 (管理者のみ表示) -->
-    <div class="toolbar">
-      <button class="btn btn-new" type="button" id="new-employee-btn"
-              th:if="${authorityCode == '01'}">
-        <span>＋</span>
-        <span>新規登録</span>
-      </button>
-    </div>
-
-    <!-- 検索エリア -->
+    <!-- 検索エリア (社員番号・社員名で絞込み。新規登録は絞込み UI の右端に配置) -->
     <div class="search-box">
-      <label class="search-label" for="employee-kana">社員名カナ</label>
+      <div class="search-targets">
+        <span class="search-label" style="margin-bottom:0;">絞込み対象</span>
+        <label class="check">
+          <input type="checkbox" id="target-number" checked /> 社員番号
+        </label>
+        <label class="check">
+          <input type="checkbox" id="target-name" /> 社員名
+        </label>
+      </div>
       <div class="search-row">
-        <input type="text" id="employee-kana" class="search-input" placeholder="社員名カナを入力" />
+        <input type="text" id="search-keyword" class="search-input"
+               placeholder="社員番号で絞込み" />
         <button class="btn btn-search" type="button">
           <span>🔍</span>
           <span>絞込み</span>
         </button>
         <button class="btn btn-clear" type="button">クリア</button>
+        <!-- 新規登録 (管理者のみ表示)。社員管理画面 (新規モード) で登録する -->
+        <button class="btn btn-new" type="button" id="new-employee-btn"
+                th:if="${authorityCode == '01'}">
+          <span>＋</span>
+          <span>新規登録</span>
+        </button>
       </div>
     </div>
 
@@ -555,36 +569,34 @@
       <div class="data-scroll">
         <table class="data-table">
           <colgroup>
-            <col class="c-email">
+            <col class="c-number">
             <col class="c-name">
             <col class="c-kana">
             <col class="c-dept">
             <col class="c-tel">
-            <col class="c-fax">
           </colgroup>
           <thead>
             <tr>
-              <th>メールアドレス</th>
+              <th>社員番号</th>
               <th>社員名</th>
               <th>社員名 (カナ)</th>
               <th>部署</th>
               <th>電話番号</th>
-              <th>FAX</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="data-row" th:each="employee : ${employees}">
-              <td class="email" th:text="${employee.email}"></td>
+            <!-- 行クリックでの編集遷移にメールアドレスを使うため data 属性で保持する -->
+            <tr class="data-row" th:each="employee : ${employees}"
+                th:data-email="${employee.email}">
+              <td class="number" th:text="${employee.employeeNumber}"></td>
               <td class="name" th:text="${employee.employeeName}"></td>
               <td class="kana" th:text="${employee.employeeNameKana}"></td>
               <td th:text="${employee.department}"></td>
               <td class="tel" th:text="${employee.phoneNumber}"></td>
-              <td th:class="${#strings.isEmpty(employee.faxNumber) ? 'fax empty' : 'fax'}"
-                  th:text="${#strings.isEmpty(employee.faxNumber) ? '—' : employee.faxNumber}"></td>
             </tr>
             <!-- 絞込み結果が0件のときに表示する空状態の行 -->
             <tr id="empty-row" class="empty-row" style="display:none;">
-              <td class="empty-cell" colspan="6">該当する社員がいません。</td>
+              <td class="empty-cell" colspan="5">該当する社員がいません。</td>
             </tr>
           </tbody>
         </table>
@@ -628,20 +640,21 @@
           return;
         }
         permissionError.style.display = 'none';
-        var emailCell = row.querySelector('td.email');
-        var email = emailCell ? emailCell.textContent.trim() : '';
+        var email = row.getAttribute('data-email') || '';
         window.location.href =
             '/employee_edit.html?email=' + encodeURIComponent(email);
       });
     });
 
-    // 絞込み (社員名カナ) とページネーション
+    // 絞込み (社員番号・社員名) とページネーション
     (function () {
       var allRows = Array.prototype.slice.call(
         document.querySelectorAll('.data-table tbody tr.data-row')
       );
       var filteredRows = allRows.slice();
-      var kanaInput = document.getElementById('employee-kana');
+      var keywordInput = document.getElementById('search-keyword');
+      var targetNumberCheckbox = document.getElementById('target-number');
+      var targetNameCheckbox = document.getElementById('target-name');
       var searchButton = document.querySelector('.btn-search');
       var clearButton = document.querySelector('.btn-clear');
       var emptyRow = document.getElementById('empty-row');
@@ -655,17 +668,13 @@
       var perPage = parseInt(perPageSelect.value, 10);
       var currentPage = 1;
 
-      // 検索文字列・カナを比較用に正規化する。
-      // 前後・途中の空白を除去し、ひらがなをカタカナに統一することで、
-      // ひらがな入力でもカタカナの社員名カナに一致するようにする
-      function normalizeKana(text) {
+      // 比較用に正規化する。前後・途中の空白を除去し、英字は小文字へ
+      // そろえることで、大文字小文字や空白の差を無視して部分一致できる。
+      function normalize(text) {
         if (!text) {
           return '';
         }
-        var normalized = text.replace(/[\s　]+/g, '');
-        return normalized.replace(/[ぁ-ゖ]/g, function (character) {
-          return String.fromCharCode(character.charCodeAt(0) + 0x60);
-        });
+        return text.replace(/[\s　]+/g, '').toLowerCase();
       }
 
       // 総ページ数 (最低1ページ)
@@ -773,42 +782,92 @@
         render();
       });
 
-      // 入力された社員名カナで一覧を絞り込み、1ページ目から再表示する。
-      // 部分一致 (入力がカナのどこかに含まれる) で判定する
+      // 選択された対象 (社員番号・社員名) でキーワードの部分一致絞込みを行い、
+      // 1ページ目から再表示する。どちらも未選択の場合は両方を対象とする。
       function applyFilter() {
-        var query = normalizeKana(kanaInput.value);
+        var query = normalize(keywordInput.value);
+        var byNumber = targetNumberCheckbox.checked;
+        var byName = targetNameCheckbox.checked;
+        if (!byNumber && !byName) {
+          byNumber = true;
+          byName = true;
+        }
         if (query === '') {
           filteredRows = allRows.slice();
         } else {
           filteredRows = allRows.filter(function (row) {
-            var kanaCell = row.querySelector('td.kana');
-            var kana = kanaCell ? normalizeKana(kanaCell.textContent) : '';
-            return kana.indexOf(query) !== -1;
+            if (byNumber) {
+              var numberCell = row.querySelector('td.number');
+              var number =
+                  numberCell ? normalize(numberCell.textContent) : '';
+              if (number.indexOf(query) !== -1) {
+                return true;
+              }
+            }
+            if (byName) {
+              var nameCell = row.querySelector('td.name');
+              var name = nameCell ? normalize(nameCell.textContent) : '';
+              if (name.indexOf(query) !== -1) {
+                return true;
+              }
+            }
+            return false;
           });
         }
         currentPage = 1;
         render();
       }
 
-      // 絞込みを解除し、入力を消して全件を1ページ目から再表示する
+      // 絞込みを解除し、入力と対象選択を初期状態 (社員番号) へ戻して再表示する
       function clearFilter() {
-        kanaInput.value = '';
+        keywordInput.value = '';
+        targetNumberCheckbox.checked = true;
+        targetNameCheckbox.checked = false;
+        updateKeywordPlaceholder();
         filteredRows = allRows.slice();
         currentPage = 1;
         render();
       }
 
+      // 選択中の対象に合わせて入力欄のプレースホルダを切り替える
+      function updateKeywordPlaceholder() {
+        keywordInput.placeholder =
+            targetNameCheckbox.checked ? '社員名で絞込み' : '社員番号で絞込み';
+      }
+
+      // 社員番号・社員名はどちらか一方のみ選択可能。一方を選択すると
+      // もう一方を解除し、最低1つは選択を維持する (ラジオ的な動作)。
+      function selectSingleTarget(selected, other) {
+        if (selected.checked) {
+          other.checked = false;
+        } else {
+          selected.checked = true;
+        }
+        updateKeywordPlaceholder();
+        applyFilter();
+      }
+
       searchButton.addEventListener('click', applyFilter);
       clearButton.addEventListener('click', clearFilter);
 
+      // 対象チェックボックスは一方のみ選択とし、切替時に即座に絞込みを反映する
+      targetNumberCheckbox.addEventListener('change', function () {
+        selectSingleTarget(targetNumberCheckbox, targetNameCheckbox);
+      });
+      targetNameCheckbox.addEventListener('change', function () {
+        selectSingleTarget(targetNameCheckbox, targetNumberCheckbox);
+      });
+
       // 入力欄で Enter キーを押したときも絞込みを実行する
-      kanaInput.addEventListener('keydown', function (event) {
+      keywordInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
           event.preventDefault();
           applyFilter();
         }
       });
 
+      // 初期表示時のプレースホルダを選択状態に合わせる
+      updateKeywordPlaceholder();
       render();
     })();
   </script>
