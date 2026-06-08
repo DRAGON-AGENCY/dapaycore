@@ -136,6 +136,32 @@
   .card-h .badge { margin-left: auto; font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.85); }
   .card-b { padding: 16px; }
 
+  /* 発送申込：注文商品（mPOS端末）の単価・数量・小計 */
+  .product { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .product .pimg { flex: 0 0 auto; width: 132px; height: 132px; border-radius: var(--radius-md); background: var(--bg-soft); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; padding: 12px; }
+  .product .pimg svg { width: 100%; height: 100%; }
+  .product .pinfo { flex: 1 1 240px; min-width: 220px; }
+  .product .pname { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
+  .product .pdesc { font-size: var(--fs-xs); color: var(--text-tertiary); margin: 0 0 12px; }
+  .product .price-row { display: flex; align-items: baseline; gap: 6px; }
+  .product .price-row .label { font-size: var(--fs-xs); color: var(--text-secondary); }
+  .product .price-row .price { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); }
+  .product .price-row .yen { font-size: var(--fs-sm); font-weight: 700; color: var(--accent-strong); }
+  .qty-box { flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; }
+  .qty-box > label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .qty-ctrl { display: inline-flex; align-items: center; }
+  .qty-ctrl button { width: 44px; height: 44px; border: 1px solid var(--border-strong); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .qty-ctrl button i { font-size: 18px; }
+  .qty-ctrl button:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+  .qty-ctrl button:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .qty-ctrl button:hover { background: var(--bg-soft); color: var(--accent); }
+  .qty-ctrl input { width: 64px; height: 44px; text-align: center; border-left: none; border-right: none; border-radius: 0; }
+  .subtotal { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--bg-soft); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+  .subtotal .calc { font-size: var(--fs-xs); color: var(--text-tertiary); }
+  .subtotal .stitle { font-size: var(--fs-sm); font-weight: 700; color: var(--text-secondary); }
+  .subtotal .samount { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); }
+  .subtotal .samount .yen { font-size: var(--fs-sm); margin-left: 2px; }
+
   .field { margin-bottom: 15px; }
   .field:last-child { margin-bottom: 0; }
   .field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
@@ -279,7 +305,7 @@
   /* footer actions (sticky) */
   .actions { position: sticky; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 14px 28px; border-top: 0.5px solid var(--border); background: var(--bg-surface); }
   .actions .prog { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
-  .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
+  .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
   .btn i { font-size: 17px; }
   .btn-primary { background: var(--accent); color: #fff; }
@@ -290,8 +316,9 @@
   .btn-sm { height: 42px; padding: 0 14px; white-space: nowrap; }
 
   /* 最終確認: カテゴリ別の確認リスト */
-  .review-edit { margin-left: auto; height: 32px; padding: 0 14px; font-size: 12.5px; }
-  .review-edit i { font-size: 15px; }
+  .review-edit { margin-left: auto; height: 32px; padding: 0 14px; font-size: 12.5px; color: #fff; border-color: rgba(255,255,255,0.55); }
+  .review-edit:hover { color: #fff; background: rgba(255,255,255,0.16); }
+  .review-edit i { font-size: 15px; color: #fff; }
   .rv-list { display: grid; grid-template-columns: minmax(150px, 250px) 1fr; margin: 0; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
   .rv-list dt { font-size: 12.5px; color: var(--text-secondary); font-weight: 600; padding: 11px 14px; background: var(--bg-soft-2); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; }
   .rv-list dd { font-size: 13.5px; color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; word-break: break-word; }
@@ -332,6 +359,9 @@
           <span class="t">
             申込登録
           </span>
+          <a class="btn btn-ghost btn-sm" href="login.html">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i>戻る
+          </a>
         </div>
         <nav class="stepper" id="stepper" aria-label="入力ステップ"></nav>
       </div>
@@ -1179,6 +1209,50 @@
           </div>
 
           <div class="card">
+            <div class="card-h"><i class="ti ti-device-mobile" aria-hidden="true"></i>ご注文内容</div>
+            <div class="card-b">
+              <div class="product">
+                <div class="pimg" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="26" y="6" width="48" height="80" rx="8" fill="#0c447c"/>
+                    <rect x="31" y="13" width="38" height="46" rx="3" fill="#eaf2fb"/>
+                    <rect x="35" y="18" width="30" height="6" rx="2" fill="#9cc6f2"/>
+                    <rect x="35" y="28" width="20" height="4" rx="2" fill="#c2d8f0"/>
+                    <circle cx="37" cy="68" r="4" fill="#9cc6f2"/>
+                    <circle cx="50" cy="68" r="4" fill="#9cc6f2"/>
+                    <circle cx="63" cy="68" r="4" fill="#9cc6f2"/>
+                    <circle cx="37" cy="78" r="4" fill="#9cc6f2"/>
+                    <circle cx="50" cy="78" r="4" fill="#9cc6f2"/>
+                    <circle cx="63" cy="78" r="4" fill="#9cc6f2"/>
+                    <rect x="40" y="90" width="20" height="6" rx="3" fill="#1b66b3"/>
+                  </svg>
+                </div>
+                <div class="pinfo">
+                  <p class="pname">mPOS 決済端末</p>
+                  <p class="pdesc">キャッシュレス決済対応のモバイル決済端末（1台あたり）</p>
+                  <div class="price-row">
+                    <span class="label">単価</span>
+                    <span class="price" id="unitPrice" data-price="15400">15,400</span><span class="yen">円</span>
+                  </div>
+                </div>
+                <div class="qty-box">
+                  <label for="qty">数量</label>
+                  <div class="qty-ctrl">
+                    <button type="button" id="qtyMinus" aria-label="数量を減らす"><i class="ti ti-minus" aria-hidden="true"></i></button>
+                    <input type="number" id="qty" data-f="qty" value="1" min="1" max="99" inputmode="numeric">
+                    <button type="button" id="qtyPlus" aria-label="数量を増やす"><i class="ti ti-plus" aria-hidden="true"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="subtotal">
+                <span class="stitle">合計</span>
+                <span class="calc" id="calcText">15,400円 × 1台</span>
+                <span class="samount"><span id="totalAmount">15,400</span><span class="yen">円</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
             <div class="card-h"><i class="ti ti-truck-delivery" aria-hidden="true"></i>お届け先</div>
             <div class="card-b">
               <div class="addr" data-addr="delivery">
@@ -1186,7 +1260,7 @@
                 <div class="field">
                   <label>郵便番号 <span class="req">*</span></label>
                   <div class="input-row">
-                    <input type="text" data-f="zip" placeholder="4500002" style="max-width:180px;">
+                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
                     <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
                   </div>
                 </div>
@@ -1197,32 +1271,32 @@
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）名古屋市中村区"></div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）ナゴヤシナカムラク"></div>
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）名駅"></div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）メイエキ"></div>
+                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="5-23-17"></div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="5-23-17"></div>
+                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）名駅フォレストビル3F"></div>
-                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）メイエキフォレストビル3カイ"></div>
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
 
                 <div class="sub-h"><i class="ti ti-phone"></i>電話番号</div>
                 <div class="field">
                   <label>電話番号 <span class="req">*</span></label>
-                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="052-569-5230"></div>
+                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div>
                 </div>
 
                 <div class="sub-h"><i class="ti ti-user"></i>受取人</div>
                 <div class="field">
                   <label>受取人 <span class="req">*</span></label>
-                  <input type="text" data-f="receiver" placeholder="例）青山 浩子" style="max-width:280px;">
+                  <input type="text" data-f="receiver" placeholder="例）〇〇 〇〇" style="max-width:280px;">
                 </div>
               </div>
             </div>
@@ -1250,7 +1324,7 @@
 
       <div class="actions">
         <span class="prog" id="prog"></span>
-        <button type="button" class="btn btn-ghost" id="back"><i class="ti ti-arrow-left"></i>戻る</button>
+        <button type="button" class="btn btn-ghost" id="back"><i class="ti ti-arrow-left"></i>前ページへ</button>
         <button type="submit" class="btn btn-primary" id="next">次へ進む<i class="ti ti-arrow-right"></i></button>
       </div>
 
@@ -1606,6 +1680,40 @@
       alert('郵便番号から住所を自動入力します（API連携箇所）。');
     });
   });
+
+  // 発送申込：mPOS端末の数量に応じて合計金額（単価 × 数量）を再計算する
+  const qtyInput = document.getElementById('qty');
+  if (qtyInput) {
+    const unitPrice = parseInt(
+        document.getElementById('unitPrice').dataset.price, 10);
+    const calcText = document.getElementById('calcText');
+    const totalAmount = document.getElementById('totalAmount');
+    const qtyMinus = document.getElementById('qtyMinus');
+    const qtyPlus = document.getElementById('qtyPlus');
+
+    function updateSubtotal() {
+      let qty = parseInt(qtyInput.value, 10);
+      if (isNaN(qty) || qty < 1) qty = 1;
+      if (qty > 99) qty = 99;
+      qtyInput.value = qty;
+      const total = unitPrice * qty;
+      calcText.textContent =
+          unitPrice.toLocaleString() + '円 × ' + qty + '台';
+      totalAmount.textContent = total.toLocaleString();
+    }
+
+    qtyMinus.addEventListener('click', () => {
+      qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+      updateSubtotal();
+    });
+    qtyPlus.addEventListener('click', () => {
+      qtyInput.value = Math.min(99, (parseInt(qtyInput.value, 10) || 1) + 1);
+      updateSubtotal();
+    });
+    qtyInput.addEventListener('input', updateSubtotal);
+    qtyInput.addEventListener('change', updateSubtotal);
+    updateSubtotal();
+  }
 
   render();
 </script>

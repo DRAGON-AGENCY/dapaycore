@@ -90,7 +90,8 @@
   }
 
   .container {
-    min-width: var(--container-min);
+    /* iframe 等の狭い表示幅でも全列を表示するため最小幅は設けない */
+    min-width: 0;
     max-width: var(--container-max);
     width: 100%;
     margin: 0 auto;

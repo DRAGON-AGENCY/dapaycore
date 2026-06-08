@@ -93,6 +93,42 @@ public class PageController {
     }
 
     /**
+     * 店舗・端末・加盟店データ登録・更新画面を表示する。
+     * 運用管理ポータルの「店舗・端末・加盟店データ登録・更新」から表示する。
+     */
+    @GetMapping("/operation_shop_data_create.html")
+    public String showOperationShopDataCreate() {
+        return "operation_shop_data_create";
+    }
+
+    /**
+     * 店舗・端末・SMCC加盟店番号情報照会画面を表示する。
+     * 運用管理ポータルの「店舗・端末・加盟店データ照会」から表示する。
+     */
+    @GetMapping("/operation_store_terminal.html")
+    public String showOperationStoreTerminal() {
+        return "operation_store_terminal";
+    }
+
+    /**
+     * 精算情報照会画面を表示する。
+     * 運用管理ポータルの「精算情報照会」→加盟店一覧で明細を選択して表示する。
+     */
+    @GetMapping("/operation_settlement_inquiry.html")
+    public String showOperationSettlementInquiry() {
+        return "operation_settlement_inquiry";
+    }
+
+    /**
+     * 精算データ登録画面を表示する。
+     * 運用管理ポータルの「精算データ登録」から表示する。
+     */
+    @GetMapping("/operation_settlement.html")
+    public String showOperationSettlement() {
+        return "operation_settlement";
+    }
+
+    /**
      * 機能準備中などを表示する汎用プレースホルダー画面を表示する。
      */
     @GetMapping("/content_placeholder.html")
