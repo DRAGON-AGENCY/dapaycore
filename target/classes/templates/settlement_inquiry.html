@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>売上管理｜申込・照会</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f4f6fa;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --text-primary: #1b2733;
+    --text-secondary: #5a6675;
+    --text-tertiary: #93a0af;
+    --text-danger: #c0392b;
+    --text-soft: #0c447c;
+    --text-ok: #1f8a6d;
+    --border: rgba(20,45,80,0.10);
+    --border-strong: rgba(20,45,80,0.24);
+    --accent: #0b5fd0;
+    --accent-strong: #0c447c;
+    --accent-line: #3d8ddd;
+    --ok: #2aa583;
+    --ok-soft: #e3f4ee;
+    --warn: #d8694e;
+    --warn-soft: #fdf0dd;
+    --warn-text: #8a5410;
+    --gold: #e0a93b;
+    --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #0f141a;
+      --bg-surface: #19202a;
+      --bg-secondary: #1f2832;
+      --bg-soft: #14283f;
+      --bg-soft-2: #16202c;
+      --text-primary: #eef2f7;
+      --text-secondary: #aeb9c6;
+      --text-tertiary: #7a8694;
+      --text-danger: #ec8478;
+      --text-soft: #9cc6f2;
+      --text-ok: #5ccfac;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.22);
+      --accent: #3d8ddd;
+      --accent-strong: #0c447c;
+      --accent-line: #3d8ddd;
+      --ok: #36b78f;
+      --ok-soft: #16322a;
+      --warn: #e0795f;
+      --warn-soft: #38290f;
+      --warn-text: #e8b765;
+      --gold: #d9ab43;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg-page); color: var(--text-primary);
+    font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 26px 18px 60px; }
+  .shell { background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: stretch; min-height: 640px; box-shadow: var(--shadow-md); }
+
+  /* ---- sidebar (shared design) ---- */
+  .sidebar { flex: 0 0 200px; background: linear-gradient(180deg,#0c2440 0%,#0a1f38 100%); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar .brand { display: flex; align-items: center; gap: 9px; padding: 6px 10px 18px; }
+  .sidebar .brand .logo { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+  .sidebar .brand span { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .02em; }
+  .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 13px; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .menu-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .menu-item i { font-size: 18px; }
+  .menu-group { font-size: 11px; font-weight: 700; color: #6f8db0; letter-spacing: 0.06em; padding: 15px 10px 6px; display: flex; align-items: center; gap: 8px; }
+  .menu-group i { font-size: 15px; }
+  .menu-group:first-of-type { padding-top: 4px; }
+  .menu-sub { display: flex; align-items: center; gap: 9px; padding: 8px 10px 8px 14px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 12.5px; line-height: 1.4; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .menu-sub:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .menu-sub.active { background: var(--accent); color: #fff; font-weight: 500; box-shadow: var(--shadow-sm); }
+  .menu-sub i { font-size: 16px; flex: 0 0 auto; }
+  .menu-spacer { flex: 1; }
+  .menu-divider { height: 0.5px; background: rgba(255,255,255,0.14); margin: 8px 4px; }
+
+  /* ---- main ---- */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { padding: 16px 28px 0; }
+  .topbar .titlerow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .topbar .titlerow .t { font-size: 15px; font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; }
+  .topbar .titlerow .s { font-size: 12px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px; }
+  .menu-toggle { display: none; }
+  .content { padding: 6px 28px 28px; }
+
+  .section-head { display: flex; align-items: center; gap: 9px; background: var(--accent); color: #ffffff; padding: 13px 16px; border: 0.5px solid var(--accent); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--fs-base); font-weight: 700; }
+  .section-head i { font-size: 17px; color: #ffffff; }
+  .panel-box { border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 18px 18px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
+
+  .frow { display: grid; grid-template-columns: 96px 1fr; gap: 12px 14px; align-items: start; margin-bottom: 14px; }
+  .frow.frow-tight { margin-bottom: 20px; }
+  .frow:last-child { margin-bottom: 0; }
+  .frow > label { font-size: 13px; color: var(--text-secondary); padding-top: 8px; }
+  .fcontrols { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+  .fcontrols.nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  .fcontrols.nowrap > * { flex: 0 0 auto; }
+  .fcontrols.nowrap input[type="date"] { width: 150px; }
+  .fcontrols.nowrap input[type="time"] { width: 116px; }
+  .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+  @media (max-width: 900px) { .grid-2col { grid-template-columns: 1fr; } }
+
+  label.inline { font-size: 13px; color: var(--text-secondary); }
+  input[type="text"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], select {
+    font-family: inherit; font-size: 13px; color: var(--text-primary);
+    padding: 8px 11px; height: 38px; background: var(--bg-surface);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm); outline: none;
+    transition: border-color .15s, box-shadow .15s; min-width: 0;
+  }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61,141,221,0.16); }
+  .grow { flex: 1; }
+  .addon { display: inline-flex; align-items: center; gap: 6px; }
+  .addon .ic { color: var(--text-tertiary); font-size: 16px; }
+  .tilde { color: var(--text-tertiary); font-size: 14px; padding: 0 2px; }
+  .yen-pre { position: relative; display: inline-flex; align-items: center; }
+  .yen-pre .y { position: absolute; left: 10px; color: var(--text-tertiary); font-size: 13px; pointer-events: none; }
+  .yen-pre input { padding-left: 26px; }
+
+  /* preset date dropdown */
+  .preset { position: relative; }
+  .preset-btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; font-size: 13px; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-primary); font-family: inherit; min-width: 96px; justify-content: space-between; }
+  .preset-menu { display: none; position: absolute; top: 42px; left: 0; z-index: 10; min-width: 110px; background: var(--accent); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-md); }
+  .preset-menu.open { display: block; }
+  .preset-menu button { display: block; width: 100%; text-align: left; padding: 9px 14px; font-size: 13px; background: none; border: none; color: #fff; cursor: pointer; font-family: inherit; }
+  .preset-menu button:hover, .preset-menu button.sel { background: var(--accent-strong); }
+
+  /* status toggles */
+  .status-wrap { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  .status-hint { font-size: 12px; color: var(--text-tertiary); margin-left: 4px; }
+  .status-group-label { font-size: 11px; color: var(--text-tertiary); margin: 4px 0 7px; }
+  .status-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+  .status-grid:last-child { margin-bottom: 0; }
+  @media (max-width: 720px) { .status-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 460px) { .status-grid { grid-template-columns: 1fr; } }
+  .chip {
+    display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 48px; border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1.3; cursor: pointer; user-select: none; transition: background .15s, border-color .15s, box-shadow .15s;
+    background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-secondary); overflow: hidden;
+  }
+  .chip i { font-size: 17px; color: var(--text-tertiary); flex: 0 0 auto; }
+  .chip:hover { border-color: var(--accent-line); background: var(--bg-soft-2); }
+  /* 選択中：成立=青 */
+  .chip.on.tone-ok { background: var(--bg-soft); border-color: var(--accent); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent); }
+  .chip.on.tone-ok i { color: var(--accent); }
+  /* 選択中：取消・失敗=赤 */
+  .chip.on.tone-bad { background: var(--warn-soft); border-color: var(--warn); color: #791f1f; box-shadow: inset 0 0 0 1px var(--warn); }
+  .chip.on.tone-bad i { color: var(--warn); }
+  /* 選択中：その他=グレー */
+  .chip.on.tone-neutral { background: #d5dce8; border-color: var(--border-strong); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--border-strong); }
+  .chip.on.tone-neutral i { color: var(--text-secondary); }
+  @media (prefers-color-scheme: dark) {
+    .chip.on.tone-bad { color: #f7c1c1; }
+    .chip.on.tone-neutral { background: #34414f; }
+  }
+
+  .btn { font-family: inherit; font-size: 13px; font-weight: 500; padding: 0 16px; height: 38px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: opacity .15s, background .15s, transform .05s; }
+  .btn:active { transform: scale(0.98); }
+  .btn i { font-size: 16px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-ghost:hover { background: var(--bg-secondary); }
+  .btn-grey { background: #8a929c; color: #fff; }
+  .btn-grey:hover { opacity: 0.92; }
+  .btn-green { background: var(--ok); color: #fff; }
+  .btn-green:hover { opacity: 0.92; }
+  .actions-row { display: flex; gap: 10px; margin-top: 16px; }
+
+  /* summary cards */
+  .summary { display: flex; align-items: stretch; gap: 14px; flex-wrap: wrap; }
+  .scard { flex: 1; min-width: 210px; display: flex; flex-direction: column; gap: 14px; border-radius: var(--radius-md); padding: 18px; border: 1px solid transparent; }
+  .scard-top { display: flex; align-items: center; gap: 11px; }
+  .scard-ico { width: 38px; height: 38px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .scard-ico i { font-size: 21px; }
+  .scard-label { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; }
+  .scard-cnt { font-size: 11px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; font-weight: 600; }
+  .scard-amt { font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .scard.tone-in { background: var(--bg-soft); border-color: var(--accent-line); }
+  .scard.tone-in .scard-label, .scard.tone-in .scard-amt { color: var(--accent-strong); }
+  .scard.tone-in .scard-ico { background: var(--accent); color: #fff; }
+  .scard.tone-in .scard-cnt { background: rgba(27,102,179,0.14); color: var(--accent-strong); }
+  .scard.tone-out { background: var(--warn-soft); border-color: var(--warn); }
+  .scard.tone-out .scard-label, .scard.tone-out .scard-amt { color: #791f1f; }
+  .scard.tone-out .scard-ico { background: var(--warn); color: #fff; }
+  .scard.tone-out .scard-cnt { background: rgba(216,105,78,0.18); color: #791f1f; }
+  .scard.tone-total { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); border-color: var(--accent); box-shadow: var(--shadow-md); }
+  .scard.tone-total .scard-label, .scard.tone-total .scard-amt { color: #fff; }
+  .scard.tone-total .scard-ico { background: rgba(255,255,255,0.22); color: #fff; }
+  .scard.tone-total .scard-cnt { background: rgba(255,255,255,0.25); color: #fff; }
+  .scard.tone-total .scard-amt { font-size: 30px; }
+  @media (prefers-color-scheme: dark) {
+    .scard.tone-out .scard-label, .scard.tone-out .scard-amt { color: #f7c1c1; }
+    .scard.tone-out .scard-cnt { color: #f7c1c1; }
+  }
+  .op { font-size: 18px; color: var(--text-secondary); align-self: center; font-weight: 600; width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--bg-surface); border: 1px solid var(--border-strong); flex: 0 0 auto; }
+  .summary-note { font-size: 12px; color: var(--text-tertiary); margin: 14px 0 0; line-height: 1.6; }
+
+  /* csv row */
+  .csv-row { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; }
+  .csv-row .reslabel { font-size: 13px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .csv-row .reslabel b { color: var(--text-primary); font-size: 15px; }
+  .csv-row .spacer { flex: 1; }
+  .csv-opt { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .csv-opt input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
+  .csv-note { font-size: 12px; color: var(--text-tertiary); margin: 8px 0 0; line-height: 1.6; }
+
+  /* table */
+  .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 940px; }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-bottom: 0.5px solid transparent; }
+  thead th i { font-size: 14px; vertical-align: -2px; margin-right: 3px; color: #ffffff; }
+  tbody td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); white-space: nowrap; color: var(--text-primary); }
+  tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-soft); }
+  td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+  th.amt { text-align: right; }
+  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); padding: 12px; white-space: nowrap; }
+  tfoot td.total-label { text-align: right; }
+  tfoot td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+  tfoot .total-count { font-variant-numeric: tabular-nums; }
+  .badge-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; line-height: 1.4; }
+  .badge-status i { font-size: 14px; flex: 0 0 auto; }
+  .st-sale    { background: var(--ok-soft);   color: var(--text-ok);        border-color: rgba(31,138,109,0.40); }
+  .st-auth    { background: var(--bg-soft);   color: var(--text-soft);      border-color: var(--accent-line); }
+  .st-refund  { background: var(--warn-soft); color: #8a3d10;               border-color: var(--warn); }
+  .st-cancel  { background: var(--warn-soft); color: #791f1f;               border-color: var(--warn); }
+  .st-failed  { background: #fde3e0;          color: #a11414;               border-color: #e7a59c; }
+  .st-expired { background: var(--bg-soft-2); color: var(--text-secondary); border-color: var(--border-strong); }
+  @media (prefers-color-scheme: dark) {
+    .st-refund { color: #f0b48f; }
+    .st-cancel { color: #f7c1c1; }
+    .st-failed { background: #3a1714; color: #f6b0a6; border-color: #6e2c25; }
+  }
+  .svc { display: inline-flex; align-items: center; gap: 6px; }
+  .svc .pill { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; color: #fff; }
+  .pill-paypay { background: #ec0000; }
+  .pill-jcb { background: #0b318f; }
+  .pill-visa { background: #1a1f71; }
+  .pill-mc { background: #b34700; }
+  .pill-amex { background: #2671b9; }
+  .pill-aupay { background: #eb5505; }
+  .pill-dpay { background: #cc0033; }
+  .pill-rpay { background: #bf0000; }
+
+  /* 表示件数セレクト・ページネーション（管理者一覧と同じ作り） */
+  .per-page-control { display: inline-flex; align-items: center; gap: 8px; }
+  .per-page-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+  .per-page-select { padding: 6px 28px 6px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); font-family: inherit; font-size: 12px; color: var(--text-primary); cursor: pointer; }
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; }
+  .page-numbers { display: flex; align-items: center; gap: 6px; }
+  .page-btn { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-primary); font-family: inherit; font-size: 13px; cursor: pointer; transition: all .15s ease; }
+  .page-btn:hover:not(:disabled):not(.is-active) { background: var(--bg-soft-2); }
+  .page-btn:disabled { opacity: 0.4; cursor: default; }
+  .page-number.is-active { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 700; cursor: default; }
+  .page-ellipsis { min-width: 22px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+  .page-nav { font-weight: 600; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  @media (max-width: 720px) {
+    .shell { flex-direction: column; min-height: 0; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 30; width: 240px; flex: none; transform: translateX(-100%); transition: transform .2s; }
+    .sidebar.open { transform: translateX(0); }
+    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 20; }
+    .menu-overlay.show { display: block; }
+    .menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary); cursor: pointer; margin-right: 10px; }
+    .topbar, .content { padding-left: 16px; padding-right: 16px; }
+    .frow { grid-template-columns: 1fr; gap: 6px; }
+    .frow > label { padding-top: 0; }
+    .op { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h2 class="sr-only">売上管理。取引検索の条件入力、金額サマリー、CSVダウンロード、検索結果テーブルで構成されています。</h2>
+  <div class="shell">
+
+    <div class="main">
+
+      <div class="topbar">
+        <div class="titlerow">
+          <span class="t">
+            売上管理
+          </span>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <div class="section-head"><i class="ti ti-search" aria-hidden="true"></i>取引検索</div>
+        <div class="panel-box">
+
+          <div class="frow">
+            <label>取引日時</label>
+            <div class="fcontrols nowrap">
+              <div class="preset">
+                <button type="button" class="preset-btn" id="presetBtn"><span id="presetLabel">今月</span><i class="ti ti-chevron-down" style="font-size:15px;"></i></button>
+                <div class="preset-menu" id="presetMenu">
+                  <button type="button">今日</button>
+                  <button type="button">昨日</button>
+                  <button type="button">今週</button>
+                  <button type="button">先週</button>
+                  <button type="button" class="sel">今月</button>
+                  <button type="button">先月</button>
+                </div>
+              </div>
+              <span class="addon"><span class="ic" style="font-size:13px;color:var(--text-tertiary);">From</span><input type="date" value="2026-06-01"><input type="time" value="00:00:00" step="1"></span>
+              <span class="tilde">〜</span>
+              <span class="addon"><span class="ic" style="font-size:13px;color:var(--text-tertiary);">To</span><input type="date" value="2026-06-02"><input type="time" value="23:59:59" step="1"></span>
+            </div>
+          </div>
+
+          <div class="frow frow-tight">
+            <label>ステータス</label>
+            <div class="fcontrols" style="flex-direction:column; align-items:stretch; gap:10px;">
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" class="btn btn-ghost" id="statusAll"><i class="ti ti-checks"></i>全選択</button>
+                <button type="button" class="btn btn-ghost" id="statusClear"><i class="ti ti-square-off"></i>解除</button>
+                <span class="status-hint">（クリックで選択／解除）</span>
+              </div>
+              <div id="statusWrap">
+                <div class="status-group-label">成立</div>
+                <div class="status-grid">
+                  <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>売上</span>
+                  <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>与信・決済申込</span>
+                </div>
+                <div class="status-group-label">取消・失敗</div>
+                <div class="status-grid">
+                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-arrow-back-up"></i>取消（返金）</span>
+                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-circle-x"></i>キャンセル（与信・決済申込）</span>
+                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-alert-circle"></i>取引失敗</span>
+                </div>
+                <div class="status-group-label">その他</div>
+                <div class="status-grid">
+                  <span class="chip tone-neutral" data-tone="neutral" data-on="0"><i class="ti ti-clock-off"></i>期限切れ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="frow">
+            <label>ショップ</label>
+            <div class="fcontrols"><input type="text" class="grow" placeholder="ショップを選択"></div>
+          </div>
+
+          <div class="frow">
+            <label>サービス事業者</label>
+            <div class="fcontrols">
+              <select style="min-width:240px;">
+                <option>選択してください</option>
+                <option>PayPay決済</option>
+                <option>（株）ジェーシービー</option>
+                <option>りゅうぎん</option>
+                <option>NETSTARS（StarPay）</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button type="button" class="btn btn-primary"><i class="ti ti-search"></i>検索実行</button>
+            <button type="button" class="btn btn-ghost"><i class="ti ti-refresh"></i>リセット</button>
+          </div>
+        </div>
+
+        <!-- summary -->
+        <div class="section-head"><i class="ti ti-calculator" aria-hidden="true"></i>集計</div>
+        <div class="panel-box">
+          <div class="summary">
+            <div class="scard tone-in">
+              <div class="scard-top">
+                <span class="scard-ico"><i class="ti ti-arrow-down-circle" aria-hidden="true"></i></span>
+                <span class="scard-label">取引額</span>
+                <span class="scard-cnt">2 件</span>
+              </div>
+              <div class="scard-amt">¥2,310</div>
+            </div>
+            <span class="op" aria-hidden="true">−</span>
+            <div class="scard tone-out">
+              <div class="scard-top">
+                <span class="scard-ico"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></span>
+                <span class="scard-label">取消額</span>
+                <span class="scard-cnt">0 件</span>
+              </div>
+              <div class="scard-amt">¥0</div>
+            </div>
+            <span class="op" aria-hidden="true">=</span>
+            <div class="scard tone-total">
+              <div class="scard-top">
+                <span class="scard-ico"><i class="ti ti-equal" aria-hidden="true"></i></span>
+                <span class="scard-label">合計額</span>
+                <span class="scard-cnt">2 件</span>
+              </div>
+              <div class="scard-amt">¥2,310</div>
+            </div>
+          </div>
+          <p class="summary-note">※「取引」の合計金額には、取引失敗、仮売上、仮売上取消、与信・決済申込、キャンセル（与信・決済申込）の値を含みません。</p>
+        </div>
+
+        <div class="section-head"><i class="ti ti-table" aria-hidden="true"></i>検索結果<span id="result-summary" style="margin-left:auto; font-weight:500;"></span></div>
+        <div class="panel-box">
+          <div class="csv-row">
+            <div class="per-page-control">
+              <label class="per-page-label" for="per-page-select">表示件数</label>
+              <select id="per-page-select" class="per-page-select">
+                <option value="10" selected>10件</option>
+                <option value="20">20件</option>
+                <option value="50">50件</option>
+                <option value="100">100件</option>
+              </select>
+            </div>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-primary"><i class="ti ti-download"></i>CSVダウンロード</button>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th><i class="ti ti-hash"></i>取引ID</th>
+                  <th><i class="ti ti-clock"></i>日時</th>
+                  <th><i class="ti ti-user"></i>担当者</th>
+                  <th><i class="ti ti-building-store"></i>ショップ名</th>
+                  <th><i class="ti ti-credit-card"></i>カード番号</th>
+                  <th><i class="ti ti-wallet"></i>サービス種類</th>
+                  <th><i class="ti ti-building-bank"></i>サービス事業者</th>
+                  <th><i class="ti ti-checkbox"></i>ステータス</th>
+                  <th><i class="ti ti-info-circle"></i>説明</th>
+                  <th class="amt">金額</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>TX5001A</td>
+                  <td>2026/06/01 17:36:29</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
+                  <td>PayPay決済</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 660</td>
+                </tr>
+                <tr>
+                  <td>TX5002B</td>
+                  <td>2026/06/01 15:15:44</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>358760*******34</td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
+                  <td>（株）ジェーシービー</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 1,650</td>
+                </tr>
+                <tr>
+                  <td>TX5003C</td>
+                  <td>2026/06/01 14:02:11</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>414720*******09</td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
+                  <td>りゅうぎん</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 2,200</td>
+                </tr>
+                <tr>
+                  <td>TX5004D</td>
+                  <td>2026/06/01 13:20:47</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>553011*******42</td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
+                  <td>りゅうぎん</td>
+                  <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 980</td>
+                </tr>
+                <tr>
+                  <td>TX5005E</td>
+                  <td>2026/06/01 12:48:30</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>374830*******05</td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
+                  <td>（株）ジェーシービー</td>
+                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消（返金）</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 3,520</td>
+                </tr>
+                <tr>
+                  <td>TX5006F</td>
+                  <td>2026/06/01 11:15:09</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル（与信・決済申込）</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 540</td>
+                </tr>
+                <tr>
+                  <td>TX5007G</td>
+                  <td>2026/06/01 10:33:52</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 1,280</td>
+                </tr>
+                <tr>
+                  <td>TX5008H</td>
+                  <td>2026/06/01 09:47:18</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 760</td>
+                </tr>
+                <tr>
+                  <td>TX5009I</td>
+                  <td>2026/06/01 09:12:05</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>453210*******88</td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
+                  <td>りゅうぎん</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 4,180</td>
+                </tr>
+                <tr>
+                  <td>TX5010J</td>
+                  <td>2026/05/31 19:40:22</td>
+                  <td>田中 結衣</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
+                  <td>PayPay決済</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 880</td>
+                </tr>
+                <tr>
+                  <td>TX5011K</td>
+                  <td>2026/05/31 18:05:51</td>
+                  <td>田中 結衣</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>358760*******12</td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
+                  <td>（株）ジェーシービー</td>
+                  <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 2,750</td>
+                </tr>
+                <tr>
+                  <td>TX5012L</td>
+                  <td>2026/05/31 16:22:38</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>553011*******77</td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
+                  <td>りゅうぎん</td>
+                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消（返金）</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 1,100</td>
+                </tr>
+                <tr>
+                  <td>TX5013M</td>
+                  <td>2026/05/31 14:55:10</td>
+                  <td>鈴木 大地</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 640</td>
+                </tr>
+                <tr>
+                  <td>TX5014N</td>
+                  <td>2026/05/31 13:11:47</td>
+                  <td>鈴木 大地</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル（与信・決済申込）</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 1,980</td>
+                </tr>
+                <tr>
+                  <td>TX5015O</td>
+                  <td>2026/05/31 11:38:29</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>374830*******61</td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
+                  <td>（株）ジェーシービー</td>
+                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
+                  <td>店頭支払い</td>
+                  <td class="amt">¥ 5,300</td>
+                </tr>
+                <tr>
+                  <td>TX5016P</td>
+                  <td>2026/05/31 10:02:14</td>
+                  <td>佐藤 健一</td>
+                  <td>カフェ・ソレイユ</td>
+                  <td>—</td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
+                  <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
+                  <td>外部支払い</td>
+                  <td class="amt">¥ 720</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td class="total-label" colspan="9">合計 <span class="total-count" id="total-count">0</span> 件</td>
+                  <td class="amt" id="total-amount">¥ 0</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="pagination" id="pagination">
+            <button class="page-btn page-nav" type="button" data-nav="prev" aria-label="前のページ">‹</button>
+            <div class="page-numbers" id="page-numbers"></div>
+            <button class="page-btn page-nav" type="button" data-nav="next" aria-label="次のページ">›</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // preset date dropdown
+  const presetBtn = document.getElementById('presetBtn');
+  const presetMenu = document.getElementById('presetMenu');
+  const presetLabel = document.getElementById('presetLabel');
+  presetBtn.addEventListener('click', (e) => { e.stopPropagation(); presetMenu.classList.toggle('open'); });
+  presetMenu.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      presetMenu.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      presetLabel.textContent = b.textContent;
+      presetMenu.classList.remove('open');
+      // ここで From/To の日付を選択プリセットに応じて設定してください。
+    });
+  });
+  document.addEventListener('click', () => presetMenu.classList.remove('open'));
+
+  // status chips toggle
+  const statusWrap = document.getElementById('statusWrap');
+  statusWrap.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const on = chip.dataset.on === '1';
+      chip.dataset.on = on ? '0' : '1';
+      chip.classList.toggle('on', !on);
+    });
+  });
+  document.getElementById('statusAll').addEventListener('click', () => {
+    statusWrap.querySelectorAll('.chip').forEach(c => { c.dataset.on = '1'; c.classList.add('on'); });
+  });
+  document.getElementById('statusClear').addEventListener('click', () => {
+    statusWrap.querySelectorAll('.chip').forEach(c => { c.dataset.on = '0'; c.classList.remove('on'); });
+  });
+
+  // 合計（件数・金額）を全件から集計してテーブル下部に表示する。
+  (function () {
+    var rows = Array.prototype.slice.call(
+      document.querySelectorAll('.table-scroll table tbody tr')
+    );
+    var countEl = document.getElementById('total-count');
+    var amountEl = document.getElementById('total-amount');
+    if (!countEl || !amountEl) {
+      return;
+    }
+    var totalAmount = 0;
+    rows.forEach(function (row) {
+      var amtCell = row.querySelector('td.amt');
+      if (!amtCell) {
+        return;
+      }
+      var digits = amtCell.textContent.replace(/[^0-9]/g, '');
+      if (digits !== '') {
+        totalAmount += parseInt(digits, 10);
+      }
+    });
+    countEl.textContent = rows.length.toLocaleString();
+    amountEl.textContent = '¥ ' + totalAmount.toLocaleString();
+  })();
+
+  // 検索結果のページネーション（表示件数の切替と複数ページの表示制御）
+  (function () {
+    var rows = Array.prototype.slice.call(
+      document.querySelectorAll('.table-scroll table tbody tr')
+    );
+    var perPageSelect = document.getElementById('per-page-select');
+    var pageNumbersEl = document.getElementById('page-numbers');
+    var summaryEl = document.getElementById('result-summary');
+    var pagination = document.getElementById('pagination');
+    if (!perPageSelect || !pagination) {
+      return;
+    }
+    var prevBtn = pagination.querySelector('[data-nav="prev"]');
+    var nextBtn = pagination.querySelector('[data-nav="next"]');
+
+    var totalItems = rows.length;
+    var perPage = parseInt(perPageSelect.value, 10);
+    var currentPage = 1;
+
+    // 総ページ数（最低1ページ）
+    function getTotalPages() {
+      return Math.max(1, Math.ceil(totalItems / perPage));
+    }
+
+    // 表示するページ番号の並びを生成（両端と現在ページ周辺、省略は'...'）
+    function buildPageItems(current, total) {
+      var items = [];
+      if (total <= 7) {
+        for (var i = 1; i <= total; i++) {
+          items.push(i);
+        }
+        return items;
+      }
+      items.push(1);
+      var left = Math.max(2, current - 1);
+      var right = Math.min(total - 1, current + 1);
+      if (left > 2) {
+        items.push('...');
+      }
+      for (var page = left; page <= right; page++) {
+        items.push(page);
+      }
+      if (right < total - 1) {
+        items.push('...');
+      }
+      items.push(total);
+      return items;
+    }
+
+    // 現在ページに応じて行の表示・概要・ページUIを再描画する
+    function render() {
+      var totalPages = getTotalPages();
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+      var startIndex = (currentPage - 1) * perPage;
+      var endIndex = Math.min(startIndex + perPage, totalItems);
+
+      rows.forEach(function (row, index) {
+        row.style.display =
+          (index >= startIndex && index < endIndex) ? '' : 'none';
+      });
+
+      if (summaryEl) {
+        summaryEl.textContent = (totalItems === 0)
+          ? '0 件'
+          : (startIndex + 1) + '-' + endIndex + ' / ' + totalItems + ' 件';
+      }
+
+      pageNumbersEl.innerHTML = '';
+      buildPageItems(currentPage, totalPages).forEach(function (item) {
+        if (item === '...') {
+          var ellipsis = document.createElement('span');
+          ellipsis.className = 'page-ellipsis';
+          ellipsis.textContent = '…';
+          pageNumbersEl.appendChild(ellipsis);
+          return;
+        }
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className =
+          'page-btn page-number' + (item === currentPage ? ' is-active' : '');
+        button.textContent = item;
+        button.addEventListener('click', function () {
+          currentPage = item;
+          render();
+        });
+        pageNumbersEl.appendChild(button);
+      });
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    prevBtn.addEventListener('click', function () {
+      if (currentPage > 1) {
+        currentPage--;
+        render();
+      }
+    });
+
+    nextBtn.addEventListener('click', function () {
+      if (currentPage < getTotalPages()) {
+        currentPage++;
+        render();
+      }
+    });
+
+    perPageSelect.addEventListener('change', function () {
+      perPage = parseInt(perPageSelect.value, 10);
+      currentPage = 1;
+      render();
+    });
+
+    render();
+  })();
+
+</script>
+</body>
+</html>
