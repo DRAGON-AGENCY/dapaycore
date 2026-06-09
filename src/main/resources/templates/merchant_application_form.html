@@ -202,6 +202,17 @@
   .opt-sub i { font-size: 16px; color: var(--accent); }
   .opt-sub:not(:first-child) { margin-top: 18px; }
   .opt-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
+  /* クレジットお支払方法 */
+  .pay-methods { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .pay-method-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pay-method-item { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .pay-method-item.pm-fixed { background: #e9f1fb; border-color: rgba(27,102,179,0.22); }
+  .pay-method-label { flex: 1; min-width: 0; }
+  .pay-method-label .pm-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
+  .pay-method-label .pm-brand { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+  .pm-fixed-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 14px; background: #dff0e0; color: #2e7d32; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .pm-fixed-note { font-size: 12px; color: var(--text-tertiary); flex: 1; min-width: 0; }
+  .pay-method-item .seg { margin: 0; flex-wrap: nowrap; }
   @media (max-width: 560px) { .opt-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   #txGrid { grid-template-columns: repeat(3, 1fr); }
   @media (max-width: 720px) { #txGrid { grid-template-columns: repeat(2, 1fr); } }
@@ -279,11 +290,10 @@
   .banner i { font-size: 19px; flex: 0 0 auto; margin-top: 1px; }
 
   /* agreement rows */
-  .a-row { display: flex; align-items: center; gap: 13px; padding: 13px 16px; cursor: pointer; }
+  .a-row { display: flex; align-items: center; gap: 13px; padding: 13px 16px; cursor: default; }
   .a-row + .a-row { border-top: 0.5px solid var(--border); }
-  .a-row:hover { background: var(--bg-soft-2); }
   .a-row.tinted { background: var(--bg-soft); }
-  .a-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; }
+  .a-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; pointer-events: none; }
   .a-row .abody { flex: 1; min-width: 0; }
   .a-row .nameline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .a-row .aname { font-size: 13.5px; font-weight: 500; }
@@ -305,6 +315,8 @@
   /* footer actions (sticky) */
   .actions { position: sticky; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 14px 28px; border-top: 0.5px solid var(--border); background: var(--bg-surface); }
   .actions .prog { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
+  .actions .step1-err { display: none; font-size: 13px; color: #c0392b; align-items: center; gap: 5px; }
+  .actions .step1-err.visible { display: inline-flex; }
   .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
   .btn i { font-size: 17px; }
@@ -382,68 +394,63 @@
             <i class="ti ti-alert-triangle" aria-hidden="true"></i>
             <div class="guide">
               <span class="gtitle">ご記入時の注意事項</span>
-              <p>チェックは「同意済みであることの確認」です。この画面では規約全文の表示・同意取得は行いません。各規約の内容は各社の公式ページ（外部リンク）でご確認いただけます。</p>
+              <p>「規約を確認」をクリックすると各社の公式ページ（外部リンク）で規約が開き、確認済みに自動でチェックが入ります。チェックは「同意済みであることの確認」です。</p>
             </div>
           </div>
 
           <div class="card">
             <div class="card-h"><i class="ti ti-file-text" aria-hidden="true"></i>① 決済サービスの加盟店規約・特約</div>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="nameline"><span class="aname">StarPay決済サービス加盟店規約（共通・第2特約）</span><span class="tag tag-net">NETSTARS</span></span></span>
+              <input type="checkbox" class="req" id="chk-starpay">
+              <span class="abody"><span class="nameline"><span class="aname">StarPay決済サービス加盟店規約（共通・第2特約）</span><span class="tag tag-net">NETSTARS</span>
+                <a class="a-link agreement-link" href="https://www.netstars.co.jp/starpay_common_termsofuse/" target="_blank" data-for="chk-starpay"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">確認済み</span>
             </label>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="nameline"><span class="aname">JCB加盟店規約・加盟店特約</span><span class="tag tag-jcb">JCB</span></span></span>
+              <input type="checkbox" class="req" id="chk-jcb">
+              <span class="abody"><span class="nameline"><span class="aname">JCB加盟店規約・加盟店特約</span><span class="tag tag-jcb">JCB</span>
+                <a class="a-link agreement-link" href="https://www.jcb.co.jp/merchant/regulation/index.html" target="_blank" data-for="chk-jcb"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">確認済み</span>
             </label>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="nameline"><span class="aname">琉球銀行加盟店規約（Visa / Mastercard / 銀聯）</span><span class="tag tag-ryu">りゅうぎん</span></span></span>
+              <input type="checkbox" class="req" id="chk-ryu1">
+              <span class="abody"><span class="nameline"><span class="aname">琉球銀行加盟店規約（Visa / Mastercard / 銀聯）</span><span class="tag tag-ryu">りゅうぎん</span>
+                <a class="a-link agreement-link" href="https://www.ryugin.co.jp/kiteikiyaku/kameitenkanren/" target="_blank" data-for="chk-ryu1"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">確認済み</span>
             </label>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="nameline"><span class="aname">銀聯QRコード決済サービス利用加盟店規約</span><span class="tag tag-ryu">りゅうぎん</span></span></span>
+              <input type="checkbox" class="req" id="chk-ryu2">
+              <span class="abody"><span class="nameline"><span class="aname">銀聯QRコード決済サービス利用加盟店規約</span><span class="tag tag-ryu">りゅうぎん</span>
+                <a class="a-link agreement-link" href="https://www.ryugin.co.jp/kiteikiyaku/kameitenkanren/" target="_blank" data-for="chk-ryu2"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">確認済み</span>
             </label>
           </div>
 
           <div class="card">
-            <div class="card-h"><i class="ti ti-shield-lock" aria-hidden="true"></i>② 個人情報・反社に関する同意</div>
+            <div class="card-h"><i class="ti ti-writing-sign" aria-hidden="true"></i>② 当社（代理申請者）への委任・利用規約</div>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">個人情報の取扱い・共同利用への同意（各社）</span><span class="asub">代表者個人情報を含む。各決済会社・イシュアと共同利用</span></span>
+              <input type="checkbox" class="req" id="chk-iin1">
+              <span class="abody"><span class="nameline"><span class="aname">代理申請の委任（委任契約）への同意</span>
+                <a class="a-link agreement-link" href="/terms/agency-delegation.html" target="_blank" data-for="chk-iin1"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span><span class="asub">別途締結の契約書により合意済み</span></span>
               <span class="astatus">同意済み</span>
             </label>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">信用情報の照会・登録への同意</span><span class="asub">割賦販売法に基づく加盟店審査のため</span></span>
+              <input type="checkbox" class="req" id="chk-iin2">
+              <span class="abody"><span class="nameline"><span class="aname">当社サービス利用規約</span>
+                <a class="a-link agreement-link" href="/terms/service.html" target="_blank" data-for="chk-iin2"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">同意済み</span>
             </label>
             <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">反社会的勢力でないことの表明・確約</span></span>
-              <span class="astatus">同意済み</span>
-            </label>
-          </div>
-
-          <div class="card">
-            <div class="card-h"><i class="ti ti-writing-sign" aria-hidden="true"></i>③ 当社（代理申請者）への委任・利用規約</div>
-            <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">代理申請の委任（委任契約）への同意</span><span class="asub">別途締結の契約書により合意済み</span></span>
-              <span class="astatus">同意済み</span>
-            </label>
-            <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">当社サービス利用規約</span></span>
-              <span class="astatus">同意済み</span>
-            </label>
-            <label class="a-row">
-              <input type="checkbox" class="req">
-              <span class="abody"><span class="aname">当社プライバシーポリシー（取得情報の各社提供）</span></span>
+              <input type="checkbox" class="req" id="chk-iin3">
+              <span class="abody"><span class="nameline"><span class="aname">当社プライバシーポリシー（取得情報の各社提供）</span>
+                <a class="a-link agreement-link" href="/terms/privacy-policy.html" target="_blank" data-for="chk-iin3"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
               <span class="astatus">同意済み</span>
             </label>
           </div>
@@ -551,6 +558,78 @@
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>Diners Club</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>American Express</label>
               </div>
+              <div class="opt-sub"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットのお支払方法</div>
+              <div class="note" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>ご指定がない場合は、JCBにて設定します。</span></div>
+              <div class="pay-methods">
+                <!-- 1回払い（固定） -->
+                <div class="pay-method-item pm-fixed">
+                  <div class="pay-method-label">
+                    <div class="pm-name">1回払い</div>
+                    <div class="pm-brand">JCB・AMEX・Diners・Discover</div>
+                  </div>
+                  <span class="pm-fixed-badge"><i class="ti ti-check" aria-hidden="true"></i>する（固定）</span>
+                  <span class="pm-fixed-note">クレジット以外は、1回払いのみのお取り扱いとなります。</span>
+                </div>
+                <!-- ボーナス払い・2回払い -->
+                <div class="pay-method-pair">
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">ボーナス払い</div>
+                      <div class="pm-brand">JCB・AMEX・Diners</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payBonus">①する</label>
+                      <label class="opt"><input type="radio" name="payBonus">②しない</label>
+                    </div>
+                  </div>
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">2回払い</div>
+                      <div class="pm-brand">JCB</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="pay2kai">①する</label>
+                      <label class="opt"><input type="radio" name="pay2kai">②しない</label>
+                    </div>
+                  </div>
+                </div>
+                <!-- 分割払い・リボ払い -->
+                <div class="pay-method-pair">
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">分割払い</div>
+                      <div class="pm-brand">JCB・AMEX</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payBunkatsu">①する</label>
+                      <label class="opt"><input type="radio" name="payBunkatsu">②しない</label>
+                    </div>
+                  </div>
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">リボ払い</div>
+                      <div class="pm-brand">JCB・Diners</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payRevo">①する</label>
+                      <label class="opt"><input type="radio" name="payRevo">②しない</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="opt-sub"><i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー</div>
+              <div class="opt-grid">
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>iD</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>WAON</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>楽天Edy</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>nanaco</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-train bico" aria-hidden="true"></i>交通系IC（Suica 等）</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>OKICA</label>
+              </div>
+              <div class="opt-sub"><i class="ti ti-credit-card" aria-hidden="true"></i>デビット・プリペイド</div>
+              <div class="opt-grid">
+                <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>悠遊カード（EasyCard）</label>
+              </div>
             </div>
           </div>
         </section>
@@ -650,7 +729,11 @@
                   <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
-                <div class="field" style="margin-top:14px;"><label>本社電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
+                <div class="grid3" style="margin-top:14px;">
+                  <div class="field"><label>本社電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
+                  <div class="field"><label>本社FAX番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-printer"></i><input type="tel" data-f="fax" placeholder="0312345679"></div></div>
+                  <div class="field"><label>携帯電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" data-f="mobile" placeholder="09012345678"></div></div>
+                </div>
               </div>
             </div>
           </div>
@@ -800,7 +883,11 @@
             <div class="card-h"><i class="ti ti-building-bank" aria-hidden="true"></i>入金先口座</div>
             <div class="card-b">
               <div class="grid2">
+                <div class="field"><label>金融機関コード <span class="req">*</span></label><input type="text" placeholder="4桁（例）0005" maxlength="4" style="max-width:200px;"></div>
                 <div class="field"><label>金融機関名 <span class="req">*</span></label><input type="text" placeholder="〇〇銀行"></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>支店コード <span class="req">*</span></label><input type="text" placeholder="3桁（例）150" maxlength="3" style="max-width:200px;"></div>
                 <div class="field"><label>支店名 <span class="req">*</span></label><input type="text" placeholder="〇〇支店"></div>
               </div>
               <div class="field" style="margin-top:15px;">
@@ -882,6 +969,10 @@
                   <select><option>選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
                 <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input type="text" placeholder="例）〇〇の販売・提供内容"></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>店舗数 <span class="req">*</span></label><div class="input-row"><input type="number" min="1" placeholder="例）1" style="max-width:160px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">店舗</span></div></div>
+                <div class="field"><label>平均単価 <span class="req">*</span></label><div class="input-row"><input type="number" min="0" placeholder="例）5000" style="max-width:200px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">円</span></div></div>
               </div>
             </div>
           </div>
@@ -992,6 +1083,28 @@
                 <div class="grid2" style="margin-top:14px;">
                   <div class="field"><label>電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
                   <div class="field"><label>営業許可番号 <span class="help">任意</span></label><input type="text" placeholder="許可業種の場合に入力"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-device-desktop" aria-hidden="true"></i>端末情報</div>
+            <div class="card-b">
+              <div class="field">
+                <label>端末保持状況 <span class="req">*</span></label>
+                <div class="seg" data-single>
+                  <label class="opt"><input type="radio" name="terminalStatus">保持中</label>
+                  <label class="opt"><input type="radio" name="terminalStatus">保持していない</label>
+                  <label class="opt"><input type="radio" name="terminalStatus">非保持化予定</label>
+                </div>
+              </div>
+              <div class="field" style="margin-top:15px;">
+                <label>POS端末IC対応状況 <span class="help">任意</span></label>
+                <div class="seg" data-single>
+                  <label class="opt"><input type="radio" name="terminalIc">IC対応済み</label>
+                  <label class="opt"><input type="radio" name="terminalIc">IC非対応</label>
+                  <label class="opt"><input type="radio" name="terminalIc">IC対応予定あり</label>
                 </div>
               </div>
             </div>
@@ -1324,6 +1437,9 @@
 
       <div class="actions">
         <span class="prog" id="prog"></span>
+        <span class="step1-err" id="step1Err" role="alert">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>すべての規約を「規約を確認」で確認してからお進みください。
+        </span>
         <button type="button" class="btn btn-ghost" id="back"><i class="ti ti-arrow-left"></i>前ページへ</button>
         <button type="submit" class="btn btn-primary" id="next">次へ進む<i class="ti ti-arrow-right"></i></button>
       </div>
@@ -1333,6 +1449,29 @@
 </main>
 
 <script>
+  // 事前確認の a-row ラベルは手動クリックによるチェック切替を禁止する
+  // （agreement-link は stopPropagation 済みのため、このハンドラは link クリック時には呼ばれない）
+  document.querySelectorAll('.a-row').forEach(function (label) {
+    label.addEventListener('click', function (e) {
+      e.preventDefault();
+    });
+  });
+
+  // 規約リンクをクリックしたとき、ラベルのトグルを止めてチェックのみを付ける
+  document.querySelectorAll('.agreement-link').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var checkbox = document.getElementById(link.dataset.for);
+      if (checkbox) {
+        checkbox.checked = true;
+      }
+      // href が "#" のままのときはページ内ジャンプを防ぐ
+      if (link.getAttribute('href') === '#') {
+        e.preventDefault();
+      }
+    });
+  });
+
   const steps = ["事前確認", "取引形態", "決済種類", "法人情報", "口座情報", "店舗情報", "書類情報", "発送申込", "最終確認"];
   const total = steps.length;
   let current = 0;
@@ -1345,6 +1484,7 @@
   const backBtn = document.getElementById('back');
   const nextBtn = document.getElementById('next');
   const progEl = document.getElementById('prog');
+  const step1ErrEl = document.getElementById('step1Err');
   const reviewArea = document.getElementById('reviewArea');
 
   function buildStepper() {
@@ -1400,6 +1540,7 @@
     // 最終確認ステップを表示する直前に、入力内容の確認リストを組み立てる
     if (current === total - 1) buildReview();
     progEl.textContent = 'ステップ ' + (current + 1) + ' / ' + total + '：' + steps[current];
+    step1ErrEl.classList.remove('visible');
     buildStepper();
     document.querySelector('.panel-area').scrollTop = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1606,6 +1747,15 @@
   document.getElementById('wizard').addEventListener('submit', (e) => {
     e.preventDefault();
     if (current < total - 1) {
+      // 事前確認（STEP 1）はすべての規約チェックボックスが確認済みでないと進めない
+      if (current === 0) {
+        var unchecked = panels[0].querySelectorAll(
+            'input[type="checkbox"].req:not(:checked)');
+        if (unchecked.length > 0) {
+          step1ErrEl.classList.add('visible');
+          return;
+        }
+      }
       // 通常の前進操作のため、最終確認からの修正フラグは解除する
       cameFromReview = false;
       goTo(current + 1);
