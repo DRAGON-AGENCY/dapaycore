@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<title>振込データ作成</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    media="print" onload="this.media='all'">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f4f6fa;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --text-primary: #1b2733;
+    --text-secondary: #5a6675;
+    --text-tertiary: #93a0af;
+    --text-soft: #0c447c;
+    --text-ok: #1f8a6d;
+    --text-danger: #c0392b;
+    --border: rgba(20,45,80,0.10);
+    --border-strong: rgba(20,45,80,0.24);
+    --accent: #0b5fd0;
+    --accent-strong: #0b3f86;
+    --ok: #2aa583;
+    --ok-soft: #e3f4ee;
+    --warn-strong: #8f6315;
+    --warn-soft: #f9f1dd;
+    --warn-line: #e7d4a6;
+    --warn-text: #5d4a2a;
+    --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 22px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #0f141a; --bg-surface: #19202a; --bg-secondary: #1f2832;
+      --bg-soft: #14283f; --bg-soft-2: #16202c;
+      --text-primary: #eef2f7; --text-secondary: #aeb9c6; --text-tertiary: #7a8694;
+      --text-soft: #9cc6f2; --text-ok: #5ccfac; --text-danger: #ec8478;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.22);
+      --accent: #3d8ddd; --accent-strong: #0c447c;
+      --ok: #36b78f; --ok-soft: #16322a;
+      --warn-strong: #e0b463; --warn-soft: #2e2412; --warn-line: #4a3a1c; --warn-text: #d8c6a2;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3); --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg-page); color: var(--text-primary);
+    font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { width: 100%; max-width: 1040px; margin: 0 auto; padding: 26px 28px 48px; }
+  .shell {
+    background: var(--bg-surface); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);
+  }
+
+  /* topbar */
+  .topbar { padding: 16px 28px 14px; border-bottom: 0.5px solid var(--border); }
+  .titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .titlerow .t { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 8px; }
+  .titlerow .t i { font-size: var(--fs-lg); color: var(--accent); }
+
+  .content { padding: 22px 28px 26px; }
+
+  /* card */
+  .card { border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-surface); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; }
+  .card:last-child { margin-bottom: 0; }
+  .card-h { display: flex; align-items: center; gap: 9px; padding: 13px 16px; background: var(--accent); color: #ffffff; font-size: var(--fs-base); font-weight: 700; }
+  .card-h i { font-size: var(--fs-md); color: #ffffff; }
+  .card-b { padding: 18px 16px; }
+
+  /* form */
+  .field-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); letter-spacing: 0.02em; display: flex; align-items: center; gap: 6px; }
+  .req { color: var(--text-danger); font-size: 12px; }
+  .field input[type="text"], .field input[type="date"], .field select {
+    height: 42px; padding: 0 12px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: var(--bg-surface); font-family: inherit;
+    font-size: var(--fs-base); color: var(--text-primary);
+  }
+  .field select {
+    appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%230b5fd0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,95,208,0.16); }
+
+  .actions-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+  /* buttons */
+  .btn { font-family: inherit; font-size: var(--fs-base); font-weight: 500; height: 42px; padding: 0 18px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; border: 1px solid transparent; transition: background .15s; white-space: nowrap; }
+  .btn i { font-size: var(--fs-md); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-ghost { background: var(--bg-surface); color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-ghost:hover { background: var(--bg-secondary); }
+  .btn-ok { background: var(--ok); color: #fff; }
+  .btn-ok:hover { opacity: 0.9; }
+  .btn-ok:disabled { opacity: 0.5; cursor: default; }
+
+  /* notice */
+  .notice-list { list-style: none; counter-reset: n; margin: 0; padding: 0; }
+  .notice-list li { counter-increment: n; position: relative; padding-left: 30px; margin-bottom: 10px; font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.7; }
+  .notice-list li:last-child { margin-bottom: 0; }
+  .notice-list li::before { content: counter(n); position: absolute; left: 0; top: 2px; width: 21px; height: 21px; border-radius: 50%; background: var(--bg-soft); color: var(--accent-strong); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  .card-warn { background: var(--warn-soft); border-color: var(--warn-line); box-shadow: none; }
+  .card-warn .card-h { background: transparent; color: var(--warn-strong); padding: 14px 18px 2px; }
+  .card-warn .card-h i { color: var(--warn-strong); }
+  .card-warn .card-b { background: transparent; padding: 8px 18px 16px; }
+  .card-warn .notice-list li { color: var(--warn-text); padding-left: 26px; }
+  .card-warn .notice-list li::before { content: counter(n) "."; background: none; color: var(--warn-strong); width: auto; height: auto; left: 4px; top: 1px; font-size: var(--fs-sm); font-weight: 700; }
+
+  /* status badge */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+  .badge-pending  { background: var(--bg-soft);   color: var(--text-soft);  border-color: rgba(27,102,179,0.28); }
+  .badge-complete { background: var(--ok-soft);   color: var(--text-ok);    border-color: rgba(31,138,109,0.35); }
+
+  /* table */
+  .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); margin-top: 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); table-layout: fixed; }
+  col.c-code   { width: 14%; }
+  col.c-name   { width: 30%; }
+  col.c-sales  { width: 18%; }
+  col.c-fee    { width: 17%; }
+  col.c-amount { width: 21%; }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 14px; white-space: nowrap; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.25); }
+  thead th:last-child { border-right: none; }
+  tbody td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); font-size: var(--fs-sm); }
+  tbody td:last-child { border-right: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+  td.mono { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace; font-variant-numeric: tabular-nums; }
+  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); border-right: 1px solid var(--border); padding: 12px 14px; white-space: nowrap; }
+  tfoot td:last-child { border-right: none; }
+  tfoot td.label { text-align: right; }
+  tfoot td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* 結果件数 */
+  .preview-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .preview-count { font-size: var(--fs-xs); color: var(--text-tertiary); }
+  .preview-note  { font-size: var(--fs-xs); color: var(--text-danger); font-weight: 600; }
+
+  /* confirm dialog */
+  .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .dialog-overlay[hidden] { display: none !important; }
+  .dialog { background: var(--bg-surface); border-radius: 12px; padding: 32px 36px; max-width: 420px; width: 92%; box-shadow: 0 12px 40px rgba(16,40,70,0.20); }
+  .dialog-title { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .dialog-title i { color: var(--ok); font-size: 22px; }
+  .dialog-body { font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.8; margin-bottom: 24px; }
+  .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 0; }
+    .shell { border-radius: 0; border: none; }
+    .topbar, .content { padding-left: 16px; padding-right: 16px; }
+    .field-row .field { width: 100% !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="shell">
+
+    <div class="topbar">
+      <div class="titlerow">
+        <span class="t"><i class="ti ti-send" aria-hidden="true"></i>振込データ作成</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- 条件設定 -->
+      <div class="card">
+        <div class="card-h"><i class="ti ti-calendar-month" aria-hidden="true"></i>対象期間・締め日</div>
+        <div class="card-b">
+          <div class="field-row">
+            <div class="field" style="width: 160px;">
+              <label>対象年月 <span class="req">*</span></label>
+              <input type="text" id="target-month" placeholder="YYYY/MM" value="2026/06" maxlength="7">
+            </div>
+            <div class="field" style="width: 200px;">
+              <label>締め日 <span class="req">*</span></label>
+              <input type="date" id="closing-date" value="2026-06-30">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 振込予定一覧 -->
+      <div class="card" id="preview-card">
+        <div class="card-h"><i class="ti ti-table" aria-hidden="true"></i>振込予定一覧</div>
+        <div class="card-b">
+          <div class="preview-meta">
+            <span class="preview-count" id="preview-count">対象 3 件</span>
+            <span class="preview-note" id="preview-note"></span>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <colgroup>
+                <col class="c-code">
+                <col class="c-name">
+                <col class="c-sales">
+                <col class="c-fee">
+                <col class="c-amount">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>会員コード</th>
+                  <th>法人名（カナ）</th>
+                  <th class="amt">売上合計</th>
+                  <th class="amt">手数料</th>
+                  <th class="amt">振込予定額</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- 静的サンプルデータ。実装時は API プレビュー結果を差し替える。 -->
+                <tr>
+                  <td class="mono">M001</td>
+                  <td>カブシキガイシャサンプルショウジ</td>
+                  <td class="amt">¥ 328,500</td>
+                  <td class="amt">¥ 6,570</td>
+                  <td class="amt">¥ 321,930</td>
+                </tr>
+                <tr>
+                  <td class="mono">M002</td>
+                  <td>ユウゲンガイシャフラワーショップキタ</td>
+                  <td class="amt">¥ 185,000</td>
+                  <td class="amt">¥ 5,921</td>
+                  <td class="amt">¥ 179,079</td>
+                </tr>
+                <tr>
+                  <td class="mono">M003</td>
+                  <td>ヤマダタロウ</td>
+                  <td class="amt">¥ 64,800</td>
+                  <td class="amt">¥ 1,285</td>
+                  <td class="amt">¥ 63,515</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td class="label" colspan="2">合計</td>
+                  <td class="amt">¥ 578,300</td>
+                  <td class="amt">¥ 13,776</td>
+                  <td class="amt">¥ 564,524</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="actions-row">
+            <button type="button" class="btn btn-ok" id="create-btn">
+              <i class="ti ti-send" aria-hidden="true"></i>振込データを作成する
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 注意書き -->
+      <div class="card card-warn">
+        <div class="card-h"><i class="ti ti-alert-circle" aria-hidden="true"></i>データ作成時のご注意</div>
+        <div class="card-b">
+          <ol class="notice-list">
+            <li>対象年月と締め日を確認のうえ、振込予定一覧の内容を確認してください。</li>
+            <li>振込予定額は「売上合計 − 手数料」です。手数料率は手数料管理に登録されたレートを使用します。</li>
+            <li>「振込データを作成する」ボタンを押すと確定され、会員のマイポータル「振込一覧」に反映されます。</li>
+            <li>同じ対象年月・締め日で既にデータが存在する場合は上書きできません。取消処理が必要です。</li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- 作成確認ダイアログ -->
+<div class="dialog-overlay" id="confirm-dialog" hidden>
+  <div class="dialog">
+    <div class="dialog-title"><i class="ti ti-send" aria-hidden="true"></i>振込データ作成の確認</div>
+    <div class="dialog-body" id="dialog-body">
+      対象年月 <strong id="dlg-month"></strong>、締め日 <strong id="dlg-date"></strong> の振込データを作成します。<br>
+      対象 <strong id="dlg-count"></strong> 件・振込総額 <strong id="dlg-amount"></strong> を確定します。<br><br>
+      この操作は取り消せません。よろしいですか？
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" id="dlg-cancel">キャンセル</button>
+      <button class="btn btn-ok" type="button" id="dlg-confirm">
+        <i class="ti ti-check" aria-hidden="true"></i>作成する
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var confirmDialog = document.getElementById('confirm-dialog');
+
+  document.getElementById('create-btn').addEventListener('click', function () {
+    var month = document.getElementById('target-month').value.trim();
+    var date  = document.getElementById('closing-date').value;
+    document.getElementById('dlg-month').textContent  = month;
+    document.getElementById('dlg-date').textContent   = date;
+    document.getElementById('dlg-count').textContent  = '3';
+    document.getElementById('dlg-amount').textContent = '¥ 564,524';
+    confirmDialog.removeAttribute('hidden');
+  });
+
+  document.getElementById('dlg-cancel').addEventListener('click', function () {
+    confirmDialog.setAttribute('hidden', '');
+  });
+
+  document.getElementById('dlg-confirm').addEventListener('click', function () {
+    confirmDialog.setAttribute('hidden', '');
+    var csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).getAttribute('content') || '';
+    var month = document.getElementById('target-month').value.trim();
+    var date  = document.getElementById('closing-date').value;
+
+    document.getElementById('dlg-confirm').disabled = true;
+
+    // 実装時: POST /api/transfer/create で振込データを確定する。
+    fetch('/api/transfer/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+      body: JSON.stringify({ targetMonth: month, closingDate: date })
+    })
+    .then(function (res) {
+      if (!res.ok) { throw new Error('振込データの作成に失敗しました。'); }
+      return res.json();
+    })
+    .then(function () {
+      alert('振込データを作成しました。');
+    })
+    .catch(function (err) {
+      alert(err.message || '振込データの作成に失敗しました。');
+      document.getElementById('dlg-confirm').disabled = false;
+    });
+  });
+</script>
+</body>
+</html>

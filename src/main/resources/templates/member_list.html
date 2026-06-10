@@ -493,6 +493,28 @@
     cursor: default;
   }
 
+  /* 行クリック可能インジケーター */
+  .data-table tbody tr.data-row { cursor: pointer; }
+  .data-table thead th.c-action { width: 36px; min-width: 36px; padding: 0; border-right: none; }
+  .data-table tbody tr.data-row td.c-action {
+    width: 36px; min-width: 36px; padding: 0; text-align: center;
+    border-right: none !important; overflow: visible !important;
+  }
+  .data-table tbody tr.data-row td.c-action::after {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-right: 2px solid rgba(11,95,208,0.32);
+    border-top: 2px solid rgba(11,95,208,0.32);
+    transform: rotate(45deg);
+    transition: border-color .15s;
+    vertical-align: middle;
+  }
+  .data-table tbody tr.data-row:hover td.c-action::after {
+    border-right-color: var(--accent-blue);
+    border-top-color: var(--accent-blue);
+  }
+
 </style>
 </head>
 <body>
@@ -857,6 +879,27 @@
       // 初期表示時のプレースホルダを選択状態に合わせる
       updateKeywordPlaceholder();
       render();
+    })();
+  </script>
+  <script>
+    /* 行クリック可能インジケーター: colgroup / thead / データ行にシェブロン列を追加 */
+    (function () {
+      var colgroup = document.querySelector('.data-table colgroup');
+      if (colgroup) {
+        var col = document.createElement('col');
+        col.style.width = '36px';
+        colgroup.appendChild(col);
+      }
+      document.querySelectorAll('.data-table thead tr').forEach(function (tr) {
+        var th = document.createElement('th');
+        th.className = 'c-action';
+        tr.appendChild(th);
+      });
+      document.querySelectorAll('.data-table tbody tr.data-row').forEach(function (tr) {
+        var td = document.createElement('td');
+        td.className = 'c-action';
+        tr.appendChild(td);
+      });
     })();
   </script>
 </body>

@@ -490,3 +490,88 @@ UI 等を「申込画面」に合わせることを前提とする。** デザ�
 - 管理者のみ表示する `新規登録` ボタン（`.btn-new`）など、画面固有のアクションは
   `.search-row` の右端（`margin-left:auto`）に配置してよい。
 
+---
+
+## 一覧画面の明細表（テーブル）UI の標準
+
+**明細表の UI は `src/main/resources/templates/member_list.html` を基準（リファレンス）と
+し、新規作成・既存改修いずれも以下の仕様に揃える。**
+
+### レイアウト
+
+- `table-layout: fixed` を指定し、`<colgroup>` で各列の幅を `%` で定義する。
+  全列の合計が 100% になるよう配分する。
+- テーブル全体に `min-width` を設定し、狭い環境では `overflow-x: auto` で横スクロールさせる。
+- 列幅クラス（例: `c-code`, `c-name`, `c-amt`）を `<col>` と `<th>` / `<td>` に付与して
+  管理する。
+
+### ヘッダー（`thead th`）
+
+- 背景色は `--accent`（`#0b5fd0` / `#1b66b3`）、文字色は `#ffffff`、`font-weight: 700`。
+- **`text-align: left` に統一する。** 金額列も含め、見出しは一律左寄せとする。
+  列ごとに個別の `text-align` ルールを追加しない。
+- 列間の縦線は `border-right: 1px solid rgba(255,255,255,0.25)`、最終列のみ `border-right: none`。
+- パディングは `11px 14px`（画面によって `12px` など微調整可）。
+
+### ボディ（`tbody td`）
+
+- 列間の縦線は `border-right: 1px solid var(--border)`（`--border: rgba(20,45,80,0.10)`）、
+  最終列のみ `border-right: none`。
+- 行間の横線は `border-bottom: 0.5px solid var(--border)`。
+- 偶数行は薄い地色（`nth-child(even)` に `var(--bg-soft-2)` など）を付けてゼブラ縞にする。
+- ホバー時は `var(--bg-hover)` で行全体をハイライトする。
+- **金額・数値セルには `.amt` クラスを付与し、`text-align: right; font-variant-numeric: tabular-nums;` を適用する。**
+  見出し（`th.amt`）は左寄せのままとし、データセル（`td.amt`）のみ右寄せにする。
+
+### フッター（`tfoot td`）（合計行がある場合）
+
+- 合計行の縦線も `tbody` と同様に `border-right: 1px solid var(--border)` / 最終列 `none`。
+- 集計ラベル・金額セルは `td.amt` で右寄せにする。
+
+### 行クリック可能インジケーター（`.c-action` 列）
+
+明細行のクリックで次画面へ遷移する一覧表には、最終列に幅 36px の空列（`.c-action`）を設け、
+CSS `::after` で右向き山形（シェブロン）を描画する。アイコンフォントに依存しない実装とする。
+
+```css
+/* colgroup に追加 */
+/* <col style="width:36px;"> */
+
+thead th.c-action { width: 36px; min-width: 36px; padding: 0; text-align: center; border-right: none; }
+tbody tr.data-row { cursor: pointer; }
+tbody tr.data-row td.c-action { text-align: center; padding: 0; border-right: none; }
+tbody tr.data-row td.c-action::after {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-right: 2px solid rgba(11,95,208,0.32);
+  border-top:   2px solid rgba(11,95,208,0.32);
+  transform: rotate(45deg); transition: border-color .15s; vertical-align: middle;
+}
+tbody tr.data-row:hover td.c-action::after {
+  border-right-color: var(--accent);
+  border-top-color:   var(--accent);
+}
+```
+
+- Thymeleaf テンプレートの場合：`<col>` / `<th>` / `th:each` の `<td>` に直接追記する。
+- 静的 HTML（行数が多い）の場合：JS でページロード時に動的に `th` / `td` を挿入する。
+
+### 空状態行
+
+0 件のとき用に `tbody` 末尾に空状態行を用意し、JS で表示/非表示を切り替える。
+
+```html
+<tr id="empty-row">
+  <td class="empty-cell" colspan="N">該当する◯◯がいません。</td>
+</tr>
+```
+
+- `colspan` の値は `.c-action` 列を含む全列数にする。
+- データ行には `.data-row` クラスを必ず付与し、絞込みや行クリックの対象を `tr.data-row` に限定する。
+
+### 状態バッジ（ステータス表示がある列）
+
+- バッジは `<span class="badge badge-XXX">` で実装し、`display: inline-flex; align-items: center; justify-content: center;` で中央揃えにする。
+- `min-width` を揃えて全種類のバッジが同じ幅になるようにする（例: `min-width: 3.5em`）。
+- 状態ごとに `data-status="XXX"` 属性を `<tr>` に付与し、無効・終了行の背景色変更などに利用する。
+
+

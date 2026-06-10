@@ -129,6 +129,51 @@ public class PageController {
     }
 
     /**
+     * 手数料一覧画面を表示する。
+     * 運用管理ポータルの「手数料一覧」から表示する。
+     */
+    @GetMapping("/operation_fee_list.html")
+    public String showOperationFeeList() {
+        return "operation_fee_list";
+    }
+
+    /**
+     * 手数料登録・変更画面を表示する。
+     * 運用管理ポータルの「手数料登録・変更」または手数料一覧の行クリックから表示する。
+     */
+    @GetMapping("/operation_fee_edit.html")
+    public String showOperationFeeEdit() {
+        return "operation_fee_edit";
+    }
+
+    /**
+     * 振込データ作成画面を表示する。
+     * 運用管理ポータルの「振込データ作成」から表示する。
+     */
+    @GetMapping("/operation_transfer.html")
+    public String showOperationTransfer() {
+        return "operation_transfer";
+    }
+
+    /**
+     * 振込一覧画面を表示する。
+     * マイポータルの「振込一覧」から表示する。
+     */
+    @GetMapping("/transfer_list.html")
+    public String showTransferList() {
+        return "transfer_list";
+    }
+
+    /**
+     * 振込明細画面を表示する。
+     * 振込一覧の行クリックから表示する。
+     */
+    @GetMapping("/transfer_detail.html")
+    public String showTransferDetail() {
+        return "transfer_detail";
+    }
+
+    /**
      * 機能準備中などを表示する汎用プレースホルダー画面を表示する。
      */
     @GetMapping("/content_placeholder.html")

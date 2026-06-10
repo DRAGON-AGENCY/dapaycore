@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>売上管理｜申込・照会</title>
+<title>売上明細照会｜申込・照会</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -106,8 +106,8 @@
   .section-head i { font-size: 17px; color: #ffffff; }
   .panel-box { border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 18px 18px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
 
-  .frow { display: grid; grid-template-columns: 96px 1fr; gap: 12px 14px; align-items: start; margin-bottom: 14px; }
-  .frow.frow-tight { margin-bottom: 20px; }
+  .frow { display: grid; grid-template-columns: 96px 1fr; gap: 8px 12px; align-items: start; margin-bottom: 10px; }
+  .frow.frow-tight { margin-bottom: 10px; }
   .frow:last-child { margin-bottom: 0; }
   .frow > label { font-size: 13px; color: var(--text-secondary); padding-top: 8px; }
   .fcontrols { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
@@ -143,19 +143,14 @@
   .preset-menu button:hover, .preset-menu button.sel { background: var(--accent-strong); }
 
   /* status toggles */
-  .status-wrap { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
-  .status-hint { font-size: 12px; color: var(--text-tertiary); margin-left: 4px; }
-  .status-group-label { font-size: 11px; color: var(--text-tertiary); margin: 4px 0 7px; }
-  .status-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
-  .status-grid:last-child { margin-bottom: 0; }
-  @media (max-width: 720px) { .status-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  @media (max-width: 460px) { .status-grid { grid-template-columns: 1fr; } }
+  .status-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   .chip {
-    display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 48px; border-radius: var(--radius-sm);
-    font-size: 13px; line-height: 1.3; cursor: pointer; user-select: none; transition: background .15s, border-color .15s, box-shadow .15s;
-    background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-secondary); overflow: hidden;
+    display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 34px;
+    border-radius: 999px; font-size: 13px; line-height: 1; cursor: pointer; user-select: none;
+    transition: background .15s, border-color .15s, box-shadow .15s;
+    background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-secondary); white-space: nowrap;
   }
-  .chip i { font-size: 17px; color: var(--text-tertiary); flex: 0 0 auto; }
+  .chip i { font-size: 15px; color: var(--text-tertiary); flex: 0 0 auto; }
   .chip:hover { border-color: var(--accent-line); background: var(--bg-soft-2); }
   /* 選択中：成立=青 */
   .chip.on.tone-ok { background: var(--bg-soft); border-color: var(--accent); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent); }
@@ -170,6 +165,14 @@
     .chip.on.tone-bad { color: #f7c1c1; }
     .chip.on.tone-neutral { background: #34414f; }
   }
+  .btn-chip-ctrl {
+    display: inline-flex; align-items: center; height: 28px; padding: 0 10px;
+    font-size: 12px; font-weight: 600; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg-surface);
+    color: var(--text-secondary); font-family: inherit; white-space: nowrap;
+  }
+  .btn-chip-ctrl:hover { background: var(--bg-secondary); }
+  .chip-sep { width: 1px; height: 22px; background: var(--border-strong); flex: 0 0 auto; margin: 0 2px; }
 
   .btn { font-family: inherit; font-size: 13px; font-weight: 500; padding: 0 16px; height: 38px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: opacity .15s, background .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
@@ -182,36 +185,39 @@
   .btn-grey:hover { opacity: 0.92; }
   .btn-green { background: var(--ok); color: #fff; }
   .btn-green:hover { opacity: 0.92; }
-  .actions-row { display: flex; gap: 10px; margin-top: 16px; }
+  .actions-row { display: flex; gap: 10px; margin-top: 12px; }
 
-  /* summary cards */
-  .summary { display: flex; align-items: stretch; gap: 14px; flex-wrap: wrap; }
-  .scard { flex: 1; min-width: 210px; display: flex; flex-direction: column; gap: 14px; border-radius: var(--radius-md); padding: 18px; border: 1px solid transparent; }
-  .scard-top { display: flex; align-items: center; gap: 11px; }
-  .scard-ico { width: 38px; height: 38px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-  .scard-ico i { font-size: 21px; }
-  .scard-label { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; }
-  .scard-cnt { font-size: 11px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; font-weight: 600; }
-  .scard-amt { font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-  .scard.tone-in { background: var(--bg-soft); border-color: var(--accent-line); }
-  .scard.tone-in .scard-label, .scard.tone-in .scard-amt { color: var(--accent-strong); }
-  .scard.tone-in .scard-ico { background: var(--accent); color: #fff; }
-  .scard.tone-in .scard-cnt { background: rgba(27,102,179,0.14); color: var(--accent-strong); }
-  .scard.tone-out { background: var(--warn-soft); border-color: var(--warn); }
-  .scard.tone-out .scard-label, .scard.tone-out .scard-amt { color: #791f1f; }
-  .scard.tone-out .scard-ico { background: var(--warn); color: #fff; }
-  .scard.tone-out .scard-cnt { background: rgba(216,105,78,0.18); color: #791f1f; }
-  .scard.tone-total { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); border-color: var(--accent); box-shadow: var(--shadow-md); }
-  .scard.tone-total .scard-label, .scard.tone-total .scard-amt { color: #fff; }
-  .scard.tone-total .scard-ico { background: rgba(255,255,255,0.22); color: #fff; }
-  .scard.tone-total .scard-cnt { background: rgba(255,255,255,0.25); color: #fff; }
-  .scard.tone-total .scard-amt { font-size: 30px; }
+  /* summary strip */
+  .summary-strip { display: flex; align-items: stretch; }
+  .sop { flex: 0 0 36px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--text-tertiary); background: var(--bg-secondary); border-left: 0.5px solid var(--border-strong); border-right: 0.5px solid var(--border-strong); }
+  .sitem { flex: 1; display: flex; align-items: center; gap: 12px; padding: 14px 20px; min-width: 0; }
+  .sitem-ico { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .sitem-ico i { font-size: 19px; }
+  .sitem-body { flex: 1; min-width: 0; }
+  .sitem-row1 { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+  .sitem-label { font-size: 12px; font-weight: 600; }
+  .sitem-cnt { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .sitem-amt { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; line-height: 1.1; }
+  .sitem.tone-in { background: var(--bg-soft); }
+  .sitem.tone-in .sitem-ico { background: var(--accent); color: #fff; }
+  .sitem.tone-in .sitem-label { color: var(--text-soft); }
+  .sitem.tone-in .sitem-cnt  { background: rgba(27,102,179,0.14); color: var(--accent-strong); }
+  .sitem.tone-in .sitem-amt  { color: var(--accent-strong); }
+  .sitem.tone-out { background: var(--warn-soft); }
+  .sitem.tone-out .sitem-ico { background: var(--warn); color: #fff; }
+  .sitem.tone-out .sitem-label { color: #8a5410; }
+  .sitem.tone-out .sitem-cnt  { background: rgba(216,105,78,0.18); color: #791f1f; }
+  .sitem.tone-out .sitem-amt  { color: #791f1f; }
+  .sitem.tone-total { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); }
+  .sitem.tone-total .sitem-ico  { background: rgba(255,255,255,0.22); color: #fff; }
+  .sitem.tone-total .sitem-label { color: rgba(255,255,255,0.8); }
+  .sitem.tone-total .sitem-cnt  { background: rgba(255,255,255,0.25); color: #fff; }
+  .sitem.tone-total .sitem-amt  { color: #fff; font-size: 22px; }
   @media (prefers-color-scheme: dark) {
-    .scard.tone-out .scard-label, .scard.tone-out .scard-amt { color: #f7c1c1; }
-    .scard.tone-out .scard-cnt { color: #f7c1c1; }
+    .sitem.tone-out .sitem-label, .sitem.tone-out .sitem-amt { color: #f7c1c1; }
+    .sitem.tone-out .sitem-cnt { color: #f7c1c1; }
   }
-  .op { font-size: 18px; color: var(--text-secondary); align-self: center; font-weight: 600; width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--bg-surface); border: 1px solid var(--border-strong); flex: 0 0 auto; }
-  .summary-note { font-size: 12px; color: var(--text-tertiary); margin: 14px 0 0; line-height: 1.6; }
+  .summary-note { font-size: 11.5px; color: var(--text-tertiary); padding: 9px 18px 11px; border-top: 0.5px solid var(--border); line-height: 1.6; margin: 0; }
 
   /* csv row */
   .csv-row { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; }
@@ -224,20 +230,48 @@
 
   /* table */
   .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); margin-top: 16px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 940px; }
-  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-bottom: 0.5px solid transparent; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; table-layout: fixed; }
+  col.c-txid   { width: 10%; }
+  col.c-date   { width: 12%; }
+  col.c-shop   { width: 14%; }
+  col.c-card   { width: 12%; }
+  col.c-svc    { width: 17%; }
+  col.c-status { width: 17%; }
+  col.c-amt    { width: 14%; }
+  col.c-action { width: 4%; }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
+  thead th:last-child { border-right: none; }
   thead th i { font-size: 14px; vertical-align: -2px; margin-right: 3px; color: #ffffff; }
-  tbody td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); white-space: nowrap; color: var(--text-primary); }
+  tbody td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; }
+  tbody td:last-child { border-right: none; }
   tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: var(--bg-soft); }
   td.amt { text-align: right; font-variant-numeric: tabular-nums; }
-  th.amt { text-align: right; }
-  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); padding: 12px; white-space: nowrap; }
+  td.amt.c-minus { color: var(--warn); font-weight: 600; }
+  td.amt.c-gray  { color: var(--text-tertiary); }
+  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); padding: 12px; white-space: nowrap; border-right: 1px solid var(--border); }
+  tfoot td:last-child { border-right: none; }
   tfoot td.total-label { text-align: right; }
   tfoot td.amt { text-align: right; font-variant-numeric: tabular-nums; }
   tfoot .total-count { font-variant-numeric: tabular-nums; }
-  .badge-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; line-height: 1.4; }
+  .date-day  { display: block; }
+  .date-time { display: block; font-size: 11.5px; color: var(--text-tertiary); }
+  .svc-provider { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+  tbody tr.data-row { cursor: pointer; }
+  thead th.c-action { padding: 0; text-align: center; border-right: none; }
+  tbody tr.data-row td.c-action { text-align: center; padding: 0; border-right: none; }
+  tbody tr.data-row td.c-action::after {
+    content: ''; display: inline-block; width: 6px; height: 6px;
+    border-right: 2px solid rgba(11,95,208,0.32);
+    border-top:   2px solid rgba(11,95,208,0.32);
+    transform: rotate(45deg); transition: border-color .15s; vertical-align: middle;
+  }
+  tbody tr.data-row:hover td.c-action::after {
+    border-right-color: var(--accent);
+    border-top-color:   var(--accent);
+  }
+  .badge-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; line-height: 1.4; min-width: 120px; justify-content: center; }
   .badge-status i { font-size: 14px; flex: 0 0 auto; }
   .st-sale    { background: var(--ok-soft);   color: var(--text-ok);        border-color: rgba(31,138,109,0.40); }
   .st-auth    { background: var(--bg-soft);   color: var(--text-soft);      border-color: var(--accent-line); }
@@ -292,7 +326,7 @@
 </head>
 <body>
 <main class="wrap">
-  <h2 class="sr-only">売上管理。取引検索の条件入力、金額サマリー、CSVダウンロード、検索結果テーブルで構成されています。</h2>
+  <h2 class="sr-only">売上明細照会。取引検索の条件入力、金額サマリー、CSVダウンロード、検索結果テーブルで構成されています。</h2>
   <div class="shell">
 
     <div class="main">
@@ -300,7 +334,7 @@
       <div class="topbar">
         <div class="titlerow">
           <span class="t">
-            売上管理
+            売上明細照会
           </span>
         </div>
       </div>
@@ -330,49 +364,39 @@
             </div>
           </div>
 
-          <div class="frow frow-tight">
+          <div class="frow">
             <label>ステータス</label>
-            <div class="fcontrols" style="flex-direction:column; align-items:stretch; gap:10px;">
-              <div style="display:flex; gap:8px; align-items:center;">
-                <button type="button" class="btn btn-ghost" id="statusAll"><i class="ti ti-checks"></i>全選択</button>
-                <button type="button" class="btn btn-ghost" id="statusClear"><i class="ti ti-square-off"></i>解除</button>
-                <span class="status-hint">（クリックで選択／解除）</span>
-              </div>
-              <div id="statusWrap">
-                <div class="status-group-label">成立</div>
-                <div class="status-grid">
-                  <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>売上</span>
-                  <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>与信・決済申込</span>
-                </div>
-                <div class="status-group-label">取消・失敗</div>
-                <div class="status-grid">
-                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-arrow-back-up"></i>取消（返金）</span>
-                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-circle-x"></i>キャンセル（与信・決済申込）</span>
-                  <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-alert-circle"></i>取引失敗</span>
-                </div>
-                <div class="status-group-label">その他</div>
-                <div class="status-grid">
-                  <span class="chip tone-neutral" data-tone="neutral" data-on="0"><i class="ti ti-clock-off"></i>期限切れ</span>
-                </div>
+            <div class="fcontrols">
+              <div id="statusWrap" class="status-chips">
+                <button type="button" class="btn-chip-ctrl" id="statusAll">全選択</button>
+                <button type="button" class="btn-chip-ctrl" id="statusClear">解除</button>
+                <span class="chip-sep"></span>
+                <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>売上</span>
+                <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>与信・決済申込</span>
+                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-arrow-back-up"></i>取消</span>
+                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-circle-x"></i>キャンセル</span>
+                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-alert-circle"></i>取引失敗</span>
+                <span class="chip tone-neutral" data-tone="neutral" data-on="0"><i class="ti ti-clock-off"></i>期限切れ</span>
               </div>
             </div>
           </div>
 
-          <div class="frow">
-            <label>ショップ</label>
-            <div class="fcontrols"><input type="text" class="grow" placeholder="ショップを選択"></div>
-          </div>
-
-          <div class="frow">
-            <label>サービス事業者</label>
-            <div class="fcontrols">
-              <select style="min-width:240px;">
-                <option>選択してください</option>
-                <option>PayPay決済</option>
-                <option>（株）ジェーシービー</option>
-                <option>りゅうぎん</option>
-                <option>NETSTARS（StarPay）</option>
-              </select>
+          <div class="grid-2col">
+            <div class="frow">
+              <label>ショップ</label>
+              <div class="fcontrols"><input type="text" class="grow" placeholder="ショップ名"></div>
+            </div>
+            <div class="frow">
+              <label>サービス事業者</label>
+              <div class="fcontrols">
+                <select style="width:100%;">
+                  <option>選択してください</option>
+                  <option>PayPay決済</option>
+                  <option>（株）ジェーシービー</option>
+                  <option>りゅうぎん</option>
+                  <option>NETSTARS（StarPay）</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -384,36 +408,42 @@
 
         <!-- summary -->
         <div class="section-head"><i class="ti ti-calculator" aria-hidden="true"></i>集計</div>
-        <div class="panel-box">
-          <div class="summary">
-            <div class="scard tone-in">
-              <div class="scard-top">
-                <span class="scard-ico"><i class="ti ti-arrow-down-circle" aria-hidden="true"></i></span>
-                <span class="scard-label">取引額</span>
-                <span class="scard-cnt">2 件</span>
+        <div class="panel-box" style="padding:0;">
+          <div class="summary-strip">
+            <div class="sitem tone-in">
+              <span class="sitem-ico"><i class="ti ti-arrow-down-circle" aria-hidden="true"></i></span>
+              <div class="sitem-body">
+                <div class="sitem-row1">
+                  <span class="sitem-label">取引額</span>
+                  <span class="sitem-cnt">2 件</span>
+                </div>
+                <div class="sitem-amt">¥ 2,310</div>
               </div>
-              <div class="scard-amt">¥2,310</div>
             </div>
-            <span class="op" aria-hidden="true">−</span>
-            <div class="scard tone-out">
-              <div class="scard-top">
-                <span class="scard-ico"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></span>
-                <span class="scard-label">取消額</span>
-                <span class="scard-cnt">0 件</span>
+            <span class="sop" aria-hidden="true">−</span>
+            <div class="sitem tone-out">
+              <span class="sitem-ico"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></span>
+              <div class="sitem-body">
+                <div class="sitem-row1">
+                  <span class="sitem-label">取消額</span>
+                  <span class="sitem-cnt">0 件</span>
+                </div>
+                <div class="sitem-amt">¥ 0</div>
               </div>
-              <div class="scard-amt">¥0</div>
             </div>
-            <span class="op" aria-hidden="true">=</span>
-            <div class="scard tone-total">
-              <div class="scard-top">
-                <span class="scard-ico"><i class="ti ti-equal" aria-hidden="true"></i></span>
-                <span class="scard-label">合計額</span>
-                <span class="scard-cnt">2 件</span>
+            <span class="sop" aria-hidden="true">=</span>
+            <div class="sitem tone-total">
+              <span class="sitem-ico"><i class="ti ti-equal" aria-hidden="true"></i></span>
+              <div class="sitem-body">
+                <div class="sitem-row1">
+                  <span class="sitem-label">合計額</span>
+                  <span class="sitem-cnt">2 件</span>
+                </div>
+                <div class="sitem-amt">¥ 2,310</div>
               </div>
-              <div class="scard-amt">¥2,310</div>
             </div>
           </div>
-          <p class="summary-note">※「取引」の合計金額には、取引失敗、仮売上、仮売上取消、与信・決済申込、キャンセル（与信・決済申込）の値を含みません。</p>
+          <p class="summary-note">※「取引額」は売上のみが対象です。取引失敗・与信・決済申込・キャンセルは含まれません。</p>
         </div>
 
         <div class="section-head"><i class="ti ti-table" aria-hidden="true"></i>検索結果<span id="result-summary" style="margin-left:auto; font-weight:500;"></span></div>
@@ -434,218 +464,195 @@
 
           <div class="table-scroll">
             <table>
+              <colgroup>
+                <col class="c-txid">
+                <col class="c-date">
+                <col class="c-shop">
+                <col class="c-card">
+                <col class="c-svc">
+                <col class="c-status">
+                <col class="c-amt">
+                <col class="c-action">
+              </colgroup>
               <thead>
                 <tr>
                   <th><i class="ti ti-hash"></i>取引ID</th>
                   <th><i class="ti ti-clock"></i>日時</th>
-                  <th><i class="ti ti-user"></i>担当者</th>
                   <th><i class="ti ti-building-store"></i>ショップ名</th>
                   <th><i class="ti ti-credit-card"></i>カード番号</th>
-                  <th><i class="ti ti-wallet"></i>サービス種類</th>
-                  <th><i class="ti ti-building-bank"></i>サービス事業者</th>
+                  <th><i class="ti ti-wallet"></i>サービス</th>
                   <th><i class="ti ti-checkbox"></i>ステータス</th>
-                  <th><i class="ti ti-info-circle"></i>説明</th>
                   <th class="amt">金額</th>
+                  <th class="c-action"></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr class="data-row">
                   <td>TX5001A</td>
-                  <td>2026/06/01 17:36:29</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">17:36:29</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
-                  <td>PayPay決済</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span><span class="svc-provider">PayPay決済</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>外部支払い</td>
                   <td class="amt">¥ 660</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5002B</td>
-                  <td>2026/06/01 15:15:44</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">15:15:44</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>358760*******34</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
-                  <td>（株）ジェーシービー</td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>外部支払い</td>
                   <td class="amt">¥ 1,650</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5003C</td>
-                  <td>2026/06/01 14:02:11</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">14:02:11</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>414720*******09</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
-                  <td>りゅうぎん</td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span><span class="svc-provider">りゅうぎん</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>店頭支払い</td>
                   <td class="amt">¥ 2,200</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5004D</td>
-                  <td>2026/06/01 13:20:47</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">13:20:47</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>553011*******42</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
-                  <td>りゅうぎん</td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span><span class="svc-provider">りゅうぎん</span></td>
                   <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
-                  <td>店頭支払い</td>
                   <td class="amt">¥ 980</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5005E</td>
-                  <td>2026/06/01 12:48:30</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">12:48:30</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>374830*******05</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
-                  <td>（株）ジェーシービー</td>
-                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消（返金）</span></td>
-                  <td>店頭支払い</td>
-                  <td class="amt">¥ 3,520</td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
+                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
+                  <td class="amt c-minus">−¥ 3,520</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5006F</td>
-                  <td>2026/06/01 11:15:09</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">11:15:09</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル（与信・決済申込）</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 540</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
+                  <td class="amt c-minus">−¥ 540</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5007G</td>
-                  <td>2026/06/01 10:33:52</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">10:33:52</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
                   <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 1,280</td>
+                  <td class="amt c-gray">¥ 1,280</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5008H</td>
-                  <td>2026/06/01 09:47:18</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">09:47:18</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
                   <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 760</td>
+                  <td class="amt c-gray">¥ 760</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5009I</td>
-                  <td>2026/06/01 09:12:05</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/06/01</span><span class="date-time">09:12:05</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>453210*******88</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
-                  <td>りゅうぎん</td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span><span class="svc-provider">りゅうぎん</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>店頭支払い</td>
                   <td class="amt">¥ 4,180</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5010J</td>
-                  <td>2026/05/31 19:40:22</td>
-                  <td>田中 結衣</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">19:40:22</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
-                  <td>PayPay決済</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span><span class="svc-provider">PayPay決済</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>外部支払い</td>
                   <td class="amt">¥ 880</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5011K</td>
-                  <td>2026/05/31 18:05:51</td>
-                  <td>田中 結衣</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">18:05:51</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>358760*******12</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
-                  <td>（株）ジェーシービー</td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
                   <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
-                  <td>店頭支払い</td>
                   <td class="amt">¥ 2,750</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5012L</td>
-                  <td>2026/05/31 16:22:38</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">16:22:38</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>553011*******77</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
-                  <td>りゅうぎん</td>
-                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消（返金）</span></td>
-                  <td>店頭支払い</td>
-                  <td class="amt">¥ 1,100</td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span><span class="svc-provider">りゅうぎん</span></td>
+                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
+                  <td class="amt c-minus">−¥ 1,100</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5013M</td>
-                  <td>2026/05/31 14:55:10</td>
-                  <td>鈴木 大地</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">14:55:10</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
                   <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 640</td>
+                  <td class="amt c-gray">¥ 640</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5014N</td>
-                  <td>2026/05/31 13:11:47</td>
-                  <td>鈴木 大地</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">13:11:47</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル（与信・決済申込）</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 1,980</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
+                  <td class="amt c-minus">−¥ 1,980</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5015O</td>
-                  <td>2026/05/31 11:38:29</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">11:38:29</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>374830*******61</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
-                  <td>（株）ジェーシービー</td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td>店頭支払い</td>
                   <td class="amt">¥ 5,300</td>
+                  <td class="c-action"></td>
                 </tr>
-                <tr>
+                <tr class="data-row">
                   <td>TX5016P</td>
-                  <td>2026/05/31 10:02:14</td>
-                  <td>佐藤 健一</td>
+                  <td><span class="date-day">2026/05/31</span><span class="date-time">10:02:14</span></td>
                   <td>カフェ・ソレイユ</td>
-                  <td>—</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
+                  <td>&mdash;</td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
                   <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
-                  <td>外部支払い</td>
-                  <td class="amt">¥ 720</td>
+                  <td class="amt c-gray">¥ 720</td>
+                  <td class="c-action"></td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td class="total-label" colspan="9">合計 <span class="total-count" id="total-count">0</span> 件</td>
+                  <td class="total-label" colspan="6">合計 <span class="total-count" id="total-count">0</span> 件</td>
                   <td class="amt" id="total-amount">¥ 0</td>
+                  <td></td>
                 </tr>
               </tfoot>
             </table>
@@ -709,16 +716,19 @@
     var totalAmount = 0;
     rows.forEach(function (row) {
       var amtCell = row.querySelector('td.amt');
-      if (!amtCell) {
+      if (!amtCell || amtCell.classList.contains('c-gray')) {
         return;
       }
       var digits = amtCell.textContent.replace(/[^0-9]/g, '');
       if (digits !== '') {
-        totalAmount += parseInt(digits, 10);
+        var val = parseInt(digits, 10);
+        totalAmount += amtCell.classList.contains('c-minus') ? -val : val;
       }
     });
+    var prefix = totalAmount < 0 ? '−¥ ' : '¥ ';
+    if (totalAmount < 0) { amountEl.classList.add('c-minus'); }
     countEl.textContent = rows.length.toLocaleString();
-    amountEl.textContent = '¥ ' + totalAmount.toLocaleString();
+    amountEl.textContent = prefix + Math.abs(totalAmount).toLocaleString();
   })();
 
   // 検索結果のページネーション（表示件数の切替と複数ページの表示制御）

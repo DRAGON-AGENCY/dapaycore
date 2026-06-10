@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>振込一覧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    media="print" onload="this.media='all'">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f4f6fa;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --text-primary: #1b2733;
+    --text-secondary: #5a6675;
+    --text-tertiary: #93a0af;
+    --text-soft: #0c447c;
+    --border: rgba(20,45,80,0.10);
+    --border-strong: rgba(20,45,80,0.24);
+    --accent: #0b5fd0;
+    --accent-strong: #0c447c;
+    --accent-line: rgba(11,95,208,0.25);
+    --ok-soft: #d6f0e8;
+    --text-ok: #1a7054;
+    --warn: #d9820a;
+    --warn-soft: #fef0de;
+    --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 22px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #0f141a; --bg-surface: #19202a; --bg-secondary: #1f2832;
+      --bg-soft: #14283f; --bg-soft-2: #16202c;
+      --text-primary: #eef2f7; --text-secondary: #aeb9c6; --text-tertiary: #7a8694;
+      --text-soft: #9cc6f2;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.22);
+      --accent: #3d8ddd; --accent-strong: #0c447c;
+      --ok-soft: #0e3128; --text-ok: #5fc49a;
+      --warn: #f0a83a; --warn-soft: #3a2008;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3); --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg-page); color: var(--text-primary);
+    font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { width: 100%; padding: 24px 28px 48px; }
+
+  /* topbar */
+  .topbar { margin-bottom: 20px; }
+  .topbar .t { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 9px; }
+  .topbar .t i { font-size: var(--fs-lg); color: var(--accent); }
+
+  /* search box */
+  .search-box {
+    background: var(--bg-surface); border: 0.5px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 16px;
+    box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px;
+  }
+  .search-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  /* year-month filter */
+  .filter-ym {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--bg-soft); border-radius: var(--radius-sm);
+    border: 0.5px solid rgba(11,95,208,0.18);
+  }
+  .filter-ym label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-soft); white-space: nowrap; }
+  .filter-ym select {
+    height: 36px; padding: 0 28px 0 10px; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); background: var(--bg-surface); font-family: inherit;
+    font-size: var(--fs-sm); color: var(--text-primary); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%230b5fd0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center;
+  }
+  .filter-ym select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,95,208,0.16); }
+
+  .btn-search, .btn-clear {
+    height: 40px; padding: 0 16px; border-radius: var(--radius-sm);
+    font-family: inherit; font-size: var(--fs-sm); font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .btn-search { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-search:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+  .btn-clear  { background: var(--bg-surface); color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-clear:hover  { background: var(--bg-secondary); }
+
+  /* table area */
+  .panel-box {
+    background: var(--bg-surface); border: 0.5px solid var(--border);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap;
+  }
+  .result-count { font-size: var(--fs-xs); color: var(--text-tertiary); }
+  .result-count strong { color: var(--text-primary); font-weight: 700; }
+
+  /* per-page control */
+  .per-page-control { display: inline-flex; align-items: center; gap: 8px; }
+  .per-page-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+  .per-page-select {
+    padding: 6px 28px 6px 10px; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); background: var(--bg-surface);
+    font-family: inherit; font-size: 12px; color: var(--text-primary); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath fill='%230b5fd0' d='M0 0l4.5 5 4.5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center;
+  }
+  .per-page-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,95,208,0.16); }
+
+  /* table */
+  .tbl-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); table-layout: fixed; min-width: 700px; }
+  col.c-ym     { width: 18%; }
+  col.c-close  { width: 18%; }
+  col.c-count  { width: 12%; }
+  col.c-status { width: 22%; }
+  col.c-amt    { width: 26%; }
+  col.c-action { width: 4%; }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 14px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
+  thead th:last-child { border-right: none; }
+  tbody td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; }
+  tbody td:last-child { border-right: none; }
+  tbody tr.data-row:hover td { background: var(--bg-soft); }
+  tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
+  tbody tr:nth-child(even).data-row:hover td { background: var(--bg-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+  td.c-count-val { text-align: right; font-variant-numeric: tabular-nums; }
+  .empty-cell { text-align: center; color: var(--text-tertiary); padding: 36px 14px; font-size: var(--fs-sm); }
+
+  /* 行クリック可能インジケーター */
+  tbody tr.data-row { cursor: pointer; }
+  thead th.c-action { text-align: center; padding: 0; border-right: none; }
+  tbody tr.data-row td.c-action { text-align: center; padding: 0; border-right: none; }
+  tbody tr.data-row td.c-action::after {
+    content: ''; display: inline-block; width: 6px; height: 6px;
+    border-right: 2px solid rgba(11,95,208,0.32);
+    border-top: 2px solid rgba(11,95,208,0.32);
+    transform: rotate(45deg); transition: border-color .15s; vertical-align: middle;
+  }
+  tbody tr.data-row:hover td.c-action::after {
+    border-right-color: var(--accent);
+    border-top-color: var(--accent);
+  }
+
+  /* tfoot */
+  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); padding: 12px 14px; white-space: nowrap; border-right: 1px solid var(--border); }
+  tfoot td:last-child { border-right: none; }
+  tfoot .total-label { text-align: right; }
+  tfoot td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* status badge */
+  .badge-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; line-height: 1.4; min-width: 100px; justify-content: center; }
+  .badge-status i { font-size: 14px; flex: 0 0 auto; }
+  .st-done       { background: var(--ok-soft);   color: var(--text-ok);      border-color: rgba(31,138,109,0.40); }
+  .st-pending    { background: var(--bg-soft-2); color: var(--text-soft);    border-color: var(--accent-line); }
+  .st-processing { background: var(--bg-soft);   color: var(--accent);       border-color: rgba(11,95,208,0.30); }
+  .st-hold       { background: var(--warn-soft); color: #8a3d10;             border-color: var(--warn); }
+  @media (prefers-color-scheme: dark) {
+    .st-hold { color: #f0b48f; }
+  }
+
+  /* pagination */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 16px; border-top: 0.5px solid var(--border); flex-wrap: wrap; }
+  .page-numbers { display: flex; align-items: center; gap: 6px; }
+  .page-btn { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-primary); font-family: inherit; font-size: 13px; cursor: pointer; transition: all .15s ease; }
+  .page-btn:hover:not(:disabled):not(.is-active) { background: var(--bg-soft-2); }
+  .page-btn:disabled { opacity: 0.4; cursor: default; }
+  .page-number.is-active { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 700; cursor: default; }
+  .page-ellipsis { min-width: 22px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+  .page-nav { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <span class="t"><i class="ti ti-transfer" aria-hidden="true"></i>振込一覧</span>
+  </div>
+
+  <!-- 絞込み -->
+  <div class="search-box">
+    <div class="filter-ym">
+      <label for="filter-year">対象年月で絞込み：</label>
+      <select id="filter-year">
+        <option value="">年（すべて）</option>
+        <option value="2026">2026年</option>
+        <option value="2025">2025年</option>
+      </select>
+      <select id="filter-month">
+        <option value="">月（すべて）</option>
+        <option value="01">1月</option>
+        <option value="02">2月</option>
+        <option value="03">3月</option>
+        <option value="04">4月</option>
+        <option value="05">5月</option>
+        <option value="06">6月</option>
+        <option value="07">7月</option>
+        <option value="08">8月</option>
+        <option value="09">9月</option>
+        <option value="10">10月</option>
+        <option value="11">11月</option>
+        <option value="12">12月</option>
+      </select>
+    </div>
+    <div class="search-row">
+      <button type="button" class="btn-search" id="search-btn"><i class="ti ti-search" aria-hidden="true"></i>絞込み</button>
+      <button type="button" class="btn-clear" id="clear-btn"><i class="ti ti-x" aria-hidden="true"></i>クリア</button>
+    </div>
+  </div>
+
+  <!-- 一覧テーブル -->
+  <div class="panel-box">
+    <div class="panel-head">
+      <span class="result-count" id="result-count">表示件数 <strong>0</strong> 件</span>
+      <div class="per-page-control">
+        <label class="per-page-label" for="per-page-sel">表示件数</label>
+        <select id="per-page-sel" class="per-page-select">
+          <option value="10" selected>10件</option>
+          <option value="20">20件</option>
+          <option value="50">50件</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tbl-scroll">
+      <table>
+        <colgroup>
+          <col class="c-ym">
+          <col class="c-close">
+          <col class="c-count">
+          <col class="c-status">
+          <col class="c-amt">
+          <col class="c-action">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="c-ym">対象年月</th>
+            <th class="c-close">締め日</th>
+            <th class="c-count">取引件数</th>
+            <th class="c-status">ステータス</th>
+            <th class="c-amt amt">振込金額</th>
+            <th class="c-action"></th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- JS で描画 -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="total-label" colspan="4">合計</td>
+            <td class="amt" id="total-amount">¥ 0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="pagination" id="pagination">
+      <button class="page-btn page-nav" type="button" data-nav="prev" aria-label="前のページ">‹</button>
+      <div class="page-numbers" id="page-numbers"></div>
+      <button class="page-btn page-nav" type="button" data-nav="next" aria-label="次のページ">›</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  /* ---- サンプルデータ 20 件。実装時は API から取得して差し替える。 ---- */
+  var allData = [
+    { ym: '2026/06', closing: '2026/06/30', count:  18, status: 'st-pending',    amt:  38420 },
+    { ym: '2026/05', closing: '2026/05/31', count:  24, status: 'st-done',       amt:  51880 },
+    { ym: '2026/05', closing: '2026/05/31', count:  11, status: 'st-done',       amt:  22100 },
+    { ym: '2026/04', closing: '2026/04/30', count:  32, status: 'st-done',       amt:  76350 },
+    { ym: '2026/04', closing: '2026/04/30', count:  19, status: 'st-hold',       amt:  41200 },
+    { ym: '2026/03', closing: '2026/03/31', count:  27, status: 'st-done',       amt:  63180 },
+    { ym: '2026/03', closing: '2026/03/31', count:  15, status: 'st-done',       amt:  29900 },
+    { ym: '2026/02', closing: '2026/02/28', count:  20, status: 'st-done',       amt:  44500 },
+    { ym: '2026/02', closing: '2026/02/28', count:   8, status: 'st-done',       amt:  17600 },
+    { ym: '2026/01', closing: '2026/01/31', count:  35, status: 'st-done',       amt:  82300 },
+    { ym: '2026/01', closing: '2026/01/31', count:  22, status: 'st-done',       amt:  49750 },
+    { ym: '2025/12', closing: '2025/12/31', count:  41, status: 'st-done',       amt: 101200 },
+    { ym: '2025/12', closing: '2025/12/31', count:  28, status: 'st-done',       amt:  67400 },
+    { ym: '2025/11', closing: '2025/11/30', count:  30, status: 'st-done',       amt:  71000 },
+    { ym: '2025/11', closing: '2025/11/30', count:  16, status: 'st-done',       amt:  33800 },
+    { ym: '2025/10', closing: '2025/10/31', count:  25, status: 'st-done',       amt:  58600 },
+    { ym: '2025/10', closing: '2025/10/31', count:  13, status: 'st-done',       amt:  28900 },
+    { ym: '2025/09', closing: '2025/09/30', count:  21, status: 'st-done',       amt:  47300 },
+    { ym: '2025/08', closing: '2025/08/31', count:  17, status: 'st-done',       amt:  38700 },
+    { ym: '2025/07', closing: '2025/07/31', count:  29, status: 'st-done',       amt:  65100 }
+  ];
+
+  var STATUS_LABEL = {
+    'st-done':       '振込済み',
+    'st-pending':    '未処理',
+    'st-processing': '処理中',
+    'st-hold':       '保留'
+  };
+  var STATUS_ICON = {
+    'st-done':       'ti-circle-check',
+    'st-pending':    'ti-clock',
+    'st-processing': 'ti-loader',
+    'st-hold':       'ti-alert-triangle'
+  };
+
+  function fmtYm(ym) {
+    var parts = ym.split('/');
+    return parts[0] + '年' + parseInt(parts[1], 10) + '月';
+  }
+
+  function fmtAmt(n) { return '¥ ' + n.toLocaleString('ja-JP'); }
+
+  var filteredRows = allData.slice();
+  var currentPage  = 1;
+  var perPage      = 10;
+
+  var filterYear  = document.getElementById('filter-year');
+  var filterMonth = document.getElementById('filter-month');
+  var prevBtn     = document.querySelector('[data-nav="prev"]');
+  var nextBtn     = document.querySelector('[data-nav="next"]');
+
+  function getTotalPages() {
+    return Math.max(1, Math.ceil(filteredRows.length / perPage));
+  }
+
+  function applyFilter() {
+    var yr = filterYear.value;
+    var mo = filterMonth.value;
+    filteredRows = allData.filter(function (row) {
+      if (yr && row.ym.indexOf(yr) !== 0)  { return false; }
+      if (mo && row.ym.slice(-2) !== mo)   { return false; }
+      return true;
+    });
+    currentPage = 1;
+    render();
+  }
+
+  filterYear.addEventListener('change', applyFilter);
+  filterMonth.addEventListener('change', applyFilter);
+  document.getElementById('search-btn').addEventListener('click', applyFilter);
+
+  document.getElementById('clear-btn').addEventListener('click', function () {
+    filterYear.value  = '';
+    filterMonth.value = '';
+    applyFilter();
+  });
+
+  document.getElementById('per-page-sel').addEventListener('change', function () {
+    perPage = parseInt(this.value, 10);
+    currentPage = 1;
+    render();
+  });
+
+  function buildPageItems(current, total) {
+    var items = [];
+    if (total <= 7) {
+      for (var i = 1; i <= total; i++) { items.push(i); }
+      return items;
+    }
+    items.push(1);
+    var left  = Math.max(2, current - 1);
+    var right = Math.min(total - 1, current + 1);
+    if (left > 2)          { items.push('...'); }
+    for (var p = left; p <= right; p++) { items.push(p); }
+    if (right < total - 1) { items.push('...'); }
+    items.push(total);
+    return items;
+  }
+
+  function render() {
+    var total      = filteredRows.length;
+    var totalPages = getTotalPages();
+    if (currentPage > totalPages) { currentPage = totalPages; }
+
+    var startIndex = (currentPage - 1) * perPage;
+    var endIndex   = Math.min(startIndex + perPage, total);
+    var page       = filteredRows.slice(startIndex, endIndex);
+
+    document.getElementById('result-count').innerHTML = '表示件数 <strong>' + total + '</strong> 件';
+
+    var totalAmt = filteredRows.reduce(function (s, r) { return s + r.amt; }, 0);
+    document.getElementById('total-amount').textContent = fmtAmt(totalAmt);
+
+    var tbody = document.getElementById('table-body');
+    if (total === 0) {
+      tbody.innerHTML = '<tr><td class="empty-cell" colspan="6">該当する振込データがありません。</td></tr>';
+    } else {
+      tbody.innerHTML = page.map(function (row) {
+        return '<tr class="data-row" data-ym="' + row.ym + '" data-closing="' + row.closing + '">'
+          + '<td>' + fmtYm(row.ym) + '</td>'
+          + '<td>' + row.closing + '</td>'
+          + '<td class="c-count-val">' + row.count.toLocaleString('ja-JP') + ' 件</td>'
+          + '<td><span class="badge-status ' + row.status + '"><i class="ti ' + STATUS_ICON[row.status] + '" aria-hidden="true"></i>' + STATUS_LABEL[row.status] + '</span></td>'
+          + '<td class="amt">' + fmtAmt(row.amt) + '</td>'
+          + '<td class="c-action"></td>'
+          + '</tr>';
+      }).join('');
+
+      tbody.querySelectorAll('tr.data-row').forEach(function (tr) {
+        tr.addEventListener('click', function () {
+          var ym      = tr.getAttribute('data-ym');
+          var closing = tr.getAttribute('data-closing');
+          window.location.href = '/transfer_detail.html?ym=' + encodeURIComponent(ym) + '&closing=' + encodeURIComponent(closing);
+        });
+      });
+    }
+
+    var pageNumbersEl = document.getElementById('page-numbers');
+    pageNumbersEl.innerHTML = '';
+
+    buildPageItems(currentPage, totalPages).forEach(function (item) {
+      if (item === '...') {
+        var ellipsis = document.createElement('span');
+        ellipsis.className = 'page-ellipsis';
+        ellipsis.textContent = '…';
+        pageNumbersEl.appendChild(ellipsis);
+        return;
+      }
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'page-btn page-number' + (item === currentPage ? ' is-active' : '');
+      btn.textContent = item;
+      (function (pg) {
+        btn.addEventListener('click', function () { currentPage = pg; render(); });
+      })(item);
+      pageNumbersEl.appendChild(btn);
+    });
+
+    prevBtn.disabled = (currentPage === 1);
+    nextBtn.disabled = (currentPage === totalPages);
+  }
+
+  prevBtn.addEventListener('click', function () {
+    if (currentPage > 1) { currentPage--; render(); }
+  });
+  nextBtn.addEventListener('click', function () {
+    if (currentPage < getTotalPages()) { currentPage++; render(); }
+  });
+
+  applyFilter();
+</script>
+</body>
+</html>
