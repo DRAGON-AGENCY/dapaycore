@@ -58,7 +58,7 @@
     font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { width: 100%; min-width: 0; max-width: 1760px; margin: 0 auto; padding: 26px 28px 60px; }
+  .wrap { width: 100%; min-width: 1200px; max-width: 1760px; margin: 0 auto; padding: 26px 28px 60px; }
   .shell { background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; min-height: 640px; box-shadow: var(--shadow-md); }
   .main { display: flex; flex-direction: column; min-height: 640px; }
 
@@ -70,18 +70,18 @@
   .topbar .titlerow .s { font-size: var(--fs-xs); color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px; }
   .topbar .titlerow .s i { font-size: var(--fs-sm); }
 
-  /* stepper */
+  /* 水平ステッパー */
   .stepper { display: flex; align-items: flex-start; overflow-x: auto; padding: 2px 0 16px; border-bottom: 0.5px solid var(--border); scrollbar-width: thin; }
-  .stepper .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 84px; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
-  .stepper .dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 700; flex: 0 0 auto; transition: all .2s; }
-  .stepper .dot.done { background: var(--accent-strong); color: #fff; }
+  .stepper .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 66px; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+  .stepper .dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; flex: 0 0 auto; transition: all .2s; }
+  .stepper .dot.done { background: var(--ok); color: #fff; }
   .stepper .dot.active { background: var(--accent); color: #fff; box-shadow: 0 0 0 4px rgba(61,141,221,0.22); }
   .stepper .dot.todo { background: var(--bg-secondary); border: 0.5px solid var(--border-strong); color: var(--text-tertiary); }
-  .stepper .stxt { font-size: var(--fs-xs); color: var(--text-tertiary); text-align: center; line-height: 1.3; white-space: nowrap; }
+  .stepper .stxt { font-size: 11px; color: var(--text-tertiary); text-align: center; line-height: 1.3; white-space: nowrap; }
   .stepper .step.is-done .stxt { color: var(--text-secondary); }
   .stepper .step.is-active .stxt { color: var(--text-soft); font-weight: 700; }
-  .stepper .bar { flex: 1; height: 2px; background: var(--border-strong); margin-top: 16px; min-width: 12px; border-radius: 2px; }
-  .stepper .bar.done { background: var(--accent-strong); }
+  .stepper .bar { flex: 1; height: 2px; background: var(--border-strong); margin-top: 14px; min-width: 12px; border-radius: 2px; }
+  .stepper .bar.done { background: var(--ok); }
 
   /* panels */
   .panel-area { flex: 1; padding: 22px 28px 18px; }
@@ -102,10 +102,14 @@
   .card-b { padding: 16px; }
 
 
+  /* card grid layout */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .card-grid > .card { margin-bottom: 0; }
+
   /* 読み取り専用の項目リスト */
-  .kv { display: grid; grid-template-columns: minmax(220px, 320px) 1fr; max-width: 920px; margin: 0; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
-  .kv dt { font-size: var(--fs-xs); color: var(--accent-strong); font-weight: 600; padding: 11px 14px; background: var(--bg-soft); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; }
-  .kv dd { font-size: var(--fs-base); color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; word-break: break-word; }
+  .kv { display: grid; grid-template-columns: minmax(160px, 240px) 1fr; margin: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+  .kv dt { font-size: var(--fs-xs); color: var(--accent-strong); font-weight: 600; padding: 11px 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); display: flex; align-items: center; }
+  .kv dd { font-size: var(--fs-base); color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 1px solid var(--border-strong); display: flex; align-items: center; word-break: break-word; }
   .kv dt:nth-last-of-type(1), .kv dd:nth-last-of-type(1) { border-bottom: none; }
   .status-ok { color: var(--text-ok); font-weight: 600; }
   .status-na { color: var(--text-tertiary); }
@@ -119,17 +123,19 @@
     .kv dd { padding-top: 3px; }
   }
 
-  /* 決済種類テーブル（売上管理画面と同様の表示） */
-  .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); }
+  /* 決済種類テーブル */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border-strong); border-radius: var(--radius-md); }
   .pay-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); min-width: 620px; }
-  .pay-table thead th { background: var(--bg-soft-2); color: var(--text-soft); font-weight: 700; text-align: left; padding: 12px 14px; white-space: nowrap; border-bottom: 0.5px solid var(--border); font-size: var(--fs-xs); }
-  .pay-table thead th i { font-size: var(--fs-xs); vertical-align: -2px; margin-right: 3px; color: var(--accent); }
-  .pay-table tbody td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); color: var(--text-primary); vertical-align: middle; }
+  .pay-table thead th { background: var(--accent); color: #fff; font-weight: 700; text-align: left; padding: 12px 14px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); font-size: var(--fs-xs); }
+  .pay-table thead th:last-child { border-right: none; }
+  .pay-table thead th i { font-size: var(--fs-xs); vertical-align: -2px; margin-right: 3px; color: #fff; }
+  .pay-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); color: var(--text-primary); vertical-align: middle; }
+  .pay-table tbody td:last-child { border-right: none; }
   .pay-table tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
   .pay-table tbody tr:last-child td { border-bottom: none; }
   .pay-table tbody tr:hover td { background: var(--bg-soft); }
   /* 決済種別の見出しセル（同一種別を行結合してまとめる） */
-  .pay-table tbody tr td.pay-cat { background: var(--bg-soft); color: var(--text-soft); font-weight: 700; white-space: nowrap; vertical-align: middle; text-align: center; width: 1%; border-right: 0.5px solid var(--border); }
+  .pay-table tbody tr td.pay-cat { background: var(--bg-soft); color: var(--text-soft); font-weight: 700; white-space: nowrap; vertical-align: middle; text-align: center; width: 1%; border-right: 1px solid var(--border-strong); }
   .pay-table tbody td.pay-cat .cat-inner { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; line-height: 1.3; }
   .pay-table tbody td.pay-cat .cat-inner i { font-size: 22px; color: var(--accent); }
   .pay-table tbody td.pay-cat .cat-count { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
@@ -180,7 +186,7 @@
         <div class="titlerow">
           <span class="t"><i class="ti ti-file-search" aria-hidden="true"></i>申込内容照会</span>
         </div>
-        <nav class="stepper" id="stepper" aria-label="照会カテゴリ"></nav>
+        <nav class="stepper" id="step-nav" aria-label="申込ステップ"></nav>
       </div>
 
       <div class="panel-area">
@@ -223,22 +229,24 @@
               <p class="desc">特定商取引法に該当する取引形態です。</p>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-gavel" aria-hidden="true"></i>特定商取引法に該当する取引形態</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>該当する取引形態</dt><dd>①〜⑥に該当する取引形態ではない</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-gavel" aria-hidden="true"></i>特定商取引法に該当する取引形態</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>該当する取引形態</dt><dd>①〜⑥に該当する取引形態ではない</dd>
+                </dl>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-building" aria-hidden="true"></i>事業区分</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>法人区分</dt><dd>法人</dd>
-                <dt>販売形態</dt><dd>固定店舗</dd>
-                <dt>運営形態</dt><dd>個店</dd>
-              </dl>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-building" aria-hidden="true"></i>事業区分</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>法人区分</dt><dd>法人</dd>
+                  <dt>販売形態</dt><dd>固定店舗</dd>
+                  <dt>運営形態</dt><dd>個店</dd>
+                </dl>
+              </div>
             </div>
           </div>
         </section>
@@ -347,100 +355,104 @@
               <p class="desc">申込者・代表者の情報です。</p>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>申込者情報</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>法人番号</dt><dd>7010001010001</dd>
-                <dt>法人名</dt><dd>株式会社サンプル商事</dd>
-                <dt>法人名（カナ）</dt><dd>カブシキガイシャサンプルショウジ</dd>
-                <dt>法人名（英語表記）</dt><dd>Sample Shoji Co.</dd>
-                <dt>法人設立年月日</dt><dd>2015年4月1日</dd>
-                <dt>法人種別</dt><dd>株式会社</dd>
-                <dt>ブランド名（屋号）</dt><dd>サンプルフラワー</dd>
-                <dt>ブランド名（カナ）</dt><dd>サンプルフラワー</dd>
-                <dt>ブランド名（英語表記）</dt><dd>Sample Flower</dd>
-                <dt>会社URL</dt><dd>https://example.co.jp</dd>
-                <dt>年商（万円）</dt><dd>12,000</dd>
-                <dt>資本金（万円）</dt><dd>1,000</dd>
-                <dt>従業員数（人）</dt><dd>40</dd>
-                <dt>業種（カテゴリー）</dt><dd>小売</dd>
-                <dt>業種（詳細）</dt><dd>その他</dd>
-                <dt>事業内容及び取扱商材</dt><dd>生花・園芸用品の販売</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>申込者情報</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>法人番号</dt><dd>7010001010001</dd>
+                  <dt>法人名</dt><dd>株式会社サンプル商事</dd>
+                  <dt>法人名（カナ）</dt><dd>カブシキガイシャサンプルショウジ</dd>
+                  <dt>法人名（英語表記）</dt><dd>Sample Shoji Co.</dd>
+                  <dt>法人設立年月日</dt><dd>2015年4月1日</dd>
+                  <dt>法人種別</dt><dd>株式会社</dd>
+                  <dt>ブランド名（屋号）</dt><dd>サンプルフラワー</dd>
+                  <dt>ブランド名（カナ）</dt><dd>サンプルフラワー</dd>
+                  <dt>ブランド名（英語表記）</dt><dd>Sample Flower</dd>
+                  <dt>会社URL</dt><dd>https://example.co.jp</dd>
+                  <dt>年商（万円）</dt><dd>12,000</dd>
+                  <dt>資本金（万円）</dt><dd>1,000</dd>
+                  <dt>従業員数（人）</dt><dd>40</dd>
+                  <dt>業種（カテゴリー）</dt><dd>小売</dd>
+                  <dt>業種（詳細）</dt><dd>その他</dd>
+                  <dt>事業内容及び取扱商材</dt><dd>生花・園芸用品の販売</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-map-pin" aria-hidden="true"></i>個人事業主住所／本社住所</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>郵便番号</dt><dd>070-0031</dd>
+                  <dt>都道府県</dt><dd>北海道</dd>
+                  <dt>都道府県（カナ）</dt><dd>ホッカイドウ</dd>
+                  <dt>市区町村</dt><dd>旭川市</dd>
+                  <dt>市区町村（カナ）</dt><dd>アサヒカワシ</dd>
+                  <dt>町域</dt><dd>二条通</dd>
+                  <dt>町域（カナ）</dt><dd>ニジョウドオリ</dd>
+                  <dt>番地</dt><dd>6丁目</dd>
+                  <dt>番地（カナ）</dt><dd>6チョウメ</dd>
+                  <dt>建物名及び部屋番号</dt><dd>サンプルビル 3F</dd>
+                  <dt>建物名及び部屋番号（カナ）</dt><dd>サンプルビル3カイ</dd>
+                  <dt>本社電話番号</dt><dd>0166-00-0000</dd>
+                  <dt>本社FAX番号</dt><dd>0166-00-0001</dd>
+                  <dt>携帯電話番号</dt><dd>090-1234-5678</dd>
+                </dl>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-map-pin" aria-hidden="true"></i>個人事業主住所／本社住所</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>郵便番号</dt><dd>070-0031</dd>
-                <dt>都道府県</dt><dd>北海道</dd>
-                <dt>都道府県（カナ）</dt><dd>ホッカイドウ</dd>
-                <dt>市区町村</dt><dd>旭川市</dd>
-                <dt>市区町村（カナ）</dt><dd>アサヒカワシ</dd>
-                <dt>町域</dt><dd>二条通</dd>
-                <dt>町域（カナ）</dt><dd>ニジョウドオリ</dd>
-                <dt>番地</dt><dd>6丁目</dd>
-                <dt>番地（カナ）</dt><dd>6チョウメ</dd>
-                <dt>建物名及び部屋番号</dt><dd>サンプルビル 3F</dd>
-                <dt>建物名及び部屋番号（カナ）</dt><dd>サンプルビル3カイ</dd>
-                <dt>本社電話番号</dt><dd>0166-00-0000</dd>
-                <dt>本社FAX番号</dt><dd>0166-00-0001</dd>
-                <dt>携帯電話番号</dt><dd>090-1234-5678</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-user" aria-hidden="true"></i>代表者様情報</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>姓</dt><dd>山田</dd>
+                  <dt>姓（カナ）</dt><dd>ヤマダ</dd>
+                  <dt>姓（英語表記）</dt><dd>YAMADA</dd>
+                  <dt>名</dt><dd>太郎</dd>
+                  <dt>名（カナ）</dt><dd>タロウ</dd>
+                  <dt>名（英語表記）</dt><dd>TARO</dd>
+                  <dt>生年月日</dt><dd>1980年5月10日</dd>
+                  <dt>性別</dt><dd>男</dd>
+                  <dt>自宅住所 郵便番号</dt><dd>070-0032</dd>
+                  <dt>自宅住所 都道府県</dt><dd>北海道</dd>
+                  <dt>自宅住所 都道府県（カナ）</dt><dd>ホッカイドウ</dd>
+                  <dt>自宅住所 市区町村</dt><dd>旭川市</dd>
+                  <dt>自宅住所 市区町村（カナ）</dt><dd>アサヒカワシ</dd>
+                  <dt>自宅住所 町域</dt><dd>三条通</dd>
+                  <dt>自宅住所 町域（カナ）</dt><dd>サンジョウドオリ</dd>
+                  <dt>自宅住所 番地</dt><dd>1-2-3</dd>
+                  <dt>自宅住所 番地（カナ）</dt><dd>1-2-3</dd>
+                  <dt>自宅住所 建物名及び部屋番号</dt><dd class="status-na">（なし）</dd>
+                  <dt>自宅電話番号</dt><dd>0166-00-1111</dd>
+                </dl>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-user" aria-hidden="true"></i>代表者様情報</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>姓</dt><dd>山田</dd>
-                <dt>姓（カナ）</dt><dd>ヤマダ</dd>
-                <dt>姓（英語表記）</dt><dd>YAMADA</dd>
-                <dt>名</dt><dd>太郎</dd>
-                <dt>名（カナ）</dt><dd>タロウ</dd>
-                <dt>名（英語表記）</dt><dd>TARO</dd>
-                <dt>生年月日</dt><dd>1980年5月10日</dd>
-                <dt>性別</dt><dd>男</dd>
-                <dt>自宅住所 郵便番号</dt><dd>070-0032</dd>
-                <dt>自宅住所 都道府県</dt><dd>北海道</dd>
-                <dt>自宅住所 都道府県（カナ）</dt><dd>ホッカイドウ</dd>
-                <dt>自宅住所 市区町村</dt><dd>旭川市</dd>
-                <dt>自宅住所 市区町村（カナ）</dt><dd>アサヒカワシ</dd>
-                <dt>自宅住所 町域</dt><dd>三条通</dd>
-                <dt>自宅住所 町域（カナ）</dt><dd>サンジョウドオリ</dd>
-                <dt>自宅住所 番地</dt><dd>1-2-3</dd>
-                <dt>自宅住所 番地（カナ）</dt><dd>1-2-3</dd>
-                <dt>自宅住所 建物名及び部屋番号</dt><dd class="status-na">（なし）</dd>
-                <dt>自宅電話番号</dt><dd>0166-00-1111</dd>
-              </dl>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-headset" aria-hidden="true"></i>担当者様情報</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>姓</dt><dd>佐藤</dd>
-                <dt>姓（カナ）</dt><dd>サトウ</dd>
-                <dt>名</dt><dd>花子</dd>
-                <dt>名（カナ）</dt><dd>ハナコ</dd>
-                <dt>勤務先住所 郵便番号</dt><dd>070-0031</dd>
-                <dt>勤務先住所 都道府県</dt><dd>北海道</dd>
-                <dt>勤務先住所 都道府県（カナ）</dt><dd>ホッカイドウ</dd>
-                <dt>勤務先住所 市区町村</dt><dd>旭川市</dd>
-                <dt>勤務先住所 市区町村（カナ）</dt><dd>アサヒカワシ</dd>
-                <dt>勤務先住所 町域</dt><dd>二条通</dd>
-                <dt>勤務先住所 町域（カナ）</dt><dd>ニジョウドオリ</dd>
-                <dt>勤務先住所 番地</dt><dd>6丁目</dd>
-                <dt>勤務先住所 番地（カナ）</dt><dd>6チョウメ</dd>
-                <dt>勤務先住所 建物名及び部屋番号</dt><dd>サンプルビル 3F</dd>
-                <dt>勤務先住所 建物名及び部屋番号（カナ）</dt><dd>サンプルビル3カイ</dd>
-                <dt>部署名</dt><dd>営業部</dd>
-                <dt>メールアドレス</dt><dd>hanako@example.co.jp</dd>
-                <dt>担当者電話番号1</dt><dd>0166-00-0000</dd>
-                <dt>担当者電話番号2</dt><dd>090-1234-5678</dd>
-              </dl>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-headset" aria-hidden="true"></i>担当者様情報</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>姓</dt><dd>佐藤</dd>
+                  <dt>姓（カナ）</dt><dd>サトウ</dd>
+                  <dt>名</dt><dd>花子</dd>
+                  <dt>名（カナ）</dt><dd>ハナコ</dd>
+                  <dt>勤務先住所 郵便番号</dt><dd>070-0031</dd>
+                  <dt>勤務先住所 都道府県</dt><dd>北海道</dd>
+                  <dt>勤務先住所 都道府県（カナ）</dt><dd>ホッカイドウ</dd>
+                  <dt>勤務先住所 市区町村</dt><dd>旭川市</dd>
+                  <dt>勤務先住所 市区町村（カナ）</dt><dd>アサヒカワシ</dd>
+                  <dt>勤務先住所 町域</dt><dd>二条通</dd>
+                  <dt>勤務先住所 町域（カナ）</dt><dd>ニジョウドオリ</dd>
+                  <dt>勤務先住所 番地</dt><dd>6丁目</dd>
+                  <dt>勤務先住所 番地（カナ）</dt><dd>6チョウメ</dd>
+                  <dt>勤務先住所 建物名及び部屋番号</dt><dd>サンプルビル 3F</dd>
+                  <dt>勤務先住所 建物名及び部屋番号（カナ）</dt><dd>サンプルビル3カイ</dd>
+                  <dt>部署名</dt><dd>営業部</dd>
+                  <dt>メールアドレス</dt><dd>hanako@example.co.jp</dd>
+                  <dt>担当者電話番号1</dt><dd>0166-00-0000</dd>
+                  <dt>担当者電話番号2</dt><dd>090-1234-5678</dd>
+                </dl>
+              </div>
             </div>
           </div>
         </section>
@@ -479,67 +491,73 @@
               <p class="desc">申込店舗の情報です。</p>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-building-store" aria-hidden="true"></i>店舗名・ブランド名</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>店舗名</dt><dd>サンプルフラワー旭川店</dd>
-                <dt>店舗名（全角カナ）</dt><dd>サンプルフラワーアサヒカワテン</dd>
-                <dt>店舗名（英語表記）</dt><dd>Sample Flower Asahikawa</dd>
-                <dt>ブランド名（屋号）</dt><dd>サンプルフラワー</dd>
-                <dt>ブランド名（屋号）（全角カナ）</dt><dd>サンプルフラワー</dd>
-                <dt>ブランド名（屋号）（英語表記）</dt><dd>Sample Flower</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-building-store" aria-hidden="true"></i>店舗名・ブランド名</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>店舗名</dt><dd>サンプルフラワー旭川店</dd>
+                  <dt>店舗名（全角カナ）</dt><dd>サンプルフラワーアサヒカワテン</dd>
+                  <dt>店舗名（英語表記）</dt><dd>Sample Flower Asahikawa</dd>
+                  <dt>ブランド名（屋号）</dt><dd>サンプルフラワー</dd>
+                  <dt>ブランド名（屋号）（全角カナ）</dt><dd>サンプルフラワー</dd>
+                  <dt>ブランド名（屋号）（英語表記）</dt><dd>Sample Flower</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-category" aria-hidden="true"></i>店舗業種・商材</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>店舗業種（カテゴリ）</dt><dd>小売</dd>
+                  <dt>店舗業種（詳細）</dt><dd>その他</dd>
+                  <dt>店舗商材の詳細</dt><dd>生花・園芸用品の販売</dd>
+                  <dt>店舗数</dt><dd>1 店舗</dd>
+                  <dt>平均単価</dt><dd>3,500 円</dd>
+                </dl>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-category" aria-hidden="true"></i>店舗業種・商材</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>店舗業種（カテゴリ）</dt><dd>小売</dd>
-                <dt>店舗業種（詳細）</dt><dd>その他</dd>
-                <dt>店舗商材の詳細</dt><dd>生花・園芸用品の販売</dd>
-                <dt>店舗数</dt><dd>1 店舗</dd>
-                <dt>平均単価</dt><dd>3,500 円</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-building-bank" aria-hidden="true"></i>口座・レシート</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>店舗口座</dt><dd>北海道銀行 旭川支店 普通 1234567 カ）サンプルショウジ</dd>
+                  <dt>レシート名</dt><dd>SAMPLE FLOWER</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-map-2" aria-hidden="true"></i>地図掲載</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>地図掲載希望可否</dt><dd>希望する</dd>
+                  <dt>地図掲載希望日</dt><dd>2026年7月1日</dd>
+                  <dt>緯度</dt><dd>43.770625</dd>
+                  <dt>経度</dt><dd>142.364819</dd>
+                </dl>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-building-bank" aria-hidden="true"></i>口座・レシート</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>店舗口座</dt><dd>北海道銀行 旭川支店 普通 1234567 カ）サンプルショウジ</dd>
-                <dt>レシート名</dt><dd>SAMPLE FLOWER</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>営業時間・定休日</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>第1営業時間</dt><dd>09:00 〜 18:00</dd>
+                  <dt>第2営業時間</dt><dd class="status-na">（なし）</dd>
+                  <dt>定休日</dt><dd>日</dd>
+                </dl>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-map-2" aria-hidden="true"></i>地図掲載</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>地図掲載希望可否</dt><dd>希望する</dd>
-                <dt>地図掲載希望日</dt><dd>2026年7月1日</dd>
-                <dt>緯度</dt><dd>43.770625</dd>
-                <dt>経度</dt><dd>142.364819</dd>
-              </dl>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>営業時間・定休日</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>第1営業時間</dt><dd>09:00 〜 18:00</dd>
-                <dt>第2営業時間</dt><dd class="status-na">（なし）</dd>
-                <dt>定休日</dt><dd>日</dd>
-              </dl>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-photo" aria-hidden="true"></i>店舗の外観・内観写真</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>店舗の外観・内観写真</dt><dd class="status-ok">提出済み</dd>
-              </dl>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-photo" aria-hidden="true"></i>店舗の外観・内観写真</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>店舗の外観・内観写真</dt><dd class="status-ok">提出済み</dd>
+                </dl>
+              </div>
             </div>
           </div>
           <div class="card">
@@ -651,14 +669,14 @@
   const total = steps.length;
   let current = 0;
 
-  const stepperEl = document.getElementById('stepper');
+  const stepNavEl = document.getElementById('step-nav');
   const panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
   const backBtn = document.getElementById('back');
   const nextBtn = document.getElementById('next');
   const progEl = document.getElementById('prog');
 
   function buildStepper() {
-    stepperEl.innerHTML = '';
+    stepNavEl.innerHTML = '';
     steps.forEach(function (name, i) {
       const step = document.createElement('button');
       step.type = 'button';
@@ -677,12 +695,12 @@
       step.appendChild(dot);
       step.appendChild(txt);
       step.addEventListener('click', function () { goTo(i); });
-      stepperEl.appendChild(step);
+      stepNavEl.appendChild(step);
 
       if (i < steps.length - 1) {
         const bar = document.createElement('div');
         bar.className = 'bar' + (i < current ? ' done' : '');
-        stepperEl.appendChild(bar);
+        stepNavEl.appendChild(bar);
       }
     });
   }

@@ -70,10 +70,11 @@ public class EmployeePageController {
             Model model) {
         String authorityCode = getAuthorityCode(session);
 
+        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
         // メンテナンスは管理者 (01) のみ。それ以外は一覧へ戻す
-        if (!AUTHORITY_ADMINISTRATOR.equals(authorityCode)) {
-            return REDIRECT_EMPLOYEE_LIST;
-        }
+        // if (!AUTHORITY_ADMINISTRATOR.equals(authorityCode)) {
+        //     return REDIRECT_EMPLOYEE_LIST;
+        // }
 
         // 編集モードでは選択された社員の内容を読み込む
         if (!MODE_NEW.equals(mode)) {

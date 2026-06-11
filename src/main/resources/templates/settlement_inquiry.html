@@ -72,24 +72,24 @@
     font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 26px 18px 60px; }
+  .wrap { min-width: 1200px; max-width: 1760px; margin: 0 auto; padding: 26px 18px 60px; }
   .shell { background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: stretch; min-height: 640px; box-shadow: var(--shadow-md); }
 
   /* ---- sidebar (shared design) ---- */
-  .sidebar { flex: 0 0 200px; background: linear-gradient(180deg,#0c2440 0%,#0a1f38 100%); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar { flex: 0 0 280px; background: linear-gradient(180deg,#0c2440 0%,#0a1f38 100%); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
   .sidebar .brand { display: flex; align-items: center; gap: 9px; padding: 6px 10px 18px; }
   .sidebar .brand .logo { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-  .sidebar .brand span { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .02em; }
-  .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 13px; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .sidebar .brand span { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: .02em; }
+  .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 15px; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
   .menu-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-  .menu-item i { font-size: 18px; }
-  .menu-group { font-size: 11px; font-weight: 700; color: #6f8db0; letter-spacing: 0.06em; padding: 15px 10px 6px; display: flex; align-items: center; gap: 8px; }
+  .menu-item i { font-size: 20px; }
+  .menu-group { font-size: 12.5px; font-weight: 700; color: #6f8db0; letter-spacing: 0.06em; padding: 15px 10px 6px; display: flex; align-items: center; gap: 8px; }
   .menu-group i { font-size: 15px; }
   .menu-group:first-of-type { padding-top: 4px; }
-  .menu-sub { display: flex; align-items: center; gap: 9px; padding: 8px 10px 8px 14px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 12.5px; line-height: 1.4; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .menu-sub { display: flex; align-items: center; gap: 9px; padding: 9px 14px 9px 18px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 14px; line-height: 1.4; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
   .menu-sub:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .menu-sub.active { background: var(--accent); color: #fff; font-weight: 500; box-shadow: var(--shadow-sm); }
-  .menu-sub i { font-size: 16px; flex: 0 0 auto; }
+  .menu-sub i { font-size: 18px; flex: 0 0 auto; }
   .menu-spacer { flex: 1; }
   .menu-divider { height: 0.5px; background: rgba(255,255,255,0.14); margin: 8px 4px; }
 
@@ -230,14 +230,16 @@
 
   /* table */
   .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); margin-top: 16px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; table-layout: fixed; }
-  col.c-txid   { width: 10%; }
-  col.c-date   { width: 12%; }
-  col.c-shop   { width: 14%; }
-  col.c-card   { width: 12%; }
-  col.c-svc    { width: 17%; }
-  col.c-status { width: 17%; }
-  col.c-amt    { width: 14%; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1060px; table-layout: fixed; }
+  col.c-txid   { width: 9%; }
+  col.c-date   { width: 10%; }
+  col.c-shop   { width: 12%; }
+  col.c-card   { width: 10%; }
+  col.c-svc    { width: 11%; }
+  col.c-org    { width: 13%; }
+  col.c-status { width: 13%; }
+  col.c-amt    { width: 10%; }
+  col.c-note   { width: 8%; }
   col.c-action { width: 4%; }
   thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
   thead th:last-child { border-right: none; }
@@ -250,11 +252,6 @@
   td.amt { text-align: right; font-variant-numeric: tabular-nums; }
   td.amt.c-minus { color: var(--warn); font-weight: 600; }
   td.amt.c-gray  { color: var(--text-tertiary); }
-  tfoot td { background: var(--bg-soft); color: var(--accent-strong); font-weight: 700; border-top: 1px solid var(--border-strong); padding: 12px; white-space: nowrap; border-right: 1px solid var(--border); }
-  tfoot td:last-child { border-right: none; }
-  tfoot td.total-label { text-align: right; }
-  tfoot td.amt { text-align: right; font-variant-numeric: tabular-nums; }
-  tfoot .total-count { font-variant-numeric: tabular-nums; }
   .date-day  { display: block; }
   .date-time { display: block; font-size: 11.5px; color: var(--text-tertiary); }
   .svc-provider { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
@@ -369,7 +366,7 @@
             <div class="fcontrols">
               <div id="statusWrap" class="status-chips">
                 <button type="button" class="btn-chip-ctrl" id="statusAll">全選択</button>
-                <button type="button" class="btn-chip-ctrl" id="statusClear">解除</button>
+                <button type="button" class="btn-chip-ctrl" id="statusClear">全解除</button>
                 <span class="chip-sep"></span>
                 <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>売上</span>
                 <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>与信・決済申込</span>
@@ -415,9 +412,9 @@
               <div class="sitem-body">
                 <div class="sitem-row1">
                   <span class="sitem-label">取引額</span>
-                  <span class="sitem-cnt">2 件</span>
+                  <span class="sitem-cnt">6 件</span>
                 </div>
-                <div class="sitem-amt">¥ 2,310</div>
+                <div class="sitem-amt">¥ 14,870</div>
               </div>
             </div>
             <span class="sop" aria-hidden="true">−</span>
@@ -426,24 +423,24 @@
               <div class="sitem-body">
                 <div class="sitem-row1">
                   <span class="sitem-label">取消額</span>
-                  <span class="sitem-cnt">0 件</span>
+                  <span class="sitem-cnt">4 件</span>
                 </div>
-                <div class="sitem-amt">¥ 0</div>
+                <div class="sitem-amt">¥ 6,140</div>
               </div>
             </div>
             <span class="sop" aria-hidden="true">=</span>
             <div class="sitem tone-total">
-              <span class="sitem-ico"><i class="ti ti-equal" aria-hidden="true"></i></span>
+              <span class="sitem-ico"><i class="ti ti-building-bank" aria-hidden="true"></i></span>
               <div class="sitem-body">
                 <div class="sitem-row1">
-                  <span class="sitem-label">合計額</span>
-                  <span class="sitem-cnt">2 件</span>
+                  <span class="sitem-label">振込予定額</span>
+                  <span class="sitem-cnt">6 件</span>
                 </div>
-                <div class="sitem-amt">¥ 2,310</div>
+                <div class="sitem-amt">¥ 8,730</div>
               </div>
             </div>
           </div>
-          <p class="summary-note">※「取引額」は売上のみが対象です。取引失敗・与信・決済申込・キャンセルは含まれません。</p>
+          <p class="summary-note">※「取引額」は売上のみが対象です。与信・決済申込・取引失敗・期限切れは含まれません。振込予定額 ＝ 取引額 − 取消額。</p>
         </div>
 
         <div class="section-head"><i class="ti ti-table" aria-hidden="true"></i>検索結果<span id="result-summary" style="margin-left:auto; font-weight:500;"></span></div>
@@ -470,8 +467,10 @@
                 <col class="c-shop">
                 <col class="c-card">
                 <col class="c-svc">
+                <col class="c-org">
                 <col class="c-status">
                 <col class="c-amt">
+                <col class="c-note">
                 <col class="c-action">
               </colgroup>
               <thead>
@@ -481,8 +480,10 @@
                   <th><i class="ti ti-building-store"></i>ショップ名</th>
                   <th><i class="ti ti-credit-card"></i>カード番号</th>
                   <th><i class="ti ti-wallet"></i>サービス</th>
+                  <th><i class="ti ti-building-bank"></i>サービス事業者</th>
                   <th><i class="ti ti-checkbox"></i>ステータス</th>
                   <th class="amt">金額</th>
+                  <th>説明</th>
                   <th class="c-action"></th>
                 </tr>
               </thead>
@@ -492,9 +493,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">17:36:29</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span><span class="svc-provider">PayPay決済</span></td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
+                  <td>PayPay決済</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 660</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -502,9 +505,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">15:15:44</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>358760*******34</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
+                  <td>（株）ジェーシービー</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 1,650</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -512,9 +517,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">14:02:11</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>414720*******09</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span><span class="svc-provider">りゅうぎん</span></td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
+                  <td>りゅうぎん</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 2,200</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -522,9 +529,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">13:20:47</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>553011*******42</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span><span class="svc-provider">りゅうぎん</span></td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
+                  <td>りゅうぎん</td>
                   <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
                   <td class="amt">¥ 980</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -532,9 +541,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">12:48:30</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>374830*******05</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
+                  <td>（株）ジェーシービー</td>
                   <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
                   <td class="amt c-minus">−¥ 3,520</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -542,9 +553,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">11:15:09</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
                   <td class="amt c-minus">−¥ 540</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -552,9 +565,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">10:33:52</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
                   <td class="amt c-gray">¥ 1,280</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -562,9 +577,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">09:47:18</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
                   <td class="amt c-gray">¥ 760</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -572,9 +589,11 @@
                   <td><span class="date-day">2026/06/01</span><span class="date-time">09:12:05</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>453210*******88</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span><span class="svc-provider">りゅうぎん</span></td>
+                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
+                  <td>りゅうぎん</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 4,180</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -582,9 +601,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">19:40:22</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span><span class="svc-provider">PayPay決済</span></td>
+                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
+                  <td>PayPay決済</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 880</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -592,9 +613,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">18:05:51</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>358760*******12</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
+                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
+                  <td>（株）ジェーシービー</td>
                   <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
                   <td class="amt">¥ 2,750</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -602,9 +625,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">16:22:38</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>553011*******77</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span><span class="svc-provider">りゅうぎん</span></td>
+                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
+                  <td>りゅうぎん</td>
                   <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
                   <td class="amt c-minus">−¥ 1,100</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -612,9 +637,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">14:55:10</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
                   <td class="amt c-gray">¥ 640</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -622,9 +649,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">13:11:47</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
                   <td class="amt c-minus">−¥ 1,980</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -632,9 +661,11 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">11:38:29</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>374830*******61</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span><span class="svc-provider">（株）ジェーシービー</span></td>
+                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
+                  <td>（株）ジェーシービー</td>
                   <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
                   <td class="amt">¥ 5,300</td>
+                  <td>店頭支払い</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
@@ -642,19 +673,15 @@
                   <td><span class="date-day">2026/05/31</span><span class="date-time">10:02:14</span></td>
                   <td>カフェ・ソレイユ</td>
                   <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span><span class="svc-provider">NETSTARS（StarPay）</span></td>
+                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
+                  <td>NETSTARS（StarPay）</td>
                   <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
                   <td class="amt c-gray">¥ 720</td>
+                  <td>外部支払い</td>
                   <td class="c-action"></td>
                 </tr>
               </tbody>
-              <tfoot>
-                <tr>
-                  <td class="total-label" colspan="6">合計 <span class="total-count" id="total-count">0</span> 件</td>
-                  <td class="amt" id="total-amount">¥ 0</td>
-                  <td></td>
-                </tr>
-              </tfoot>
+
             </table>
           </div>
 
@@ -703,33 +730,6 @@
     statusWrap.querySelectorAll('.chip').forEach(c => { c.dataset.on = '0'; c.classList.remove('on'); });
   });
 
-  // 合計（件数・金額）を全件から集計してテーブル下部に表示する。
-  (function () {
-    var rows = Array.prototype.slice.call(
-      document.querySelectorAll('.table-scroll table tbody tr')
-    );
-    var countEl = document.getElementById('total-count');
-    var amountEl = document.getElementById('total-amount');
-    if (!countEl || !amountEl) {
-      return;
-    }
-    var totalAmount = 0;
-    rows.forEach(function (row) {
-      var amtCell = row.querySelector('td.amt');
-      if (!amtCell || amtCell.classList.contains('c-gray')) {
-        return;
-      }
-      var digits = amtCell.textContent.replace(/[^0-9]/g, '');
-      if (digits !== '') {
-        var val = parseInt(digits, 10);
-        totalAmount += amtCell.classList.contains('c-minus') ? -val : val;
-      }
-    });
-    var prefix = totalAmount < 0 ? '−¥ ' : '¥ ';
-    if (totalAmount < 0) { amountEl.classList.add('c-minus'); }
-    countEl.textContent = rows.length.toLocaleString();
-    amountEl.textContent = prefix + Math.abs(totalAmount).toLocaleString();
-  })();
 
   // 検索結果のページネーション（表示件数の切替と複数ページの表示制御）
   (function () {

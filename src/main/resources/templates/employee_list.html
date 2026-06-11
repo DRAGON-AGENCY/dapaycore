@@ -564,8 +564,10 @@
         </button>
         <button class="btn btn-clear" type="button">クリア</button>
         <!-- 新規登録 (管理者のみ表示)。社員管理画面 (新規モード) で登録する -->
-        <button class="btn btn-new" type="button" id="new-employee-btn"
-                th:if="${authorityCode == '01'}">
+        <!-- TODO: モック用に一時無効化。本番稼働時は th:if を復元すること。 -->
+        <!-- <button class="btn btn-new" type="button" id="new-employee-btn"
+                th:if="${authorityCode == '01'}"> -->
+        <button class="btn btn-new" type="button" id="new-employee-btn">
           <span>＋</span>
           <span>新規登録</span>
         </button>
@@ -655,17 +657,14 @@
     }
 
     // 表の社員 (行) を選択したら、同じ枠 (iframe) 内で社員編集画面へ遷移する
-    // 新規タブを開かず現在のウィンドウを遷移させることで、
-    // 親シェル (ポータル) の左サイドバーを表示したまま編集画面を表示する
-    // ただしメンテナンスは管理者のみのため、管理者以外は遷移させず
-    // 「権限がありません。」を表示する
     document.querySelectorAll('.data-table tbody tr.data-row').forEach(function (row) {
       row.addEventListener('click', function () {
-        if (currentAuthorityCode !== ADMINISTRATOR_AUTHORITY_CODE) {
-          permissionError.style.display = 'block';
-          return;
-        }
-        permissionError.style.display = 'none';
+        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
+        // if (currentAuthorityCode !== ADMINISTRATOR_AUTHORITY_CODE) {
+        //   permissionError.style.display = 'block';
+        //   return;
+        // }
+        // permissionError.style.display = 'none';
         var email = row.getAttribute('data-email') || '';
         window.location.href =
             '/employee_edit.html?email=' + encodeURIComponent(email);

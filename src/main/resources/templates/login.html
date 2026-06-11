@@ -6,8 +6,14 @@
 <title>会員ログイン｜mPOSなび</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+      media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
 <style>
   :root {
     --bg-page: #eef2f7; --bg-surface: #ffffff; --bg-secondary: #f4f6fa; --bg-soft: #e9f1fb;
@@ -36,11 +42,11 @@
     font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7; -webkit-font-smoothing: antialiased;
     display: flex; align-items: center; justify-content: center; padding: 40px 24px;
   }
-  .login { width: 100%; max-width: 940px; display: grid; grid-template-columns: 1.05fr 1fr; background: var(--bg-surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); border: 0.5px solid var(--border); }
+  .login { width: 100%; max-width: 1200px; display: grid; grid-template-columns: 1.1fr 1fr; background: var(--bg-surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); border: 0.5px solid var(--border); }
 
   /* ---- left: brand / promo ---- */
   .promo {
-    position: relative; padding: 48px 44px; color: #fff; overflow: hidden;
+    position: relative; padding: 52px 52px; color: #fff; overflow: hidden;
     background:
       radial-gradient(120% 80% at 0% 0%, rgba(61,141,221,0.45), transparent 60%),
       radial-gradient(120% 90% at 100% 100%, rgba(11,28,56,0.65), transparent 55%),
@@ -59,7 +65,7 @@
   .promo .mark i { font-size: 23px; color: #fff; }
   .promo .bname { font-size: 17px; font-weight: 700; letter-spacing: .02em; line-height: 1.3; }
   .promo .bsub { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: .06em; }
-  .promo h1 { font-size: 30px; font-weight: 700; line-height: 1.4; margin: 0 0 16px; letter-spacing: .01em; }
+  .promo h1 { font-size: 34px; font-weight: 700; line-height: 1.4; margin: 0 0 18px; letter-spacing: .01em; }
   .promo .lead { font-size: 13.5px; color: rgba(255,255,255,0.82); margin: 0 0 36px; max-width: 30em; }
   .cta { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: var(--radius-md); background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18); text-decoration: none; color: #fff; transition: background .18s, transform .06s; }
   .cta:hover { background: rgba(255,255,255,0.16); }
@@ -73,7 +79,7 @@
   .promo .foot-note { margin-top: auto; padding-top: 36px; font-size: 12px; color: rgba(255,255,255,0.62); }
 
   /* ---- right: form ---- */
-  .form-side { padding: 48px 48px 36px; display: flex; flex-direction: column; }
+  .form-side { padding: 52px 56px 40px; display: flex; flex-direction: column; }
   .brandhead { text-align: center; margin-bottom: 26px; }
   .brandhead .badge { width: 54px; height: 54px; border-radius: 15px; background: linear-gradient(135deg,var(--accent),var(--accent-strong)); display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(27,102,179,0.32); margin-bottom: 16px; }
   .brandhead .badge i { font-size: 28px; color: #fff; }

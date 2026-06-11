@@ -123,17 +123,58 @@
   }
   .per-page-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,95,208,0.16); }
 
+  /* calc summary strip (提案3) */
+  .calc-strip { display: flex; align-items: stretch; background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+  .cs-op { flex: 0 0 28px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-tertiary); background: var(--bg-secondary); border-left: 0.5px solid var(--border-strong); border-right: 0.5px solid var(--border-strong); }
+  .cs-item { flex: 1; display: flex; align-items: center; gap: 10px; padding: 12px 16px; min-width: 0; }
+  .cs-ico { width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .cs-ico i { font-size: 16px; }
+  .cs-body { flex: 1; min-width: 0; }
+  .cs-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; }
+  .cs-cnt { font-size: 11px; color: var(--text-tertiary); }
+  .cs-amt { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; line-height: 1.1; }
+  .cs-item.t-in   { background: var(--bg-soft); }
+  .cs-item.t-in   .cs-ico { background: var(--accent); color: #fff; }
+  .cs-item.t-in   .cs-label { color: var(--text-soft); }
+  .cs-item.t-in   .cs-amt { color: var(--accent-strong); }
+  .cs-item.t-fee  { background: #fef8e8; }
+  .cs-item.t-fee  .cs-ico { background: #c8900d; color: #fff; }
+  .cs-item.t-fee  .cs-label { color: #7a5200; }
+  .cs-item.t-fee  .cs-amt { color: #7a5200; }
+  .cs-item.t-out  { background: var(--warn-soft); }
+  .cs-item.t-out  .cs-ico { background: var(--warn); color: #fff; }
+  .cs-item.t-out  .cs-label { color: #8a5410; }
+  .cs-item.t-out  .cs-amt { color: #791f1f; }
+  .cs-item.t-tfee { background: var(--bg-soft-2); }
+  .cs-item.t-tfee .cs-ico { background: var(--text-tertiary); color: #fff; }
+  .cs-item.t-tfee .cs-label { color: var(--text-secondary); }
+  .cs-item.t-tfee .cs-amt { color: var(--text-secondary); }
+  .cs-item.t-total { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); }
+  .cs-item.t-total .cs-ico { background: rgba(255,255,255,0.22); color: #fff; }
+  .cs-item.t-total .cs-label { color: rgba(255,255,255,0.8); }
+  .cs-item.t-total .cs-amt { color: #fff; font-size: 19px; }
+  @media (prefers-color-scheme: dark) {
+    .cs-item.t-fee  { background: #2a2008; }
+    .cs-item.t-fee  .cs-label, .cs-item.t-fee .cs-amt { color: #e8c96a; }
+    .cs-item.t-out  .cs-label, .cs-item.t-out .cs-amt { color: #f7c1c1; }
+  }
+
   /* table */
   .tbl-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; table-layout: fixed; }
-  col.c-txid   { width: 10%; }
-  col.c-date   { width: 12%; }
-  col.c-shop   { width: 14%; }
-  col.c-card   { width: 12%; }
-  col.c-svc    { width: 17%; }
-  col.c-status { width: 17%; }
-  col.c-amt    { width: 14%; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1000px; table-layout: fixed; }
+  col.c-txid   { width: 9%; }
+  col.c-date   { width: 11%; }
+  col.c-shop   { width: 12%; }
+  col.c-card   { width: 10%; }
+  col.c-svc    { width: 16%; }
+  col.c-status { width: 16%; }
+  col.c-amt    { width: 12%; }
+  col.c-fee    { width: 10%; }
   col.c-action { width: 4%; }
+  td.c-fee { text-align: right; font-variant-numeric: tabular-nums; }
+  td.c-fee.c-gray  { color: var(--text-tertiary); }
+  td.c-fee.c-minus { color: var(--warn); font-weight: 600; }
+  .fee-rate { display: block; font-size: 11px; color: var(--text-tertiary); font-weight: 400; }
   thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
   thead th:last-child { border-right: none; }
   thead th i { font-size: 14px; vertical-align: -2px; margin-right: 3px; }
@@ -196,6 +237,22 @@
   .pill-rpay   { background: #bf0000; }
   .pill-ic     { background: #2e7d32; }
 
+  /* fee breakdown table (提案5) */
+  .breakdown-box { margin-top: 18px; }
+  .bk-head { display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 0.5px solid rgba(11,95,208,0.18); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--text-soft); }
+  .bk-head i { font-size: 15px; color: var(--accent); }
+  .bk-inner { border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); overflow: hidden; }
+  .bk-inner table { min-width: 600px; }
+  .bk-inner thead th { background: var(--bg-soft-2); color: var(--text-secondary); font-weight: 700; text-align: left; padding: 9px 14px; border-bottom: 0.5px solid var(--border-strong); border-right: 0.5px solid var(--border); font-size: 13px; }
+  .bk-inner thead th:last-child { border-right: none; }
+  .bk-inner tbody td { padding: 9px 14px; border-bottom: 0.5px solid var(--border); border-right: 0.5px solid var(--border); font-size: 13px; vertical-align: middle; }
+  .bk-inner tbody td:last-child { border-right: none; }
+  .bk-inner tbody tr:last-child td { border-bottom: none; }
+  .bk-inner tbody tr:nth-child(even) td { background: var(--bg-soft); }
+  .bk-inner tfoot td { background: var(--bg-soft); font-weight: 700; padding: 9px 14px; border-top: 0.5px solid var(--border-strong); border-right: 0.5px solid var(--border); color: var(--accent-strong); font-size: 13px; }
+  .bk-inner tfoot td:last-child { border-right: none; }
+  .bk-inner .num { text-align: right; font-variant-numeric: tabular-nums; }
+
   /* pagination（売上管理画面と同じスタイル） */
   .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 16px; border-top: 0.5px solid var(--border); flex-wrap: wrap; }
   .page-numbers { display: flex; align-items: center; gap: 6px; }
@@ -218,6 +275,49 @@
   <div class="info-strip" id="info-strip">
     <div class="item"><span class="lbl">対象年月</span><span class="val" id="lbl-ym">—</span></div>
     <div class="item"><span class="lbl">締め日</span><span class="val" id="lbl-closing">—</span></div>
+  </div>
+
+  <!-- 計算サマリー (提案3) -->
+  <div class="calc-strip" id="calc-strip">
+    <div class="cs-item t-in">
+      <div class="cs-ico"><i class="ti ti-receipt" aria-hidden="true"></i></div>
+      <div class="cs-body">
+        <div class="cs-label">売上合計 <span class="cs-cnt" id="cs-sale-cnt"></span></div>
+        <div class="cs-amt" id="cs-sale-amt">¥ 0</div>
+      </div>
+    </div>
+    <div class="cs-op">−</div>
+    <div class="cs-item t-fee">
+      <div class="cs-ico"><i class="ti ti-percentage" aria-hidden="true"></i></div>
+      <div class="cs-body">
+        <div class="cs-label">手数料合計</div>
+        <div class="cs-amt" id="cs-fee-amt">¥ 0</div>
+      </div>
+    </div>
+    <div class="cs-op">−</div>
+    <div class="cs-item t-out">
+      <div class="cs-ico"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></div>
+      <div class="cs-body">
+        <div class="cs-label">取消額 <span class="cs-cnt" id="cs-cancel-cnt"></span></div>
+        <div class="cs-amt" id="cs-cancel-amt">¥ 0</div>
+      </div>
+    </div>
+    <div class="cs-op">−</div>
+    <div class="cs-item t-tfee">
+      <div class="cs-ico"><i class="ti ti-transfer" aria-hidden="true"></i></div>
+      <div class="cs-body">
+        <div class="cs-label">振込手数料</div>
+        <div class="cs-amt" id="cs-tfee-amt">¥ 330</div>
+      </div>
+    </div>
+    <div class="cs-op">=</div>
+    <div class="cs-item t-total">
+      <div class="cs-ico"><i class="ti ti-coin" aria-hidden="true"></i></div>
+      <div class="cs-body">
+        <div class="cs-label">振込金額</div>
+        <div class="cs-amt" id="cs-transfer-amt">¥ 0</div>
+      </div>
+    </div>
   </div>
 
   <div class="panel-box">
@@ -246,6 +346,7 @@
           <col class="c-svc">
           <col class="c-status">
           <col class="c-amt">
+          <col class="c-fee">
           <col class="c-action">
         </colgroup>
         <thead>
@@ -257,6 +358,7 @@
             <th><i class="ti ti-wallet"></i>サービス</th>
             <th><i class="ti ti-checkbox"></i>ステータス</th>
             <th class="amt">金額</th>
+            <th class="c-fee">手数料</th>
             <th class="c-action"></th>
           </tr>
         </thead>
@@ -267,6 +369,7 @@
           <tr>
             <td class="total-label" colspan="6">合計 <span id="total-count">0</span> 件</td>
             <td class="amt" id="total-amount">¥ 0</td>
+            <td class="c-fee" id="total-fee">¥ 0</td>
             <td></td>
           </tr>
         </tfoot>
@@ -277,6 +380,42 @@
       <button class="page-btn page-nav" type="button" data-nav="prev" aria-label="前のページ">‹</button>
       <div class="page-numbers" id="page-numbers"></div>
       <button class="page-btn page-nav" type="button" data-nav="next" aria-label="次のページ">›</button>
+    </div>
+  </div>
+
+  <!-- 手数料内訳 (提案5) -->
+  <div class="panel-box breakdown-box">
+    <div class="bk-head"><i class="ti ti-table-column" aria-hidden="true"></i>手数料内訳（サービス別）</div>
+    <div class="bk-inner tbl-scroll">
+      <table>
+        <colgroup>
+          <col style="width:22%">
+          <col style="width:14%">
+          <col style="width:14%">
+          <col style="width:25%">
+          <col style="width:25%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>サービス</th>
+            <th class="num">件数</th>
+            <th class="num">手数料率</th>
+            <th class="num">取引合計</th>
+            <th class="num">手数料合計</th>
+          </tr>
+        </thead>
+        <tbody id="bk-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:24px;">読み込み中...</td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" id="bk-total-label">合計</td>
+            <td></td>
+            <td class="num" id="bk-total-amt">¥ 0</td>
+            <td class="num" id="bk-total-fee">¥ 0</td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   </div>
 
@@ -332,6 +471,33 @@
     'st-expired': 'ti-clock-off'
   };
 
+  var FEE_RATE = {
+    'pill-paypay': 0.0198,
+    'pill-jcb':    0.0325,
+    'pill-visa':   0.0325,
+    'pill-mc':     0.0325,
+    'pill-amex':   0.0325,
+    'pill-aupay':  0.0220,
+    'pill-dpay':   0.0220,
+    'pill-rpay':   0.0220
+  };
+  var TRANSFER_FEE = 330;
+
+  function calcFee(status, svc, amt) {
+    if (status === 'st-auth' || status === 'st-failed' || status === 'st-expired') { return null; }
+    var rate = FEE_RATE[svc] || 0;
+    var fee  = Math.round(amt * rate);
+    return { fee: fee, rate: rate, minus: (status === 'st-refund' || status === 'st-cancel') };
+  }
+
+  function fmtFeeCell(status, svc, amt) {
+    var info = calcFee(status, svc, amt);
+    if (!info) { return '<td class="c-fee c-gray">—</td>'; }
+    var rateStr = '<span class="fee-rate">' + (info.rate * 100).toFixed(2) + '%</span>';
+    if (info.minus) { return '<td class="c-fee c-minus">−¥ ' + info.fee.toLocaleString('ja-JP') + rateStr + '</td>'; }
+    return '<td class="c-fee">¥ ' + info.fee.toLocaleString('ja-JP') + rateStr + '</td>';
+  }
+
   function amtClass(status) {
     if (status === 'st-refund' || status === 'st-cancel') { return 'amt c-minus'; }
     if (status === 'st-failed' || status === 'st-expired') { return 'amt c-gray'; }
@@ -384,9 +550,19 @@
     var totalPrefix = totalAmt < 0 ? '−¥ ' : '¥ ';
     document.getElementById('total-amount').textContent = totalPrefix + Math.abs(totalAmt).toLocaleString('ja-JP');
 
+    var totalFeeNet = allData.reduce(function (s, r) {
+      var info = calcFee(r.status, r.svc, r.amt);
+      if (!info) { return s; }
+      return info.minus ? s - info.fee : s + info.fee;
+    }, 0);
+    var feeTotalEl = document.getElementById('total-fee');
+    if (feeTotalEl) {
+      feeTotalEl.textContent = (totalFeeNet < 0 ? '−¥ ' : '¥ ') + Math.abs(totalFeeNet).toLocaleString('ja-JP');
+    }
+
     var tbody = document.getElementById('table-body');
     if (total === 0) {
-      tbody.innerHTML = '<tr><td class="empty-cell" colspan="8">取引データがありません。</td></tr>';
+      tbody.innerHTML = '<tr><td class="empty-cell" colspan="9">取引データがありません。</td></tr>';
     } else {
       tbody.innerHTML = page.map(function (r) {
         var dt = r.dt.split(' ');
@@ -398,6 +574,7 @@
           + '<td><span class="svc"><span class="pill ' + r.svc + '">' + r.svcName + '</span></span><span class="svc-provider">' + r.org + '</span></td>'
           + '<td><span class="badge-status ' + r.status + '"><i class="ti ' + STATUS_ICON[r.status] + '" aria-hidden="true"></i>' + STATUS_LABEL[r.status] + '</span></td>'
           + '<td class="' + amtClass(r.status) + '">' + fmtAmt(r.amt, r.status) + '</td>'
+          + fmtFeeCell(r.status, r.svc, r.amt)
           + '<td class="c-action"></td>'
           + '</tr>';
       }).join('');
@@ -426,6 +603,71 @@
     nextBtn.disabled = (currentPage === totalPages);
   }
 
+  function renderSummary() {
+    var saleAmt = 0, saleCnt = 0, feeOnSale = 0;
+    var cancelAmt = 0, cancelCnt = 0, feeRefund = 0;
+    allData.forEach(function (r) {
+      var info = calcFee(r.status, r.svc, r.amt);
+      if (r.status === 'st-sale') {
+        saleAmt += r.amt; saleCnt++;
+        if (info) { feeOnSale += info.fee; }
+      } else if (r.status === 'st-refund' || r.status === 'st-cancel') {
+        cancelAmt += r.amt; cancelCnt++;
+        if (info) { feeRefund += info.fee; }
+      }
+    });
+    var feeNet = feeOnSale - feeRefund;
+    var transferAmt = saleAmt - feeNet - cancelAmt - TRANSFER_FEE;
+
+    document.getElementById('cs-sale-amt').textContent = '¥ ' + saleAmt.toLocaleString('ja-JP');
+    document.getElementById('cs-sale-cnt').textContent = saleCnt + '件';
+    document.getElementById('cs-fee-amt').textContent  = '¥ ' + feeNet.toLocaleString('ja-JP');
+    document.getElementById('cs-cancel-amt').textContent = '¥ ' + cancelAmt.toLocaleString('ja-JP');
+    document.getElementById('cs-cancel-cnt').textContent = cancelCnt + '件';
+    document.getElementById('cs-tfee-amt').textContent = '¥ ' + TRANSFER_FEE.toLocaleString('ja-JP');
+    var trEl = document.getElementById('cs-transfer-amt');
+    trEl.textContent = (transferAmt < 0 ? '−¥ ' : '¥ ') + Math.abs(transferAmt).toLocaleString('ja-JP');
+  }
+
+  function renderBreakdown() {
+    var groups = {};
+    var SVC_ORDER = ['pill-paypay','pill-jcb','pill-visa','pill-mc','pill-amex','pill-aupay','pill-dpay','pill-rpay'];
+    allData.forEach(function (r) {
+      var info = calcFee(r.status, r.svc, r.amt);
+      if (!info) { return; }
+      if (!groups[r.svc]) { groups[r.svc] = { svcName: r.svcName, rate: FEE_RATE[r.svc] || 0, count: 0, totalAmt: 0, totalFee: 0 }; }
+      groups[r.svc].count++;
+      if (info.minus) { groups[r.svc].totalAmt -= r.amt; groups[r.svc].totalFee -= info.fee; }
+      else            { groups[r.svc].totalAmt += r.amt; groups[r.svc].totalFee += info.fee; }
+    });
+
+    var keys = SVC_ORDER.filter(function (k) { return groups[k]; });
+    var tbody = document.getElementById('bk-tbody');
+    var totalAmt = 0, totalFee = 0, totalCnt = 0;
+
+    if (keys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:24px;">データがありません。</td></tr>';
+      return;
+    }
+    tbody.innerHTML = keys.map(function (key) {
+      var g = groups[key];
+      totalAmt += g.totalAmt; totalFee += g.totalFee; totalCnt += g.count;
+      var amtStr = (g.totalAmt < 0 ? '−¥ ' : '¥ ') + Math.abs(g.totalAmt).toLocaleString('ja-JP');
+      var feeStr = (g.totalFee < 0 ? '−¥ ' : '¥ ') + Math.abs(g.totalFee).toLocaleString('ja-JP');
+      return '<tr>'
+        + '<td><span class="svc"><span class="pill ' + key + '">' + g.svcName + '</span></span></td>'
+        + '<td class="num">' + g.count + ' 件</td>'
+        + '<td class="num">' + (g.rate * 100).toFixed(2) + '%</td>'
+        + '<td class="num">' + amtStr + '</td>'
+        + '<td class="num">' + feeStr + '</td>'
+        + '</tr>';
+    }).join('');
+
+    document.getElementById('bk-total-label').textContent = '合計 ' + totalCnt + ' 件';
+    document.getElementById('bk-total-amt').textContent = (totalAmt < 0 ? '−¥ ' : '¥ ') + Math.abs(totalAmt).toLocaleString('ja-JP');
+    document.getElementById('bk-total-fee').textContent = (totalFee < 0 ? '−¥ ' : '¥ ') + Math.abs(totalFee).toLocaleString('ja-JP');
+  }
+
   prevBtn.addEventListener('click', function () { if (currentPage > 1) { currentPage--; render(); } });
   nextBtn.addEventListener('click', function () { if (currentPage < getTotalPages()) { currentPage++; render(); } });
 
@@ -436,6 +678,8 @@
   });
 
   render();
+  renderSummary();
+  renderBreakdown();
 </script>
 </body>
 </html>

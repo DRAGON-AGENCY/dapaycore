@@ -21,8 +21,9 @@ import jp.co.dragonagency.dapaycore.service.EmployeeService;
 @Controller
 public class EmployeeController {
 
-    private static final String AUTHORITY_ADMINISTRATOR = "01";
-    private static final String MESSAGE_FORBIDDEN = "権限がありません。";
+    // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
+    // private static final String AUTHORITY_ADMINISTRATOR = "01";
+    // private static final String MESSAGE_FORBIDDEN = "権限がありません。";
 
     private final EmployeeService employeeService;
 
@@ -45,9 +46,10 @@ public class EmployeeController {
     public EmployeeResponse save(
             @RequestBody EmployeeRequest request,
             HttpSession session) {
-        if (!isAdministrator(session)) {
-            return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
-        }
+        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
+        // if (!isAdministrator(session)) {
+        //     return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
+        // }
         return employeeService.saveEmployee(request, getLoginUserId(session));
     }
 
@@ -66,9 +68,10 @@ public class EmployeeController {
     public EmployeeResponse delete(
             @RequestBody EmployeeRequest request,
             HttpSession session) {
-        if (!isAdministrator(session)) {
-            return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
-        }
+        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
+        // if (!isAdministrator(session)) {
+        //     return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
+        // }
         return employeeService.deleteEmployee(request.getEmployeeNumber());
     }
 
@@ -94,15 +97,16 @@ public class EmployeeController {
         return loginUser.getEmployeeNumber();
     }
 
-    /**
-     * セッションの権限コードが管理者 (01) かどうかを判定する。
-     *
-     * @param session 判定対象のセッション
-     * @return 管理者の場合は true
-     */
-    private boolean isAdministrator(HttpSession session) {
-        Object authorityCode =
-                session.getAttribute(SessionAttributeNames.AUTHORITY_CODE);
-        return AUTHORITY_ADMINISTRATOR.equals(authorityCode);
-    }
+    // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
+    // /**
+    //  * セッションの権限コードが管理者 (01) かどうかを判定する。
+    //  *
+    //  * @param session 判定対象のセッション
+    //  * @return 管理者の場合は true
+    //  */
+    // private boolean isAdministrator(HttpSession session) {
+    //     Object authorityCode =
+    //             session.getAttribute(SessionAttributeNames.AUTHORITY_CODE);
+    //     return AUTHORITY_ADMINISTRATOR.equals(authorityCode);
+    // }
 }
