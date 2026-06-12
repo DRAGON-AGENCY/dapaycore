@@ -105,9 +105,36 @@
   /* card grid layout */
   .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .card-grid > .card { margin-bottom: 0; }
+  .card-col { display: flex; flex-direction: column; gap: 16px; }
+  .card-h .cnt { margin-left: auto; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.22); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  .pay-table.pay-2col { min-width: 240px; }
+
+  /* 決済KPIサマリー */
+  .pay-kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .pay-kpi { background: var(--bg-soft-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 20px; display: flex; align-items: center; gap: 16px; }
+  .pay-kpi-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-strong)); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; box-shadow: 0 3px 10px rgba(11,63,134,0.22); }
+  .pay-kpi-icon i { font-size: 23px; color: #fff; }
+  .pay-kpi-icon.dim { background: var(--bg-secondary); border: 1px solid var(--border-strong); box-shadow: none; }
+  .pay-kpi-icon.dim i { color: var(--text-tertiary); }
+  .pay-kpi-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .pay-kpi-num { font-size: 28px; font-weight: 700; line-height: 1; color: var(--ok); }
+  .pay-kpi-num.zero { color: var(--text-tertiary); }
+  .pay-kpi-num .denom { font-size: 14px; font-weight: 400; color: var(--text-tertiary); }
+  .pay-kpi-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* ブランドチップグリッド */
+  .brand-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .brand-chip { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; border: 1px solid transparent; width: 185px; box-sizing: border-box; }
+  .brand-chip.applied { background: #b8e8d4; color: #0e5438; border-color: rgba(14,84,56,0.35); }
+  .brand-chip.applied i { font-size: 15px; flex: 0 0 auto; }
+  .brand-chip.none { background: #d4dae5; color: #4a5568; border-color: rgba(20,45,80,0.28); }
+  .brand-chip.none i { font-size: 15px; flex: 0 0 auto; }
 
   /* 読み取り専用の項目リスト */
   .kv { display: grid; grid-template-columns: minmax(160px, 240px) 1fr; margin: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+  .kv-terms { grid-template-columns: 1fr auto; }
+  .kv-terms dt { white-space: nowrap; }
+  .kv-terms dd { white-space: nowrap; justify-content: flex-end; }
   .kv dt { font-size: var(--fs-xs); color: var(--accent-strong); font-weight: 600; padding: 11px 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); display: flex; align-items: center; }
   .kv dd { font-size: var(--fs-base); color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 1px solid var(--border-strong); display: flex; align-items: center; word-break: break-word; }
   .kv dt:nth-last-of-type(1), .kv dd:nth-last-of-type(1) { border-bottom: none; }
@@ -200,22 +227,28 @@
               <p class="desc">各規約への同意・確認の状況です。</p>
             </div>
           </div>
-          <div class="card">
-            <div class="card-h"><i class="ti ti-checklist" aria-hidden="true"></i>規約・同意状況</div>
-            <div class="card-b">
-              <dl class="kv">
-                <dt>StarPay決済サービス加盟店規約（共通・第2特約）</dt><dd class="status-ok">確認済み</dd>
-                <dt>JCB加盟店規約・加盟店特約</dt><dd class="status-ok">確認済み</dd>
-                <dt>琉球銀行加盟店規約（Visa / Mastercard / 銀聯）</dt><dd class="status-ok">確認済み</dd>
-                <dt>銀聯QRコード決済サービス利用加盟店規約</dt><dd class="status-ok">確認済み</dd>
-                <dt>個人情報の取扱い・共同利用への同意（各社）</dt><dd class="status-ok">同意済み</dd>
-                <dt>信用情報の照会・登録への同意</dt><dd class="status-ok">同意済み</dd>
-                <dt>反社会的勢力でないことの表明・確約</dt><dd class="status-ok">確認済み</dd>
-                <dt>代理申請の委任（委任契約）への同意</dt><dd class="status-ok">同意済み</dd>
-                <dt>当社サービス利用規約</dt><dd class="status-ok">同意済み</dd>
-                <dt>当社プライバシーポリシー（取得情報の各社提供）</dt><dd class="status-ok">同意済み</dd>
-                <dt>代表者・契約締結権限の確認</dt><dd class="status-ok">確認済み</dd>
-              </dl>
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-h"><i class="ti ti-checklist" aria-hidden="true"></i>① 決済サービスの加盟店規約・特約</div>
+              <div class="card-b">
+                <dl class="kv kv-terms">
+                  <dt>StarPay決済サービス加盟店規約（共通・第2特約）</dt><dd class="status-ok">確認済み</dd>
+                  <dt>JCB加盟店規約・加盟店特約</dt><dd class="status-ok">確認済み</dd>
+                  <dt>琉球銀行加盟店規約（Visa / Mastercard / 銀聯）</dt><dd class="status-ok">確認済み</dd>
+                  <dt>銀聯QRコード決済サービス利用加盟店規約</dt><dd class="status-ok">確認済み</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-file-certificate" aria-hidden="true"></i>② 当社（代理申請者）への委任・利用規約</div>
+              <div class="card-b">
+                <dl class="kv kv-terms">
+                  <dt>代理申請の委任（委任契約）への同意</dt><dd class="status-ok">同意済み</dd>
+                  <dt>当社サービス利用規約</dt><dd class="status-ok">同意済み</dd>
+                  <dt>当社プライバシーポリシー（取得情報の各社提供）</dt><dd class="status-ok">同意済み</dd>
+                  <dt>代表者・契約締結権限の確認</dt><dd class="status-ok">確認済み</dd>
+                </dl>
+              </div>
             </div>
           </div>
         </section>
@@ -260,75 +293,45 @@
               <p class="desc">利用を申し込んだ決済サービスです。</p>
             </div>
           </div>
+
+          <!-- ブランドグリッド（1列） -->
           <div class="card">
-            <div class="card-h"><i class="ti ti-credit-card" aria-hidden="true"></i>決済サービスの申込状況</div>
+            <div class="card-h"><i class="ti ti-qrcode" aria-hidden="true"></i>QRコード決済</div>
             <div class="card-b">
-              <div class="table-scroll">
-                <table class="pay-table">
-                  <thead>
-                    <tr>
-                      <th><i class="ti ti-wallet"></i>決済種別</th>
-                      <th><i class="ti ti-credit-card"></i>ブランド・サービス</th>
-                      <th><i class="ti ti-checkbox"></i>申込状況</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="pay-cat" rowspan="9">
-                        <span class="cat-inner">
-                          <i class="ti ti-qrcode" aria-hidden="true"></i>QRコード決済
-                          <span class="cat-count">申込済み 4 / 9</span>
-                        </span>
-                      </td>
-                      <td>WeChat Pay</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td>
-                    </tr>
-                    <tr><td>PayPay</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr><td>d払い</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr><td>au PAY</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>メルペイ</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>楽天ペイ</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr><td>JKO Pay（街口支付）</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>PromptPay</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>Alipay+</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr>
-                      <td class="pay-cat" rowspan="6">
-                        <span class="cat-inner">
-                          <i class="ti ti-credit-card" aria-hidden="true"></i>クレジットカード
-                          <span class="cat-count">申込済み 3 / 6</span>
-                        </span>
-                      </td>
-                      <td>JCB</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td>
-                    </tr>
-                    <tr><td>Discover</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>Visa</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr><td>Mastercard</td><td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>申込済み</span></td></tr>
-                    <tr><td>Diners Club</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>American Express</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr>
-                      <td class="pay-cat" rowspan="6">
-                        <span class="cat-inner">
-                          <i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー
-                          <span class="cat-count">申込済み 0 / 6</span>
-                        </span>
-                      </td>
-                      <td>iD</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td>
-                    </tr>
-                    <tr><td>WAON</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>楽天Edy</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>nanaco</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>交通系IC（Suica等）</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr><td>OKICA</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td></tr>
-                    <tr>
-                      <td class="pay-cat" rowspan="1">
-                        <span class="cat-inner">
-                          <i class="ti ti-credit-card" aria-hidden="true"></i>デビット・プリペイド
-                          <span class="cat-count">申込済み 0 / 1</span>
-                        </span>
-                      </td>
-                      <td>悠遊カード（EasyCard）</td><td><span class="badge-status st-none"><i class="ti ti-minus" aria-hidden="true"></i>申込なし</span></td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="brand-grid">
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>PayPay</span>
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>d払い</span>
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>楽天ペイ</span>
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>Alipay+</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>WeChat Pay</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>au PAY</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>メルペイ</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>JKOPAY</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットカード</div>
+            <div class="card-b">
+              <div class="brand-grid">
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>JCB</span>
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>Visa</span>
+                <span class="brand-chip applied"><i class="ti ti-circle-check" aria-hidden="true"></i>Mastercard</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>Discover</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>Diners Club</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>American Express</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー</div>
+            <div class="card-b">
+              <div class="brand-grid">
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>iD</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>WAON</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>楽天Edy</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>nanaco</span>
+                <span class="brand-chip none"><i class="ti ti-minus" aria-hidden="true"></i>交通系IC（Suica等）</span>
               </div>
             </div>
           </div>

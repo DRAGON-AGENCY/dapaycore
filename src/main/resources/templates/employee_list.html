@@ -419,11 +419,12 @@
   }
 
   /* 列幅は比率指定にして画面幅に合わせて自動調整する (合計100%) */
-  .data-table col.c-number { width: 16%; }
-  .data-table col.c-name { width: 22%; }
-  .data-table col.c-kana { width: 26%; }
-  .data-table col.c-dept { width: 18%; }
-  .data-table col.c-tel { width: 18%; }
+  .data-table col.c-number { width: 13%; }
+  .data-table col.c-name { width: 19%; }
+  .data-table col.c-kana { width: 22%; }
+  .data-table col.c-dept { width: 16%; }
+  .data-table col.c-tel { width: 16%; }
+  .data-table col.c-auth { width: 14%; }
 
   .data-table thead th {
     position: sticky;
@@ -489,6 +490,11 @@
     background: var(--bg-hover);
     cursor: pointer;
   }
+
+
+  /* 権限説明 */
+  .auth-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; margin-top: 14px; padding: 10px 14px; background: var(--bg-soft); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-sub); }
+  .auth-note-label { font-size: 12px; font-weight: 700; color: var(--text-soft); letter-spacing: 0.04em; white-space: nowrap; }
 
   /* 絞込み結果が0件のときの空状態 */
   .data-table tbody td.empty-cell {
@@ -599,6 +605,7 @@
             <col class="c-kana">
             <col class="c-dept">
             <col class="c-tel">
+            <col class="c-auth">
             <col style="width:36px;">
           </colgroup>
           <thead>
@@ -608,6 +615,7 @@
               <th>社員名 (カナ)</th>
               <th>部署</th>
               <th>電話番号</th>
+              <th>権限</th>
               <th class="c-action"></th>
             </tr>
           </thead>
@@ -620,11 +628,12 @@
               <td class="kana" th:text="${employee.employeeNameKana}"></td>
               <td th:text="${employee.department}"></td>
               <td class="tel" th:text="${employee.phoneNumber}"></td>
+              <td th:text="${employee.authorityCode == '01' ? '管理者' : employee.authorityCode == '02' ? '担当者' : '閲覧のみ'}"></td>
               <td class="c-action"></td>
             </tr>
             <!-- 絞込み結果が0件のときに表示する空状態の行 -->
             <tr id="empty-row" class="empty-row" style="display:none;">
-              <td class="empty-cell" colspan="6">該当する社員がいません。</td>
+              <td class="empty-cell" colspan="7">該当する社員がいません。</td>
             </tr>
           </tbody>
         </table>
@@ -636,6 +645,14 @@
       <button class="page-btn page-nav" type="button" data-nav="prev" aria-label="前のページ">‹</button>
       <div class="page-numbers" id="page-numbers"></div>
       <button class="page-btn page-nav" type="button" data-nav="next" aria-label="次のページ">›</button>
+    </div>
+
+    <!-- 権限説明 -->
+    <div class="auth-note">
+      <span class="auth-note-label">権限について</span>
+      <span><strong>管理者</strong>：社員情報の登録・変更・削除が可能です。</span>
+      <span><strong>担当者</strong>：社員情報の参照のみ可能です。登録・変更・削除はできません。</span>
+      <span><strong>閲覧のみ</strong>：社員情報の参照のみ可能です。登録・変更・削除はできません。</span>
     </div>
 
   </div>

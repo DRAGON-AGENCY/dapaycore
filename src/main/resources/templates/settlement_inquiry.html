@@ -6,8 +6,19 @@
 <title>売上明細照会｜申込・照会</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<!-- 外部フォント・アイコン CSS はレンダリングをブロックしないよう非同期で読み込む。 -->
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    media="print" onload="this.media='all'">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
 <style>
   :root {
     --bg-page: #eef2f7;
@@ -31,12 +42,16 @@
     --warn: #d8694e;
     --warn-soft: #fdf0dd;
     --warn-text: #8a5410;
-    --gold: #e0a93b;
     --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
     --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
     --radius-sm: 7px;
     --radius-md: 10px;
     --radius-lg: 14px;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 22px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -61,7 +76,6 @@
       --warn: #e0795f;
       --warn-soft: #38290f;
       --warn-text: #e8b765;
-      --gold: #d9ab43;
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
       --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
     }
@@ -75,7 +89,7 @@
   .wrap { min-width: 1200px; max-width: 1760px; margin: 0 auto; padding: 26px 18px 60px; }
   .shell { background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: stretch; min-height: 640px; box-shadow: var(--shadow-md); }
 
-  /* ---- sidebar (shared design) ---- */
+  /* ---- sidebar ---- */
   .sidebar { flex: 0 0 280px; background: linear-gradient(180deg,#0c2440 0%,#0a1f38 100%); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
   .sidebar .brand { display: flex; align-items: center; gap: 9px; padding: 6px 10px 18px; }
   .sidebar .brand .logo { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
@@ -97,74 +111,59 @@
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .topbar { padding: 16px 28px 0; }
   .topbar .titlerow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .topbar .titlerow .t { font-size: 15px; font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; }
-  .topbar .titlerow .s { font-size: 12px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px; }
+  .topbar .titlerow .t { font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; }
   .menu-toggle { display: none; }
   .content { padding: 6px 28px 28px; }
 
-  .section-head { display: flex; align-items: center; gap: 9px; background: var(--accent); color: #ffffff; padding: 13px 16px; border: 0.5px solid var(--accent); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--fs-base); font-weight: 700; }
-  .section-head i { font-size: 17px; color: #ffffff; }
+  .section-head { display: flex; align-items: center; gap: 9px; background: var(--accent); color: #ffffff; padding: 13px 16px; border: 0.5px solid var(--accent); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; font-size: var(--fs-sm); font-weight: 700; }
+  .section-head i { font-size: var(--fs-md); color: #ffffff; }
+  .section-head .head-right { margin-left: auto; font-weight: 500; font-size: var(--fs-xs); }
   .panel-box { border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 18px 18px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
 
-  .frow { display: grid; grid-template-columns: 96px 1fr; gap: 8px 12px; align-items: start; margin-bottom: 10px; }
-  .frow.frow-tight { margin-bottom: 10px; }
+  /* 絞込み条件フォーム */
+  .frow { display: grid; grid-template-columns: 130px 1fr; gap: 8px 12px; align-items: start; margin-bottom: 10px; }
   .frow:last-child { margin-bottom: 0; }
-  .frow > label { font-size: 13px; color: var(--text-secondary); padding-top: 8px; }
+  .frow > label { font-size: var(--fs-xs); color: var(--text-secondary); padding-top: 8px; }
   .fcontrols { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-  .fcontrols.nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  .fcontrols.nowrap { flex-wrap: nowrap; }
   .fcontrols.nowrap > * { flex: 0 0 auto; }
   .fcontrols.nowrap input[type="date"] { width: 150px; }
-  .fcontrols.nowrap input[type="time"] { width: 116px; }
-  .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
-  @media (max-width: 900px) { .grid-2col { grid-template-columns: 1fr; } }
 
-  label.inline { font-size: 13px; color: var(--text-secondary); }
-  input[type="text"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], select {
-    font-family: inherit; font-size: 13px; color: var(--text-primary);
+  input[type="text"], input[type="date"], select {
+    font-family: inherit; font-size: var(--fs-xs); color: var(--text-primary);
     padding: 8px 11px; height: 38px; background: var(--bg-surface);
     border: 1px solid var(--border-strong); border-radius: var(--radius-sm); outline: none;
     transition: border-color .15s, box-shadow .15s; min-width: 0;
   }
   input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61,141,221,0.16); }
   .grow { flex: 1; }
-  .addon { display: inline-flex; align-items: center; gap: 6px; }
-  .addon .ic { color: var(--text-tertiary); font-size: 16px; }
   .tilde { color: var(--text-tertiary); font-size: 14px; padding: 0 2px; }
-  .yen-pre { position: relative; display: inline-flex; align-items: center; }
-  .yen-pre .y { position: absolute; left: 10px; color: var(--text-tertiary); font-size: 13px; pointer-events: none; }
-  .yen-pre input { padding-left: 26px; }
+  select {
+    appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%230b5fd0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
 
-  /* preset date dropdown */
+  /* プリセット日付ドロップダウン */
   .preset { position: relative; }
-  .preset-btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; font-size: 13px; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-primary); font-family: inherit; min-width: 96px; justify-content: space-between; }
+  .preset-btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; font-size: var(--fs-xs); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-primary); font-family: inherit; min-width: 96px; justify-content: space-between; }
   .preset-menu { display: none; position: absolute; top: 42px; left: 0; z-index: 10; min-width: 110px; background: var(--accent); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-md); }
   .preset-menu.open { display: block; }
-  .preset-menu button { display: block; width: 100%; text-align: left; padding: 9px 14px; font-size: 13px; background: none; border: none; color: #fff; cursor: pointer; font-family: inherit; }
+  .preset-menu button { display: block; width: 100%; text-align: left; padding: 9px 14px; font-size: var(--fs-xs); background: none; border: none; color: #fff; cursor: pointer; font-family: inherit; }
   .preset-menu button:hover, .preset-menu button.sel { background: var(--accent-strong); }
 
-  /* status toggles */
-  .status-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  /* カード会社チップ */
+  .chip-ctrl-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .chip-hint { font-size: 12px; color: var(--text-tertiary); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
-    display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 34px;
-    border-radius: 999px; font-size: 13px; line-height: 1; cursor: pointer; user-select: none;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 13px; height: 34px; min-width: 148px;
+    border-radius: 999px; font-size: var(--fs-xs); line-height: 1; cursor: pointer; user-select: none;
     transition: background .15s, border-color .15s, box-shadow .15s;
     background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-secondary); white-space: nowrap;
   }
-  .chip i { font-size: 15px; color: var(--text-tertiary); flex: 0 0 auto; }
   .chip:hover { border-color: var(--accent-line); background: var(--bg-soft-2); }
-  /* 選択中：成立=青 */
-  .chip.on.tone-ok { background: var(--bg-soft); border-color: var(--accent); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent); }
-  .chip.on.tone-ok i { color: var(--accent); }
-  /* 選択中：取消・失敗=赤 */
-  .chip.on.tone-bad { background: var(--warn-soft); border-color: var(--warn); color: #791f1f; box-shadow: inset 0 0 0 1px var(--warn); }
-  .chip.on.tone-bad i { color: var(--warn); }
-  /* 選択中：その他=グレー */
-  .chip.on.tone-neutral { background: #d5dce8; border-color: var(--border-strong); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--border-strong); }
-  .chip.on.tone-neutral i { color: var(--text-secondary); }
-  @media (prefers-color-scheme: dark) {
-    .chip.on.tone-bad { color: #f7c1c1; }
-    .chip.on.tone-neutral { background: #34414f; }
-  }
+  .chip.on { background: #b8d3f8; border-color: var(--accent); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent); }
   .btn-chip-ctrl {
     display: inline-flex; align-items: center; height: 28px; padding: 0 10px;
     font-size: 12px; font-weight: 600; border-radius: 999px; cursor: pointer;
@@ -172,89 +171,66 @@
     color: var(--text-secondary); font-family: inherit; white-space: nowrap;
   }
   .btn-chip-ctrl:hover { background: var(--bg-secondary); }
-  .chip-sep { width: 1px; height: 22px; background: var(--border-strong); flex: 0 0 auto; margin: 0 2px; }
 
-  .btn { font-family: inherit; font-size: 13px; font-weight: 500; padding: 0 16px; height: 38px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: opacity .15s, background .15s, transform .05s; }
+  .btn { font-family: inherit; font-size: var(--fs-base); font-weight: 500; padding: 0 16px; height: 38px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: opacity .15s, background .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
   .btn i { font-size: 16px; }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:hover { background: var(--accent-strong); }
   .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border-strong); }
   .btn-ghost:hover { background: var(--bg-secondary); }
-  .btn-grey { background: #8a929c; color: #fff; }
-  .btn-grey:hover { opacity: 0.92; }
-  .btn-green { background: var(--ok); color: #fff; }
-  .btn-green:hover { opacity: 0.92; }
   .actions-row { display: flex; gap: 10px; margin-top: 12px; }
 
-  /* summary strip */
-  .summary-strip { display: flex; align-items: stretch; }
-  .sop { flex: 0 0 36px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--text-tertiary); background: var(--bg-secondary); border-left: 0.5px solid var(--border-strong); border-right: 0.5px solid var(--border-strong); }
-  .sitem { flex: 1; display: flex; align-items: center; gap: 12px; padding: 14px 20px; min-width: 0; }
-  .sitem-ico { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-  .sitem-ico i { font-size: 19px; }
-  .sitem-body { flex: 1; min-width: 0; }
-  .sitem-row1 { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
-  .sitem-label { font-size: 12px; font-weight: 600; }
-  .sitem-cnt { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
-  .sitem-amt { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; line-height: 1.1; }
-  .sitem.tone-in { background: var(--bg-soft); }
-  .sitem.tone-in .sitem-ico { background: var(--accent); color: #fff; }
-  .sitem.tone-in .sitem-label { color: var(--text-soft); }
-  .sitem.tone-in .sitem-cnt  { background: rgba(27,102,179,0.14); color: var(--accent-strong); }
-  .sitem.tone-in .sitem-amt  { color: var(--accent-strong); }
-  .sitem.tone-out { background: var(--warn-soft); }
-  .sitem.tone-out .sitem-ico { background: var(--warn); color: #fff; }
-  .sitem.tone-out .sitem-label { color: #8a5410; }
-  .sitem.tone-out .sitem-cnt  { background: rgba(216,105,78,0.18); color: #791f1f; }
-  .sitem.tone-out .sitem-amt  { color: #791f1f; }
-  .sitem.tone-total { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); }
-  .sitem.tone-total .sitem-ico  { background: rgba(255,255,255,0.22); color: #fff; }
-  .sitem.tone-total .sitem-label { color: rgba(255,255,255,0.8); }
-  .sitem.tone-total .sitem-cnt  { background: rgba(255,255,255,0.25); color: #fff; }
-  .sitem.tone-total .sitem-amt  { color: #fff; font-size: 22px; }
-  @media (prefers-color-scheme: dark) {
-    .sitem.tone-out .sitem-label, .sitem.tone-out .sitem-amt { color: #f7c1c1; }
-    .sitem.tone-out .sitem-cnt { color: #f7c1c1; }
+  /* 集計 KPI グリッド */
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 18px; }
+  .kpi-card {
+    border-radius: var(--radius-md); display: flex; flex-direction: row;
+    align-items: stretch; overflow: hidden;
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
   }
-  .summary-note { font-size: 11.5px; color: var(--text-tertiary); padding: 9px 18px 11px; border-top: 0.5px solid var(--border); line-height: 1.6; margin: 0; }
+  .kpi-icon-section {
+    flex: 0 0 90px; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; color: #fff;
+  }
+  .kpi-card.kpi-plain .kpi-icon-section { background: #6CCAC9; }
+  .kpi-card.kpi-accent .kpi-icon-section { background: #F8D347; }
+  .kpi-data-section {
+    flex: 1; background: var(--bg-surface); padding: 16px 22px;
+    display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0;
+  }
+  .kpi-label { font-size: var(--fs-xs); font-weight: 700; color: var(--text-secondary); }
+  .kpi-value { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1; color: var(--text-primary); }
+  .kpi-unit { font-size: var(--fs-base); font-weight: 500; margin-left: 4px; }
+  .kpi-note { font-size: 11.5px; color: var(--text-tertiary); padding: 0 18px 14px; line-height: 1.6; margin: 0; }
 
-  /* csv row */
+  /* CSV行 */
   .csv-row { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; }
   .csv-row .reslabel { font-size: 13px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
   .csv-row .reslabel b { color: var(--text-primary); font-size: 15px; }
   .csv-row .spacer { flex: 1; }
-  .csv-opt { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
-  .csv-opt input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
-  .csv-note { font-size: 12px; color: var(--text-tertiary); margin: 8px 0 0; line-height: 1.6; }
 
-  /* table */
+  /* 売上明細テーブル */
   .table-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-md); margin-top: 16px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1060px; table-layout: fixed; }
-  col.c-txid   { width: 9%; }
-  col.c-date   { width: 10%; }
-  col.c-shop   { width: 12%; }
-  col.c-card   { width: 10%; }
-  col.c-svc    { width: 11%; }
-  col.c-org    { width: 13%; }
-  col.c-status { width: 13%; }
-  col.c-amt    { width: 10%; }
-  col.c-note   { width: 8%; }
-  col.c-action { width: 4%; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-xs); min-width: 1300px; table-layout: fixed; }
+  col.c-name     { width: 14%; }
+  col.c-code     { width: 16%; }
+  col.c-company  { width: 11%; }
+  col.c-payment  { width: 9%; }
+  col.c-cardname { width: 12%; }
+  col.c-division { width: 9%; }
+  col.c-method   { width: 6%; }
+  col.c-date     { width: 7%; }
+  col.c-amount   { width: 12%; }
+  col.c-action   { width: 4%; }
   thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
   thead th:last-child { border-right: none; }
-  thead th i { font-size: 14px; vertical-align: -2px; margin-right: 3px; color: #ffffff; }
   tbody td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; }
   tbody td:last-child { border-right: none; }
   tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: var(--bg-soft); }
   td.amt { text-align: right; font-variant-numeric: tabular-nums; }
-  td.amt.c-minus { color: var(--warn); font-weight: 600; }
-  td.amt.c-gray  { color: var(--text-tertiary); }
-  .date-day  { display: block; }
-  .date-time { display: block; font-size: 11.5px; color: var(--text-tertiary); }
-  .svc-provider { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+  td.mono { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace; font-variant-numeric: tabular-nums; font-size: 13px; }
   tbody tr.data-row { cursor: pointer; }
   thead th.c-action { padding: 0; text-align: center; border-right: none; }
   tbody tr.data-row td.c-action { text-align: center; padding: 0; border-right: none; }
@@ -268,41 +244,18 @@
     border-right-color: var(--accent);
     border-top-color:   var(--accent);
   }
-  .badge-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; line-height: 1.4; min-width: 120px; justify-content: center; }
-  .badge-status i { font-size: 14px; flex: 0 0 auto; }
-  .st-sale    { background: var(--ok-soft);   color: var(--text-ok);        border-color: rgba(31,138,109,0.40); }
-  .st-auth    { background: var(--bg-soft);   color: var(--text-soft);      border-color: var(--accent-line); }
-  .st-refund  { background: var(--warn-soft); color: #8a3d10;               border-color: var(--warn); }
-  .st-cancel  { background: var(--warn-soft); color: #791f1f;               border-color: var(--warn); }
-  .st-failed  { background: #fde3e0;          color: #a11414;               border-color: #e7a59c; }
-  .st-expired { background: var(--bg-soft-2); color: var(--text-secondary); border-color: var(--border-strong); }
-  @media (prefers-color-scheme: dark) {
-    .st-refund { color: #f0b48f; }
-    .st-cancel { color: #f7c1c1; }
-    .st-failed { background: #3a1714; color: #f6b0a6; border-color: #6e2c25; }
-  }
-  .svc { display: inline-flex; align-items: center; gap: 6px; }
-  .svc .pill { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; color: #fff; }
-  .pill-paypay { background: #ec0000; }
-  .pill-jcb { background: #0b318f; }
-  .pill-visa { background: #1a1f71; }
-  .pill-mc { background: #b34700; }
-  .pill-amex { background: #2671b9; }
-  .pill-aupay { background: #eb5505; }
-  .pill-dpay { background: #cc0033; }
-  .pill-rpay { background: #bf0000; }
 
-  /* 表示件数セレクト・ページネーション（管理者一覧と同じ作り） */
+  /* 表示件数・ページネーション */
   .per-page-control { display: inline-flex; align-items: center; gap: 8px; }
-  .per-page-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
-  .per-page-select { padding: 6px 28px 6px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); font-family: inherit; font-size: 12px; color: var(--text-primary); cursor: pointer; }
+  .per-page-label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+  .per-page-select { padding: 6px 28px 6px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); font-family: inherit; font-size: var(--fs-xs); color: var(--text-primary); cursor: pointer; }
   .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; }
   .page-numbers { display: flex; align-items: center; gap: 6px; }
-  .page-btn { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-primary); font-family: inherit; font-size: 13px; cursor: pointer; transition: all .15s ease; }
+  .page-btn { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-primary); font-family: inherit; font-size: var(--fs-xs); cursor: pointer; transition: all .15s ease; }
   .page-btn:hover:not(:disabled):not(.is-active) { background: var(--bg-soft-2); }
   .page-btn:disabled { opacity: 0.4; cursor: default; }
   .page-number.is-active { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 700; cursor: default; }
-  .page-ellipsis { min-width: 22px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+  .page-ellipsis { min-width: 22px; text-align: center; color: var(--text-tertiary); font-size: var(--fs-xs); }
   .page-nav { font-weight: 600; }
 
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -317,35 +270,36 @@
     .topbar, .content { padding-left: 16px; padding-right: 16px; }
     .frow { grid-template-columns: 1fr; gap: 6px; }
     .frow > label { padding-top: 0; }
-    .op { transform: rotate(90deg); }
   }
 </style>
 </head>
 <body>
 <main class="wrap">
-  <h2 class="sr-only">売上明細照会。取引検索の条件入力、金額サマリー、CSVダウンロード、検索結果テーブルで構成されています。</h2>
+  <h2 class="sr-only">売上明細照会。絞込み条件の入力、金額サマリー、検索結果テーブルで構成されています。</h2>
   <div class="shell">
 
     <div class="main">
 
       <div class="topbar">
         <div class="titlerow">
-          <span class="t">
-            売上明細照会
-          </span>
+          <span class="t">売上明細照会</span>
         </div>
       </div>
 
       <div class="content">
 
-        <div class="section-head"><i class="ti ti-search" aria-hidden="true"></i>取引検索</div>
+        <!-- 絞込み条件 -->
+        <div class="section-head"><i class="ti ti-search" aria-hidden="true"></i>絞込み条件</div>
         <div class="panel-box">
 
           <div class="frow">
-            <label>取引日時</label>
+            <label>集計日</label>
             <div class="fcontrols nowrap">
               <div class="preset">
-                <button type="button" class="preset-btn" id="presetBtn"><span id="presetLabel">今月</span><i class="ti ti-chevron-down" style="font-size:15px;"></i></button>
+                <button type="button" class="preset-btn" id="presetBtn">
+                  <span id="presetLabel">今月</span>
+                  <i class="ti ti-chevron-down" style="font-size:15px;"></i>
+                </button>
                 <div class="preset-menu" id="presetMenu">
                   <button type="button">今日</button>
                   <button type="button">昨日</button>
@@ -355,95 +309,101 @@
                   <button type="button">先月</button>
                 </div>
               </div>
-              <span class="addon"><span class="ic" style="font-size:13px;color:var(--text-tertiary);">From</span><input type="date" value="2026-06-01"><input type="time" value="00:00:00" step="1"></span>
+              <span style="font-size:var(--fs-xs); color:var(--text-tertiary);">From</span>
+              <input type="date" id="date-from" value="2026-06-01">
               <span class="tilde">〜</span>
-              <span class="addon"><span class="ic" style="font-size:13px;color:var(--text-tertiary);">To</span><input type="date" value="2026-06-02"><input type="time" value="23:59:59" step="1"></span>
+              <span style="font-size:var(--fs-xs); color:var(--text-tertiary);">To</span>
+              <input type="date" id="date-to" value="2026-06-30">
             </div>
           </div>
 
           <div class="frow">
-            <label>ステータス</label>
-            <div class="fcontrols">
-              <div id="statusWrap" class="status-chips">
-                <button type="button" class="btn-chip-ctrl" id="statusAll">全選択</button>
-                <button type="button" class="btn-chip-ctrl" id="statusClear">全解除</button>
-                <span class="chip-sep"></span>
-                <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>売上</span>
-                <span class="chip tone-ok" data-tone="ok" data-on="0"><i class="ti ti-circle-check"></i>与信・決済申込</span>
-                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-arrow-back-up"></i>取消</span>
-                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-circle-x"></i>キャンセル</span>
-                <span class="chip tone-bad" data-tone="bad" data-on="0"><i class="ti ti-alert-circle"></i>取引失敗</span>
-                <span class="chip tone-neutral" data-tone="neutral" data-on="0"><i class="ti ti-clock-off"></i>期限切れ</span>
+            <label>ご契約カード会社</label>
+            <div class="fcontrols" style="flex-direction:column; align-items:flex-start; gap:8px;">
+              <div class="chip-ctrl-row">
+                <button type="button" class="btn-chip-ctrl" id="companyAll">全選択</button>
+                <button type="button" class="btn-chip-ctrl" id="companyClear">全解除</button>
+                <span class="chip-hint">（クリックで選択／解除）</span>
+              </div>
+              <div class="chip-row" id="companyChips">
+                <span class="chip" data-value="JCB">JCB</span>
+                <span class="chip" data-value="Discover">Discover</span>
+                <span class="chip" data-value="Visa">Visa</span>
+                <span class="chip" data-value="Mastercard">Mastercard</span>
+                <span class="chip" data-value="DinersClub">Diners Club</span>
+                <span class="chip" data-value="AmericanExpress">American Express</span>
               </div>
             </div>
           </div>
 
-          <div class="grid-2col">
-            <div class="frow">
-              <label>ショップ</label>
-              <div class="fcontrols"><input type="text" class="grow" placeholder="ショップ名"></div>
+          <div class="frow">
+            <label>加盟店名称</label>
+            <div class="fcontrols">
+              <input type="text" id="merchant-name" class="grow" placeholder="加盟店名称を入力" style="min-width:240px;">
             </div>
-            <div class="frow">
-              <label>サービス事業者</label>
-              <div class="fcontrols">
-                <select style="width:100%;">
-                  <option>選択してください</option>
-                  <option>PayPay決済</option>
-                  <option>（株）ジェーシービー</option>
-                  <option>りゅうぎん</option>
-                  <option>NETSTARS（StarPay）</option>
-                </select>
-              </div>
+          </div>
+
+          <div class="frow">
+            <label>お支払方法</label>
+            <div class="fcontrols">
+              <select id="payment-method" style="min-width:200px;">
+                <option value="">すべて</option>
+                <option value="クレジット">クレジット</option>
+                <option value="デビット">デビット</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="frow">
+            <label>支払区分</label>
+            <div class="fcontrols">
+              <select id="payment-division" style="min-width:200px;">
+                <option value="">すべて</option>
+                <option value="1回払い">1回払い</option>
+                <option value="2回払い">2回払い</option>
+                <option value="分割払い">分割払い</option>
+                <option value="リボ払い">リボ払い</option>
+              </select>
             </div>
           </div>
 
           <div class="actions-row">
-            <button type="button" class="btn btn-primary"><i class="ti ti-search"></i>検索実行</button>
-            <button type="button" class="btn btn-ghost"><i class="ti ti-refresh"></i>リセット</button>
+            <button type="button" class="btn btn-primary" id="search-btn">
+              <i class="ti ti-search"></i>検索実行
+            </button>
+            <button type="button" class="btn btn-ghost" id="reset-btn">
+              <i class="ti ti-refresh"></i>リセット
+            </button>
           </div>
         </div>
 
-        <!-- summary -->
+        <!-- 集計 -->
         <div class="section-head"><i class="ti ti-calculator" aria-hidden="true"></i>集計</div>
         <div class="panel-box" style="padding:0;">
-          <div class="summary-strip">
-            <div class="sitem tone-in">
-              <span class="sitem-ico"><i class="ti ti-arrow-down-circle" aria-hidden="true"></i></span>
-              <div class="sitem-body">
-                <div class="sitem-row1">
-                  <span class="sitem-label">取引額</span>
-                  <span class="sitem-cnt">6 件</span>
-                </div>
-                <div class="sitem-amt">¥ 14,870</div>
+          <div class="kpi-grid">
+            <div class="kpi-card kpi-plain">
+              <div class="kpi-icon-section"><i class="ti ti-receipt" aria-hidden="true"></i></div>
+              <div class="kpi-data-section">
+                <span class="kpi-label">売上件数</span>
+                <div class="kpi-value" id="kpi-count">—<span class="kpi-unit">件</span></div>
               </div>
             </div>
-            <span class="sop" aria-hidden="true">−</span>
-            <div class="sitem tone-out">
-              <span class="sitem-ico"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></span>
-              <div class="sitem-body">
-                <div class="sitem-row1">
-                  <span class="sitem-label">取消額</span>
-                  <span class="sitem-cnt">4 件</span>
-                </div>
-                <div class="sitem-amt">¥ 6,140</div>
-              </div>
-            </div>
-            <span class="sop" aria-hidden="true">=</span>
-            <div class="sitem tone-total">
-              <span class="sitem-ico"><i class="ti ti-building-bank" aria-hidden="true"></i></span>
-              <div class="sitem-body">
-                <div class="sitem-row1">
-                  <span class="sitem-label">振込予定額</span>
-                  <span class="sitem-cnt">6 件</span>
-                </div>
-                <div class="sitem-amt">¥ 8,730</div>
+            <div class="kpi-card kpi-accent">
+              <div class="kpi-icon-section"><i class="ti ti-shopping-cart" aria-hidden="true"></i></div>
+              <div class="kpi-data-section">
+                <span class="kpi-label">売上金額合計</span>
+                <div class="kpi-value" id="kpi-amount">—</div>
               </div>
             </div>
           </div>
-          <p class="summary-note">※「取引額」は売上のみが対象です。与信・決済申込・取引失敗・期限切れは含まれません。振込予定額 ＝ 取引額 − 取消額。</p>
+          <p class="kpi-note">※ 表示中の検索結果に含まれる全件の集計です。</p>
         </div>
 
-        <div class="section-head"><i class="ti ti-table" aria-hidden="true"></i>検索結果<span id="result-summary" style="margin-left:auto; font-weight:500;"></span></div>
+        <!-- 検索結果 -->
+        <div class="section-head">
+          <i class="ti ti-table" aria-hidden="true"></i>検索結果
+          <span class="head-right" id="result-summary"></span>
+        </div>
         <div class="panel-box">
           <div class="csv-row">
             <div class="per-page-control">
@@ -456,232 +416,90 @@
               </select>
             </div>
             <span class="spacer"></span>
-            <button type="button" class="btn btn-primary"><i class="ti ti-download"></i>CSVダウンロード</button>
+            <button type="button" class="btn btn-primary">
+              <i class="ti ti-download"></i>CSVダウンロード
+            </button>
           </div>
 
           <div class="table-scroll">
             <table>
               <colgroup>
-                <col class="c-txid">
+                <col class="c-name">
+                <col class="c-code">
+                <col class="c-company">
+                <col class="c-payment">
+                <col class="c-cardname">
+                <col class="c-division">
+                <col class="c-method">
                 <col class="c-date">
-                <col class="c-shop">
-                <col class="c-card">
-                <col class="c-svc">
-                <col class="c-org">
-                <col class="c-status">
-                <col class="c-amt">
-                <col class="c-note">
+                <col class="c-amount">
                 <col class="c-action">
               </colgroup>
               <thead>
                 <tr>
-                  <th><i class="ti ti-hash"></i>取引ID</th>
-                  <th><i class="ti ti-clock"></i>日時</th>
-                  <th><i class="ti ti-building-store"></i>ショップ名</th>
-                  <th><i class="ti ti-credit-card"></i>カード番号</th>
-                  <th><i class="ti ti-wallet"></i>サービス</th>
-                  <th><i class="ti ti-building-bank"></i>サービス事業者</th>
-                  <th><i class="ti ti-checkbox"></i>ステータス</th>
-                  <th class="amt">金額</th>
-                  <th>説明</th>
+                  <th>加盟店名称</th>
+                  <th>加盟店番号</th>
+                  <th>ご契約カード会社</th>
+                  <th>お支払方法</th>
+                  <th>お取扱カード名</th>
+                  <th>支払区分</th>
+                  <th>売上方法</th>
+                  <th>集計日</th>
+                  <th class="amt">売上金額（円）</th>
                   <th class="c-action"></th>
                 </tr>
               </thead>
               <tbody>
+                <!-- 静的サンプルデータ。実装時は API 検索結果に差し替える。 -->
                 <tr class="data-row">
-                  <td>TX5001A</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">17:36:29</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
-                  <td>PayPay決済</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 660</td>
-                  <td>外部支払い</td>
+                  <td>花甚</td>
+                  <td class="mono">8874-519-05-00026</td>
+                  <td>JCB</td>
+                  <td>クレジット</td>
+                  <td>JCBカード</td>
+                  <td>1回払い</td>
+                  <td>F</td>
+                  <td>11/06</td>
+                  <td class="amt">¥ 16,500</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
-                  <td>TX5002B</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">15:15:44</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>358760*******34</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
-                  <td>（株）ジェーシービー</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 1,650</td>
-                  <td>外部支払い</td>
+                  <td>花甚</td>
+                  <td class="mono">8874-519-05-00026</td>
+                  <td>JCB</td>
+                  <td>クレジット</td>
+                  <td>JCBカード</td>
+                  <td>1回払い</td>
+                  <td>F</td>
+                  <td>11/07</td>
+                  <td class="amt">¥ 4,400</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
-                  <td>TX5003C</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">14:02:11</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>414720*******09</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
-                  <td>りゅうぎん</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 2,200</td>
-                  <td>店頭支払い</td>
+                  <td>花甚</td>
+                  <td class="mono">8874-519-05-00026</td>
+                  <td>JCB</td>
+                  <td>クレジット</td>
+                  <td>JCBカード</td>
+                  <td>1回払い</td>
+                  <td>F</td>
+                  <td>11/14</td>
+                  <td class="amt">¥ 33,000</td>
                   <td class="c-action"></td>
                 </tr>
                 <tr class="data-row">
-                  <td>TX5004D</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">13:20:47</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>553011*******42</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
-                  <td>りゅうぎん</td>
-                  <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
-                  <td class="amt">¥ 980</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5005E</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">12:48:30</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>374830*******05</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
-                  <td>（株）ジェーシービー</td>
-                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
-                  <td class="amt c-minus">−¥ 3,520</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5006F</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">11:15:09</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
-                  <td class="amt c-minus">−¥ 540</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5007G</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">10:33:52</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
-                  <td class="amt c-gray">¥ 1,280</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5008H</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">09:47:18</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
-                  <td class="amt c-gray">¥ 760</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5009I</td>
-                  <td><span class="date-day">2026/06/01</span><span class="date-time">09:12:05</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>453210*******88</td>
-                  <td><span class="svc"><span class="pill pill-visa">VISA</span></span></td>
-                  <td>りゅうぎん</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 4,180</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5010J</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">19:40:22</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-paypay">PayPay</span></span></td>
-                  <td>PayPay決済</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 880</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5011K</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">18:05:51</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>358760*******12</td>
-                  <td><span class="svc"><span class="pill pill-jcb">JCB</span></span></td>
-                  <td>（株）ジェーシービー</td>
-                  <td><span class="badge-status st-auth"><i class="ti ti-shield-check" aria-hidden="true"></i>与信・決済申込</span></td>
-                  <td class="amt">¥ 2,750</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5012L</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">16:22:38</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>553011*******77</td>
-                  <td><span class="svc"><span class="pill pill-mc">MasterCard</span></span></td>
-                  <td>りゅうぎん</td>
-                  <td><span class="badge-status st-refund"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>取消</span></td>
-                  <td class="amt c-minus">−¥ 1,100</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5013M</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">14:55:10</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-aupay">au PAY</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-failed"><i class="ti ti-alert-triangle" aria-hidden="true"></i>取引失敗</span></td>
-                  <td class="amt c-gray">¥ 640</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5014N</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">13:11:47</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-dpay">d Payment</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-cancel"><i class="ti ti-circle-x" aria-hidden="true"></i>キャンセル</span></td>
-                  <td class="amt c-minus">−¥ 1,980</td>
-                  <td>外部支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5015O</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">11:38:29</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>374830*******61</td>
-                  <td><span class="svc"><span class="pill pill-amex">American Express</span></span></td>
-                  <td>（株）ジェーシービー</td>
-                  <td><span class="badge-status st-sale"><i class="ti ti-circle-check" aria-hidden="true"></i>売上</span></td>
-                  <td class="amt">¥ 5,300</td>
-                  <td>店頭支払い</td>
-                  <td class="c-action"></td>
-                </tr>
-                <tr class="data-row">
-                  <td>TX5016P</td>
-                  <td><span class="date-day">2026/05/31</span><span class="date-time">10:02:14</span></td>
-                  <td>カフェ・ソレイユ</td>
-                  <td>&mdash;</td>
-                  <td><span class="svc"><span class="pill pill-rpay">Rakuten Pay</span></span></td>
-                  <td>NETSTARS（StarPay）</td>
-                  <td><span class="badge-status st-expired"><i class="ti ti-clock-off" aria-hidden="true"></i>期限切れ</span></td>
-                  <td class="amt c-gray">¥ 720</td>
-                  <td>外部支払い</td>
+                  <td>花甚</td>
+                  <td class="mono">8874-519-05-00026</td>
+                  <td>JCB</td>
+                  <td>クレジット</td>
+                  <td>JCBカード</td>
+                  <td>1回払い</td>
+                  <td>F</td>
+                  <td>11/27</td>
+                  <td class="amt">¥ 5,500</td>
                   <td class="c-action"></td>
                 </tr>
               </tbody>
-
             </table>
           </div>
 
@@ -698,40 +516,70 @@
 </main>
 
 <script>
-  // preset date dropdown
-  const presetBtn = document.getElementById('presetBtn');
-  const presetMenu = document.getElementById('presetMenu');
-  const presetLabel = document.getElementById('presetLabel');
-  presetBtn.addEventListener('click', (e) => { e.stopPropagation(); presetMenu.classList.toggle('open'); });
-  presetMenu.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
-      presetMenu.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+  // プリセット日付ドロップダウン
+  var presetBtn = document.getElementById('presetBtn');
+  var presetMenu = document.getElementById('presetMenu');
+  var presetLabel = document.getElementById('presetLabel');
+  presetBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    presetMenu.classList.toggle('open');
+  });
+  presetMenu.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      presetMenu.querySelectorAll('button').forEach(function (x) { x.classList.remove('sel'); });
       b.classList.add('sel');
       presetLabel.textContent = b.textContent;
       presetMenu.classList.remove('open');
-      // ここで From/To の日付を選択プリセットに応じて設定してください。
+      // 実装時: プリセット選択に応じて date-from / date-to を更新する。
     });
   });
-  document.addEventListener('click', () => presetMenu.classList.remove('open'));
+  document.addEventListener('click', function () { presetMenu.classList.remove('open'); });
 
-  // status chips toggle
-  const statusWrap = document.getElementById('statusWrap');
-  statusWrap.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const on = chip.dataset.on === '1';
-      chip.dataset.on = on ? '0' : '1';
-      chip.classList.toggle('on', !on);
+  // ご契約カード会社チップの選択トグル
+  var companyChips = document.getElementById('companyChips');
+  companyChips.querySelectorAll('.chip').forEach(function (chip) {
+    chip.addEventListener('click', function () { chip.classList.toggle('on'); });
+  });
+  document.getElementById('companyAll').addEventListener('click', function () {
+    companyChips.querySelectorAll('.chip').forEach(function (c) { c.classList.add('on'); });
+  });
+  document.getElementById('companyClear').addEventListener('click', function () {
+    companyChips.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+  });
+
+  // 検索実行（API 連携箇所）
+  document.getElementById('search-btn').addEventListener('click', function () {
+    alert('指定した条件で売上明細を絞込みます。（API連携箇所）');
+  });
+
+  // リセット
+  document.getElementById('reset-btn').addEventListener('click', function () {
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+    document.getElementById('merchant-name').value = '';
+    document.getElementById('payment-method').value = '';
+    document.getElementById('payment-division').value = '';
+    companyChips.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+  });
+
+  // 集計・合計を全行から算出して表示する。
+  (function () {
+    var rows = Array.prototype.slice.call(
+      document.querySelectorAll('table tbody tr')
+    );
+    var totalAmount = 0;
+    rows.forEach(function (row) {
+      var amtCell = row.querySelector('td.amt');
+      if (!amtCell) { return; }
+      var digits = amtCell.textContent.replace(/[^0-9]/g, '');
+      if (digits !== '') { totalAmount += parseInt(digits, 10); }
     });
-  });
-  document.getElementById('statusAll').addEventListener('click', () => {
-    statusWrap.querySelectorAll('.chip').forEach(c => { c.dataset.on = '1'; c.classList.add('on'); });
-  });
-  document.getElementById('statusClear').addEventListener('click', () => {
-    statusWrap.querySelectorAll('.chip').forEach(c => { c.dataset.on = '0'; c.classList.remove('on'); });
-  });
+    var count = rows.length;
+    document.getElementById('kpi-count').innerHTML = count.toLocaleString() + '<span class="kpi-unit">件</span>';
+    document.getElementById('kpi-amount').textContent = '¥ ' + totalAmount.toLocaleString();
+  })();
 
-
-  // 検索結果のページネーション（表示件数の切替と複数ページの表示制御）
+  // ページネーション（表示件数の切替と複数ページの表示制御）
   (function () {
     var rows = Array.prototype.slice.call(
       document.querySelectorAll('.table-scroll table tbody tr')
@@ -740,66 +588,46 @@
     var pageNumbersEl = document.getElementById('page-numbers');
     var summaryEl = document.getElementById('result-summary');
     var pagination = document.getElementById('pagination');
-    if (!perPageSelect || !pagination) {
-      return;
-    }
+    if (!perPageSelect || !pagination) { return; }
     var prevBtn = pagination.querySelector('[data-nav="prev"]');
     var nextBtn = pagination.querySelector('[data-nav="next"]');
-
     var totalItems = rows.length;
     var perPage = parseInt(perPageSelect.value, 10);
     var currentPage = 1;
 
-    // 総ページ数（最低1ページ）
     function getTotalPages() {
       return Math.max(1, Math.ceil(totalItems / perPage));
     }
 
-    // 表示するページ番号の並びを生成（両端と現在ページ周辺、省略は'...'）
     function buildPageItems(current, total) {
       var items = [];
       if (total <= 7) {
-        for (var i = 1; i <= total; i++) {
-          items.push(i);
-        }
+        for (var i = 1; i <= total; i++) { items.push(i); }
         return items;
       }
       items.push(1);
       var left = Math.max(2, current - 1);
       var right = Math.min(total - 1, current + 1);
-      if (left > 2) {
-        items.push('...');
-      }
-      for (var page = left; page <= right; page++) {
-        items.push(page);
-      }
-      if (right < total - 1) {
-        items.push('...');
-      }
+      if (left > 2) { items.push('...'); }
+      for (var page = left; page <= right; page++) { items.push(page); }
+      if (right < total - 1) { items.push('...'); }
       items.push(total);
       return items;
     }
 
-    // 現在ページに応じて行の表示・概要・ページUIを再描画する
     function render() {
       var totalPages = getTotalPages();
-      if (currentPage > totalPages) {
-        currentPage = totalPages;
-      }
+      if (currentPage > totalPages) { currentPage = totalPages; }
       var startIndex = (currentPage - 1) * perPage;
       var endIndex = Math.min(startIndex + perPage, totalItems);
-
       rows.forEach(function (row, index) {
-        row.style.display =
-          (index >= startIndex && index < endIndex) ? '' : 'none';
+        row.style.display = (index >= startIndex && index < endIndex) ? '' : 'none';
       });
-
       if (summaryEl) {
         summaryEl.textContent = (totalItems === 0)
           ? '0 件'
           : (startIndex + 1) + '-' + endIndex + ' / ' + totalItems + ' 件';
       }
-
       pageNumbersEl.innerHTML = '';
       buildPageItems(currentPage, totalPages).forEach(function (item) {
         if (item === '...') {
@@ -811,34 +639,21 @@
         }
         var button = document.createElement('button');
         button.type = 'button';
-        button.className =
-          'page-btn page-number' + (item === currentPage ? ' is-active' : '');
+        button.className = 'page-btn page-number' + (item === currentPage ? ' is-active' : '');
         button.textContent = item;
-        button.addEventListener('click', function () {
-          currentPage = item;
-          render();
-        });
+        button.addEventListener('click', function () { currentPage = item; render(); });
         pageNumbersEl.appendChild(button);
       });
-
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === totalPages;
     }
 
     prevBtn.addEventListener('click', function () {
-      if (currentPage > 1) {
-        currentPage--;
-        render();
-      }
+      if (currentPage > 1) { currentPage--; render(); }
     });
-
     nextBtn.addEventListener('click', function () {
-      if (currentPage < getTotalPages()) {
-        currentPage++;
-        render();
-      }
+      if (currentPage < getTotalPages()) { currentPage++; render(); }
     });
-
     perPageSelect.addEventListener('change', function () {
       perPage = parseInt(perPageSelect.value, 10);
       currentPage = 1;
@@ -847,7 +662,6 @@
 
     render();
   })();
-
 </script>
 </body>
 </html>

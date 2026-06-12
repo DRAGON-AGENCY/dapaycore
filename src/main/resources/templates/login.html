@@ -67,15 +67,16 @@
   .promo .bsub { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: .06em; }
   .promo h1 { font-size: 34px; font-weight: 700; line-height: 1.4; margin: 0 0 18px; letter-spacing: .01em; }
   .promo .lead { font-size: 13.5px; color: rgba(255,255,255,0.82); margin: 0 0 36px; max-width: 30em; }
-  .cta { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: var(--radius-md); background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18); text-decoration: none; color: #fff; transition: background .18s, transform .06s; }
-  .cta:hover { background: rgba(255,255,255,0.16); }
-  .cta:active { transform: scale(0.995); }
-  .cta .ci { width: 44px; height: 44px; border-radius: 11px; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-  .cta .ci i { font-size: 22px; }
+  .cta { display: flex; align-items: center; gap: 18px; padding: 22px 24px; border-radius: 14px; background: #ffffff; border: none; text-decoration: none; color: #0a2040; box-shadow: 0 6px 28px rgba(0,0,0,0.30), 0 1px 4px rgba(0,0,0,0.12); transition: background .15s, transform .12s, box-shadow .15s; }
+  .cta:hover { background: #f2f7ff; box-shadow: 0 12px 40px rgba(0,0,0,0.38); transform: translateY(-3px); }
+  .cta:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(0,0,0,0.20); }
+  .cta .ci { width: 54px; height: 54px; border-radius: 14px; background: linear-gradient(145deg, #2378d4, #0c447c); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; box-shadow: 0 4px 14px rgba(12,68,124,0.42); }
+  .cta .ci i { font-size: 26px; color: #fff; }
   .cta .cbody { flex: 1; min-width: 0; }
-  .cta .ct { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; }
-  .cta .cd { font-size: 12px; color: rgba(255,255,255,0.78); line-height: 1.6; }
-  .cta .carrow { font-size: 20px; color: rgba(255,255,255,0.7); flex: 0 0 auto; }
+  .cta .ct { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #0a2040; letter-spacing: .01em; }
+  .cta .cd { font-size: 13px; color: #5a7090; line-height: 1.65; }
+  .cta .carrow { font-size: 22px; color: #1b66b3; flex: 0 0 auto; transition: transform .15s; }
+  .cta:hover .carrow { transform: translateX(5px); }
   .promo .foot-note { margin-top: auto; padding-top: 36px; font-size: 12px; color: rgba(255,255,255,0.62); }
 
   /* ---- right: form ---- */

@@ -79,7 +79,7 @@
 
   /* topbar */
   .topbar { padding: 16px 28px 14px; border-bottom: 0.5px solid var(--border); }
-  .titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .titlerow .t { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 8px; }
   .titlerow .t i { font-size: var(--fs-lg); color: var(--accent); }
 
@@ -95,7 +95,7 @@
   /* form */
   .field-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
   .field { display: flex; flex-direction: column; gap: 7px; }
-  .field label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); letter-spacing: 0.02em; display: flex; align-items: center; gap: 6px; }
+  .field label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); letter-spacing: 0.02em; }
   .req { color: var(--text-danger); font-size: 12px; }
   .field input[type="text"], .field input[type="date"] {
     height: 42px; padding: 0 12px;
@@ -179,7 +179,6 @@
   .notice-list li { counter-increment: n; position: relative; padding-left: 30px; margin-bottom: 10px; font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.7; }
   .notice-list li:last-child { margin-bottom: 0; }
   .notice-list li::before { content: counter(n); position: absolute; left: 0; top: 2px; width: 21px; height: 21px; border-radius: 50%; background: var(--bg-soft); color: var(--accent-strong); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-
   .card-warn { background: var(--warn-soft); border-color: var(--warn-line); box-shadow: none; }
   .card-warn .card-h { background: transparent; color: var(--warn-strong); padding: 14px 18px 2px; }
   .card-warn .card-h i { color: var(--warn-strong); }
@@ -196,7 +195,7 @@
   col.c-sales  { width: 15%; }
   col.c-fee    { width: 13%; }
   col.c-amount { width: 15%; }
-  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 14px; white-space: nowrap; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.25); }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 14px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); }
   thead th:last-child { border-right: none; }
   tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); font-size: var(--fs-sm); }
   tbody td:last-child { border-right: none; }
@@ -324,7 +323,7 @@
                   <th class="amt">振込予定額</th>
                 </tr>
               </thead>
-              <tbody id="preview-tbody">
+              <tbody>
                 <!-- 静的サンプルデータ。実装時は API プレビュー結果を差し替える。 -->
                 <tr>
                   <td class="mono">M001</td>
@@ -400,11 +399,9 @@
 </div>
 
 <script>
-  var summaryCard  = document.getElementById('summary-card');
-  var previewCard  = document.getElementById('preview-card');
+  var summaryCard   = document.getElementById('summary-card');
+  var previewCard   = document.getElementById('preview-card');
   var confirmDialog = document.getElementById('confirm-dialog');
-  var previewBtn   = document.getElementById('preview-btn');
-  var createBtn    = document.getElementById('create-btn');
 
   /* 対象年月から月末日を算出して締め日の初期値に設定する */
   function setDefaultClosingDate(ym) {
@@ -420,7 +417,7 @@
   }
 
   /* プレビューボタン：サマリーと一覧を表示する */
-  previewBtn.addEventListener('click', function () {
+  document.getElementById('preview-btn').addEventListener('click', function () {
     var month = document.getElementById('target-month').value.trim();
     if (!month) {
       alert('対象年月を入力してください。');
@@ -428,16 +425,11 @@
     }
 
     /* 実装時: GET /api/transfer/preview?targetMonth={month} でデータ取得に差し替える */
-    var count  = 3;
-    var sales  = '¥ 578,300';
-    var fee    = '¥ 13,776';
-    var amount = '¥ 564,524';
-
-    document.getElementById('kpi-count').textContent  = count + ' 件';
-    document.getElementById('kpi-sales').textContent  = sales;
-    document.getElementById('kpi-fee').textContent    = fee;
-    document.getElementById('kpi-amount').textContent = amount;
-    document.getElementById('preview-count').textContent = '対象 ' + count + ' 件';
+    document.getElementById('kpi-count').textContent  = '3 件';
+    document.getElementById('kpi-sales').textContent  = '¥ 578,300';
+    document.getElementById('kpi-fee').textContent    = '¥ 13,776';
+    document.getElementById('kpi-amount').textContent = '¥ 564,524';
+    document.getElementById('preview-count').textContent = '対象 3 件';
 
     setDefaultClosingDate(month);
 
@@ -447,21 +439,13 @@
   });
 
   /* CSV 作成ボタン：確認ダイアログを表示する */
-  createBtn.addEventListener('click', function () {
-    var month  = document.getElementById('target-month').value.trim();
-    var date   = document.getElementById('closing-date').value;
-    var amount = document.getElementById('kpi-amount').textContent;
-    var count  = document.getElementById('kpi-count').textContent;
-
-    if (!date) {
-      alert('締め日を入力してください。');
-      return;
-    }
-
-    document.getElementById('dlg-month').textContent  = month;
+  document.getElementById('create-btn').addEventListener('click', function () {
+    var date = document.getElementById('closing-date').value;
+    if (!date) { alert('締め日を入力してください。'); return; }
+    document.getElementById('dlg-month').textContent  = document.getElementById('target-month').value.trim();
     document.getElementById('dlg-date').textContent   = date;
-    document.getElementById('dlg-count').textContent  = count;
-    document.getElementById('dlg-amount').textContent = amount;
+    document.getElementById('dlg-count').textContent  = document.getElementById('kpi-count').textContent;
+    document.getElementById('dlg-amount').textContent = document.getElementById('kpi-amount').textContent;
     confirmDialog.removeAttribute('hidden');
   });
 

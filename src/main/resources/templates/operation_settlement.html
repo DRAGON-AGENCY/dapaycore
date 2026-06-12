@@ -215,9 +215,9 @@
           </div>
 
           <div class="field" style="margin-top:18px;">
-            <label>ファイル</label>
+            <label>精算データファイル <span class="req">*</span></label>
             <div class="file-row">
-              <input type="text" id="file-input" readonly value="stera_settlement_202612.csv">
+              <input type="text" id="file-input" readonly placeholder="ファイルを選択してください">
               <button type="button" class="btn btn-ghost" id="browse-btn"><i class="ti ti-folder-open" aria-hidden="true"></i>参照</button>
             </div>
           </div>
@@ -229,10 +229,13 @@
       </div>
 
       <div class="card card-warn">
-        <div class="card-h"><i class="ti ti-alert-circle" aria-hidden="true"></i>データ作成時のご注意</div>
+        <div class="card-h"><i class="ti ti-alert-circle" aria-hidden="true"></i>データ登録時のご注意</div>
         <div class="card-b">
           <ol class="notice-list">
-            <li>対象年月（YYYY/MM 形式）を指定し、stera terminal から出力された精算ファイルを「参照」ボタンから選択してください。</li>
+            <li>対象年月（YYYY/MM 形式）を入力し、精算データファイルを「参照」から選択してください。</li>
+            <li>アップロードするファイルには、JCB・Discover・Visa・Mastercard・Diners Club・American Express のデータが混在しています。カード会社ごとに分けず、1 ファイルをそのままアップロードしてください。</li>
+            <li>アップロード後、ファイル内の全カード会社の精算データが一括で登録されます。</li>
+            <li>同じ対象年月のデータが既に存在する場合は上書きされます。内容を十分に確認のうえ登録してください。</li>
           </ol>
         </div>
       </div>
