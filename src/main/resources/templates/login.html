@@ -89,7 +89,7 @@
   .divider { height: 0.5px; background: var(--border); margin: 0 0 24px; }
   .field { margin-bottom: 18px; }
   .field > label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 7px; }
-  input[type="text"], input[type="password"] {
+  input[type="text"], input[type="email"], input[type="password"] {
     width: 100%; font-family: inherit; font-size: 14px; color: var(--text-primary);
     padding: 12px 14px; height: 48px; background: var(--bg-surface);
     border: 1px solid var(--border-strong); border-radius: var(--radius-sm); outline: none;
@@ -133,7 +133,7 @@
 </head>
 <body>
   <main class="login">
-    <h2 class="sr-only">mPOSなび 会員ログイン画面。会員コードとパスワードでログインします。はじめての方は左側から加盟店申込に進めます。</h2>
+    <h2 class="sr-only">mPOSなび 会員ログイン画面。メールアドレスとパスワードでログインします。はじめての方は左側から加盟店申込に進めます。</h2>
 
     <!-- 左：ブランド／申込訴求 -->
     <section class="promo">
@@ -163,14 +163,14 @@
         <div class="brandhead">
           <span class="badge"><i class="ti ti-login-2" aria-hidden="true"></i></span>
           <h2>会員ログイン</h2>
-          <p class="sub">会員コードとパスワードでログインしてください</p>
+          <p class="sub">メールアドレスとパスワードでログインしてください</p>
         </div>
 
         <div class="divider"></div>
 
         <div class="field">
-          <label for="memberid">会員コード</label>
-          <input type="text" id="memberid" placeholder="会員コードを入力" autocomplete="username">
+          <label for="email">メールアドレス</label>
+          <input type="email" id="email" placeholder="メールアドレスを入力" autocomplete="email">
         </div>
 
         <div class="field" style="margin-bottom:0;">

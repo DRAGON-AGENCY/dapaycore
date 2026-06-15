@@ -61,6 +61,15 @@ public class PageController {
     }
 
     /**
+     * 本パスワード登録画面を表示する。
+     * メールのURLからアクセスされる（例: /password-setup.html?code=MA-2026-00001）。
+     */
+    @GetMapping("/password-setup.html")
+    public String showPasswordSetup() {
+        return "password_setup";
+    }
+
+    /**
      * 申込・照会ポータル（メイン）画面を表示する。
      */
     @GetMapping("/merchant_application_wizard.html")

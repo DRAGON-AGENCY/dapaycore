@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>申込登録</title>
+<meta name="csrf-token" th:content="${csrfToken}" content="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -140,31 +141,35 @@
   .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .card-grid > .card { margin-bottom: 0; }
 
-  /* 発送申込：注文商品（mPOS端末）の単価・数量・小計 */
-  .product { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-  .product .pimg { flex: 0 0 auto; width: 132px; height: 132px; border-radius: var(--radius-md); background: var(--bg-soft); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; padding: 12px; }
-  .product .pimg svg { width: 100%; height: 100%; }
-  .product .pinfo { flex: 1 1 240px; min-width: 220px; }
-  .product .pname { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
-  .product .pdesc { font-size: var(--fs-xs); color: var(--text-tertiary); margin: 0 0 12px; }
-  .product .price-row { display: flex; align-items: baseline; gap: 6px; }
-  .product .price-row .label { font-size: var(--fs-xs); color: var(--text-secondary); }
-  .product .price-row .price { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); }
-  .product .price-row .yen { font-size: var(--fs-sm); font-weight: 700; color: var(--accent-strong); }
-  .qty-box { flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; }
-  .qty-box > label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
-  .qty-ctrl { display: inline-flex; align-items: center; }
-  .qty-ctrl button { width: 44px; height: 44px; border: 1px solid var(--border-strong); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-  .qty-ctrl button i { font-size: 18px; }
-  .qty-ctrl button:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
-  .qty-ctrl button:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-  .qty-ctrl button:hover { background: var(--bg-soft); color: var(--accent); }
-  .qty-ctrl input { width: 64px; height: 44px; text-align: center; border-left: none; border-right: none; border-radius: 0; }
-  .subtotal { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--bg-soft); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
-  .subtotal .calc { font-size: var(--fs-xs); color: var(--text-tertiary); }
-  .subtotal .stitle { font-size: var(--fs-sm); font-weight: 700; color: var(--text-secondary); }
-  .subtotal .samount { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); }
-  .subtotal .samount .yen { font-size: var(--fs-sm); margin-left: 2px; }
+  /* 発送申込：注文商品 */
+  .order-item { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; padding: 4px 0 20px; }
+  .order-prod { display: flex; gap: 20px; align-items: flex-start; }
+  .order-prod .pimg { flex: 0 0 auto; width: 96px; height: 96px; border-radius: 12px; background: linear-gradient(145deg, #e4edf8 0%, #d4e2f3 100%); border: 1px solid rgba(20,45,80,.12); display: flex; align-items: center; justify-content: center; padding: 10px; }
+  .order-prod .pimg svg { width: 100%; height: 100%; }
+  .order-prod .pinfo { padding-top: 2px; }
+  .order-prod .pname { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
+  .order-prod .pdesc { font-size: var(--fs-xs); color: var(--text-tertiary); margin: 0 0 12px; line-height: 1.5; }
+  .unit-price { display: inline-flex; align-items: baseline; gap: 3px; background: #e9f1fb; border-radius: 6px; padding: 5px 10px; }
+  .unit-price .up-label { font-size: 12px; color: var(--text-secondary); margin-right: 2px; }
+  .unit-price .up-val { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+  .unit-price .up-yen { font-size: var(--fs-sm); font-weight: 600; color: var(--accent-strong); }
+  .qty-area { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .qty-area .qty-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; color: var(--text-secondary); }
+  .qty-stepper { display: flex; align-items: center; border: 1.5px solid rgba(20,45,80,.20); border-radius: 40px; overflow: hidden; background: #fff; box-shadow: 0 1px 4px rgba(20,45,80,.08); }
+  .qty-stepper button { width: 48px; height: 48px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; transition: background .15s, color .15s; flex-shrink: 0; }
+  .qty-stepper button:hover { background: #e9f1fb; color: var(--accent); }
+  .qty-stepper button:active { background: #d5e3f4; }
+  .qty-stepper input[type="number"] { width: 58px; height: 48px; text-align: center; border: none; border-left: 1px solid rgba(20,45,80,.14); border-right: 1px solid rgba(20,45,80,.14); border-radius: 0; font-size: 22px; font-weight: 700; color: var(--text-primary); background: transparent; -moz-appearance: textfield; }
+  .qty-stepper input[type="number"]::-webkit-inner-spin-button,
+  .qty-stepper input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .qty-stepper input[type="number"]:focus { outline: none; }
+  .qty-area .qty-unit { font-size: 13px; color: var(--text-tertiary); }
+  .order-total-bar { background: #e9f1fb; border: 1px solid rgba(27,102,179,.18); border-radius: 10px; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .order-total-bar .calc-expr { font-size: var(--fs-xs); color: var(--text-secondary); }
+  .order-total-right { display: flex; align-items: baseline; gap: 8px; }
+  .order-total-right .total-label { font-size: var(--fs-sm); font-weight: 600; color: #0c447c; padding-right: 10px; border-right: 1.5px solid rgba(12,68,124,.20); margin-right: 2px; }
+  .order-total-right .total-amount { font-size: 30px; font-weight: 700; color: #0c447c; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .order-total-right .total-yen { font-size: var(--fs-md); font-weight: 700; color: #0c447c; }
 
   .field { margin-bottom: 15px; }
   .field:last-child { margin-bottom: 0; }
@@ -202,17 +207,22 @@
   .input-row { display: flex; gap: 8px; }
 
   /* selectable cards (payment brands / checkbox grid) */
-  .opt-sub { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 4px 0 10px; }
+  .opt-sub { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 4px 0 10px; justify-content: space-between; }
   .opt-sub i { font-size: 16px; color: var(--accent); }
   .opt-sub:not(:first-child) { margin-top: 18px; }
+  .opt-sub .sub-label { display: flex; align-items: center; gap: 7px; }
+  .all-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-all { font-family: inherit; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border-mid, rgba(20,45,80,0.20)); background: #fff; color: var(--accent); cursor: pointer; transition: background .12s, color .12s; }
+  .btn-all:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .opt-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
   /* クレジットお支払方法 */
   .pay-methods { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
   .pay-method-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .pay-method-item { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .pay-method-item { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); transition: background .15s, border-color .15s; }
   .pay-method-item.pm-fixed { background: #e9f1fb; border-color: rgba(27,102,179,0.22); }
+  .pay-method-item.item-active { background: var(--bg-soft); border-color: rgba(27,102,179,0.22); }
   .pay-method-label { flex: 1; min-width: 0; }
-  .pay-method-label .pm-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
+  .pay-method-label .pm-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
   .pay-method-label .pm-brand { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
   .pm-fixed-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 14px; background: #dff0e0; color: #2e7d32; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
   .pm-fixed-note { font-size: 12px; color: var(--text-tertiary); flex: 1; min-width: 0; }
@@ -297,7 +307,7 @@
   .a-row { display: flex; align-items: center; gap: 13px; padding: 13px 16px; cursor: default; }
   .a-row + .a-row { border-top: 0.5px solid var(--border); }
   .a-row.tinted { background: var(--bg-soft); }
-  .a-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; pointer-events: none; }
+  .a-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; cursor: pointer; }
   .a-row .abody { flex: 1; min-width: 0; }
   .a-row .nameline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .a-row .aname { font-size: 13.5px; font-weight: 500; }
@@ -308,6 +318,12 @@
   .a-link { font-size: 12px; color: var(--accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; text-decoration: none; }
   .a-link:hover { text-decoration: underline; }
   .a-link i { font-size: 14px; }
+  .a-row-err { font-size: 12px; color: var(--text-danger); padding: 5px 16px 8px 52px; animation: fadeInOut 3s forwards; }
+  @keyframes fadeInOut { 0% { opacity: 0; } 10% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+  .a-link.highlight { color: var(--text-danger); animation: shake .4s; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .icon-spin { display: inline-block; animation: spin .8s linear infinite; }
   .tag { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
   .tag-net { background: #E1F5EE; color: #04342C; }
   .tag-jcb { background: #E6F1FB; color: #042C53; }
@@ -321,6 +337,9 @@
   .actions .prog { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
   .actions .step1-err { display: none; font-size: 13px; color: #c0392b; align-items: center; gap: 5px; }
   .actions .step1-err.visible { display: inline-flex; }
+  .field-err { display: none; font-size: 12px; color: var(--text-danger); margin-top: 6px; align-items: center; gap: 4px; }
+  .field-err.visible { display: flex; }
+  .field-err i { font-size: 14px; }
   .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
   .btn i { font-size: 17px; }
@@ -409,7 +428,6 @@
             <span class="num">1</span>
             <div class="htext">
               <h2>事前確認</h2>
-              <p class="desc">各規約への同意は別途（口頭または契約書）で取得済みである前提です。同意済みであることをご確認ください。</p>
             </div>
           </div>
 
@@ -508,6 +526,7 @@
                 <label class="opt"><input type="checkbox">⑥連鎖販売</label>
               </div>
               <label class="opt" id="txNoneWrap" style="margin-top:10px;"><input type="checkbox" id="txNone">①〜⑥に該当する取引形態ではない</label>
+              <p class="field-err" id="err-tx-type"><i class="ti ti-alert-circle"></i>取引形態を1つ以上選択してください。</p>
             </div>
           </div>
 
@@ -520,6 +539,7 @@
                   <label class="opt"><input type="radio" name="bizkind">法人</label>
                   <label class="opt"><input type="radio" name="bizkind">個人事業主</label>
                 </div>
+                <p class="field-err" id="err-bizkind"><i class="ti ti-alert-circle"></i>法人区分を選択してください。</p>
               </div>
               <div class="field">
                 <label>販売形態 <span class="req">*</span></label>
@@ -527,6 +547,7 @@
                   <label class="opt"><input type="radio" name="saleform">固定店舗</label>
                   <label class="opt"><input type="radio" name="saleform">移動販売</label>
                 </div>
+                <p class="field-err" id="err-saleform"><i class="ti ti-alert-circle"></i>販売形態を選択してください。</p>
               </div>
               <div class="field">
                 <label>運営形態 <span class="req">*</span></label>
@@ -536,6 +557,7 @@
                   <label class="opt"><input type="radio" name="opform">フランチャイズ</label>
                   <label class="opt"><input type="radio" name="opform">該当しない</label>
                 </div>
+                <p class="field-err" id="err-opform"><i class="ti ti-alert-circle"></i>運営形態を選択してください。</p>
               </div>
             </div>
           </div>
@@ -562,8 +584,14 @@
 
           <div class="card">
             <div class="card-b">
-              <div class="opt-sub"><i class="ti ti-qrcode" aria-hidden="true"></i>QRコード決済</div>
-              <div class="opt-grid">
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-qrcode" aria-hidden="true"></i>QRコード決済</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('qrGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('qrGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="qrGrid">
                 <label class="opt"><input type="checkbox"><i class="ti ti-brand-wechat bico" aria-hidden="true"></i>WeChat Pay</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>PayPay</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>d払い</label>
@@ -573,8 +601,15 @@
                 <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>Alipay+</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>JKOPAY</label>
               </div>
-              <div class="opt-sub"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットカード</div>
-              <div class="opt-grid">
+              <p class="field-err" id="err-qr"><i class="ti ti-alert-circle"></i>QRコード決済を1つ以上選択してください。</p>
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットカード</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('creditGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('creditGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="creditGrid">
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>JCB</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>Discover</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-brand-visa bico" aria-hidden="true"></i>Visa</label>
@@ -582,7 +617,8 @@
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>Diners Club</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>American Express</label>
               </div>
-              <div class="opt-sub"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットのお支払方法</div>
+              <p class="field-err" id="err-credit"><i class="ti ti-alert-circle"></i>クレジットカードを1つ以上選択してください。</p>
+              <div class="opt-sub"><span class="sub-label"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットのお支払方法</span></div>
               <div class="note" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>ご指定がない場合は、JCBにて設定します。</span></div>
               <div class="pay-methods">
                 <!-- 1回払い（固定） -->
@@ -602,8 +638,8 @@
                       <div class="pm-brand">JCB・AMEX・Diners</div>
                     </div>
                     <div class="seg" data-single>
-                      <label class="opt"><input type="radio" name="payBonus">①する</label>
-                      <label class="opt"><input type="radio" name="payBonus">②しない</label>
+                      <label class="opt"><input type="radio" name="payBonus">する</label>
+                      <label class="opt checked"><input type="radio" name="payBonus" checked>しない</label>
                     </div>
                   </div>
                   <div class="pay-method-item">
@@ -612,8 +648,8 @@
                       <div class="pm-brand">JCB</div>
                     </div>
                     <div class="seg" data-single>
-                      <label class="opt"><input type="radio" name="pay2kai">①する</label>
-                      <label class="opt"><input type="radio" name="pay2kai">②しない</label>
+                      <label class="opt"><input type="radio" name="pay2kai">する</label>
+                      <label class="opt checked"><input type="radio" name="pay2kai" checked>しない</label>
                     </div>
                   </div>
                 </div>
@@ -625,8 +661,8 @@
                       <div class="pm-brand">JCB・AMEX</div>
                     </div>
                     <div class="seg" data-single>
-                      <label class="opt"><input type="radio" name="payBunkatsu">①する</label>
-                      <label class="opt"><input type="radio" name="payBunkatsu">②しない</label>
+                      <label class="opt"><input type="radio" name="payBunkatsu">する</label>
+                      <label class="opt checked"><input type="radio" name="payBunkatsu" checked>しない</label>
                     </div>
                   </div>
                   <div class="pay-method-item">
@@ -635,20 +671,27 @@
                       <div class="pm-brand">JCB・Diners</div>
                     </div>
                     <div class="seg" data-single>
-                      <label class="opt"><input type="radio" name="payRevo">①する</label>
-                      <label class="opt"><input type="radio" name="payRevo">②しない</label>
+                      <label class="opt"><input type="radio" name="payRevo">する</label>
+                      <label class="opt checked"><input type="radio" name="payRevo" checked>しない</label>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="opt-sub"><i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー</div>
-              <div class="opt-grid">
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('emoneyGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('emoneyGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="emoneyGrid">
                 <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>iD</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>WAON</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>楽天Edy</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>nanaco</label>
                 <label class="opt"><input type="checkbox"><i class="ti ti-train bico" aria-hidden="true"></i>交通系IC（Suica 等）</label>
               </div>
+              <p class="field-err" id="err-emoney"><i class="ti ti-alert-circle"></i>電子マネーを1つ以上選択してください。</p>
             </div>
           </div>
         </section>
@@ -679,43 +722,43 @@
               <div class="field">
                 <label>法人番号 <span class="req">*</span></label>
                 <div class="input-row">
-                  <input type="text" placeholder="例）1234567890123" style="max-width:200px;">
+                  <input type="text" id="houjinNumber" placeholder="例）1234567890123" style="max-width:200px;">
                   <button type="button" class="btn btn-ghost btn-sm" id="houjinLookup"><i class="ti ti-search"></i>確認</button>
                 </div>
               </div>
               <div class="grid3">
-                <div class="field"><label>法人名 <span class="req">*</span></label><input type="text" placeholder="株式会社〇〇"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="カブシキガイシャ〇〇"></div>
-                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" placeholder="〇〇 Co."></div>
+                <div class="field"><label>法人名 <span class="req">*</span></label><input type="text" id="companyName" placeholder="株式会社〇〇"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="companyNameKana" placeholder="カブシキガイシャ〇〇"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="companyNameEn" placeholder="〇〇 Co."></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
-                <div class="field"><label>法人設立年月日 <span class="req">*</span></label><input type="date"></div>
+                <div class="field"><label>法人設立年月日 <span class="req">*</span></label><input type="date" id="corporateEstDate"></div>
                 <div class="field"><label>法人種別 <span class="help">任意</span></label>
-                  <select><option>選択してください</option><option>株式会社</option><option>合同会社</option><option>有限会社</option><option>合名会社</option><option>合資会社</option><option>一般社団法人</option><option>その他</option></select>
+                  <select id="corporateType"><option>選択してください</option><option>株式会社</option><option>合同会社</option><option>有限会社</option><option>合名会社</option><option>合資会社</option><option>一般社団法人</option><option>その他</option></select>
                 </div>
               </div>
               <div class="grid3" style="margin-top:14px;">
-                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input type="text" placeholder="〇〇"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="〇〇"></div>
-                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" placeholder="〇〇"></div>
+                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input type="text" id="brandName" placeholder="〇〇"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="brandNameKana" placeholder="〇〇"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="brandNameEn" placeholder="〇〇"></div>
               </div>
-              <div class="field" style="margin-top:14px;"><label>会社URL <span class="help">任意</span></label><div class="input-icon"><i class="ti ti-world"></i><input type="text" placeholder="https://example.co.jp"></div></div>
+              <div class="field" style="margin-top:14px;"><label>会社URL <span class="help">任意</span></label><div class="input-icon"><i class="ti ti-world"></i><input type="text" id="companyUrl" placeholder="https://example.co.jp"></div></div>
               <div class="grid3" style="margin-top:14px;">
-                <div class="field"><label>年商（単位：万円） <span class="req">*</span></label><input type="number" placeholder="例）10000"></div>
-                <div class="field"><label>資本金（単位：万円） <span class="help">任意</span></label><input type="number" placeholder="例）1000"></div>
-                <div class="field"><label>従業員数（単位：人） <span class="help">任意</span></label><input type="number" placeholder="40"></div>
+                <div class="field"><label>年商（単位：万円） <span class="req">*</span></label><input type="number" id="annualSales" placeholder="例）10000"></div>
+                <div class="field"><label>資本金（単位：万円） <span class="help">任意</span></label><input type="number" id="capitalAmount" placeholder="例）1000"></div>
+                <div class="field"><label>従業員数（単位：人） <span class="help">任意</span></label><input type="number" id="employeeCount" placeholder="40"></div>
               </div>
 
               <div class="sub-h"><i class="ti ti-category" aria-hidden="true"></i>業種情報</div>
               <div class="grid2">
                 <div class="field"><label>業種（カテゴリー） <span class="req">*</span></label>
-                  <select><option>選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
+                  <select id="industryCategory"><option>選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
                 </div>
                 <div class="field"><label>業種（詳細） <span class="req">*</span></label>
-                  <select><option>選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
+                  <select id="industryDetail"><option>選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
               </div>
-              <div class="field" style="margin-top:14px;"><label>事業内容及び取扱商材 <span class="req">*</span></label><input type="text" placeholder="例）〇〇の製造・販売、〇〇サービスの提供"></div>
+              <div class="field" style="margin-top:14px;"><label>事業内容及び取扱商材 <span class="req">*</span></label><input type="text" id="businessContent" placeholder="例）〇〇の製造・販売、〇〇サービスの提供"></div>
 
               <div class="sub-h"><i class="ti ti-map-pin" aria-hidden="true"></i>個人事業主住所／本社住所 <span class="hint">個人事業主の場合は本人確認書類記載の住所をご入力ください</span></div>
               <div class="addr" data-addr="company">
@@ -728,7 +771,7 @@
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
-                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
@@ -754,6 +797,7 @@
                   <div class="field"><label>携帯電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" data-f="mobile" placeholder="09012345678"></div></div>
                 </div>
               </div>
+              <p class="field-err" id="err-step4-corp"><i class="ti ti-alert-circle"></i>申込者情報に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -764,17 +808,17 @@
             <div class="card-b">
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前 <span class="hint">旧字体は常用漢字に置き換えてご入力ください</span></div>
               <div class="grid3">
-                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" placeholder="山田"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="ヤマダ"></div>
-                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" placeholder="YAMADA"></div>
+                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="repLastName" placeholder="山田"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="repLastNameKana" placeholder="ヤマダ"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repLastNameEn" placeholder="YAMADA"></div>
               </div>
               <div class="grid3" style="margin-top:14px;">
-                <div class="field"><label>名 <span class="req">*</span></label><input type="text" placeholder="太郎"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="タロウ"></div>
-                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" placeholder="TARO"></div>
+                <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="repFirstName" placeholder="太郎"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="repFirstNameKana" placeholder="タロウ"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repFirstNameEn" placeholder="TARO"></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
-                <div class="field"><label>生年月日 <span class="req">*</span></label><input type="date"></div>
+                <div class="field"><label>生年月日 <span class="req">*</span></label><input type="date" id="repBirthDate"></div>
                 <div class="field"><label>性別 <span class="req">*</span></label>
                   <div class="seg" data-single>
                     <label class="opt"><input type="radio" name="repsex">男</label>
@@ -797,7 +841,7 @@
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
-                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
@@ -816,6 +860,7 @@
                 <div class="field" style="margin-top:14px;"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇マンション 101"></div>
                 <div class="field" style="margin-top:14px;"><label>自宅電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0123456789"></div></div>
               </div>
+              <p class="field-err" id="err-step4-rep"><i class="ti ti-alert-circle"></i>代表者様情報に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -825,12 +870,12 @@
             <div class="card-b">
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前</div>
               <div class="grid2">
-                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" placeholder="山田"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="ヤマダ"></div>
+                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="contactLastName" placeholder="山田"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="contactLastNameKana" placeholder="ヤマダ"></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
-                <div class="field"><label>名 <span class="req">*</span></label><input type="text" placeholder="花子"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" placeholder="ハナコ"></div>
+                <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="contactFirstName" placeholder="花子"></div>
+                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="contactFirstNameKana" placeholder="ハナコ"></div>
               </div>
 
               <div class="sub-h"><i class="ti ti-building-community" aria-hidden="true"></i>勤務先住所 <span class="hint">日中いらっしゃる住所をご入力ください</span></div>
@@ -848,7 +893,7 @@
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
-                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
@@ -868,13 +913,14 @@
                   <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
-                <div class="field" style="margin-top:14px;"><label>部署名 <span class="req">*</span> <span class="help">ない場合は「なし」と記入</span></label><input type="text" placeholder="例）〇〇部"></div>
-                <div class="field" style="margin-top:14px;"><label>メールアドレス <span class="req">*</span></label><div class="input-icon"><i class="ti ti-at"></i><input type="email" placeholder="mail@example.co.jp"></div></div>
+                <div class="field" style="margin-top:14px;"><label>部署名 <span class="req">*</span> <span class="help">ない場合は「なし」と記入</span></label><input type="text" id="contactDept" placeholder="例）〇〇部"></div>
+                <div class="field" style="margin-top:14px;"><label>メールアドレス <span class="req">*</span></label><div class="input-icon"><i class="ti ti-at"></i><input type="email" id="contactEmail" placeholder="mail@example.co.jp"></div></div>
               </div>
 
               <div class="sub-h"><i class="ti ti-phone" aria-hidden="true"></i>担当者電話番号</div>
-              <div class="field"><label>担当者電話番号1 <span class="req">*</span> <span class="help">固定電話がある場合は固定電話を記入</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" placeholder="0312345678"></div></div>
+              <div class="field"><label>担当者電話番号1 <span class="req">*</span> <span class="help">固定電話がある場合は固定電話を記入</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" id="contactTel1" placeholder="0312345678"></div></div>
               <div class="field" style="margin-top:14px;"><label>担当者電話番号2 <span class="help">携帯電話番号を記入</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" placeholder="09012345678"></div></div>
+              <p class="field-err" id="err-step4-contact"><i class="ti ti-alert-circle"></i>担当者様情報に未入力の必須項目があります。</p>
             </div>
           </div>
           </div>
@@ -931,6 +977,7 @@
                   <div class="field" style="margin-top:14px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="カ）〇〇 タロウ"></div>
                 </div>
               </div>
+              <p class="field-err" id="err-step5-acc"><i class="ti ti-alert-circle"></i>入金先口座に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -976,14 +1023,14 @@
             <div class="card-h"><i class="ti ti-building-store" aria-hidden="true"></i>店舗名・ブランド名</div>
             <div class="card-b">
               <div class="grid3">
-                <div class="field"><label>店舗名 <span class="req">*</span></label><input type="text" placeholder="例）〇〇店"></div>
-                <div class="field"><label>店舗名（全角カナ） <span class="req">*</span></label><input type="text" placeholder="例）〇〇テン"></div>
-                <div class="field"><label>店舗名（英語表記） <span class="req">*</span></label><input type="text" placeholder="例）〇〇 Store"></div>
+                <div class="field"><label>店舗名 <span class="req">*</span></label><input id="shopName" type="text" placeholder="例）〇〇店"></div>
+                <div class="field"><label>店舗名（全角カナ） <span class="req">*</span></label><input id="shopNameKana" type="text" placeholder="例）〇〇テン"></div>
+                <div class="field"><label>店舗名（英語表記） <span class="req">*</span></label><input id="shopNameEn" type="text" placeholder="例）〇〇 Store"></div>
               </div>
               <div class="grid3" style="margin-top:14px;">
-                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input type="text" placeholder="例）〇〇"></div>
-                <div class="field"><label>ブランド名（屋号）（全角カナ） <span class="req">*</span></label><input type="text" placeholder="例）〇〇"></div>
-                <div class="field"><label>ブランド名（屋号）（英語表記） <span class="req">*</span></label><input type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input id="shopBrandName" type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号）（全角カナ） <span class="req">*</span></label><input id="shopBrandNameKana" type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号）（英語表記） <span class="req">*</span></label><input id="shopBrandNameEn" type="text" placeholder="例）〇〇"></div>
               </div>
             </div>
           </div>
@@ -993,15 +1040,16 @@
             <div class="card-b">
               <div style="display:grid; grid-template-columns:2fr 2fr 2fr 1fr 1fr; gap:14px;">
                 <div class="field"><label>店舗業種（カテゴリ） <span class="req">*</span></label>
-                  <select><option>選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
+                  <select id="shopIndustryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
                 </div>
                 <div class="field"><label>店舗業種（詳細） <span class="req">*</span></label>
-                  <select><option>選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
+                  <select id="shopIndustryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
-                <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input type="text" placeholder="例）〇〇の販売・提供内容"></div>
-                <div class="field"><label>店舗数 <span class="req">*</span></label><div class="input-row"><input type="number" min="1" placeholder="例）1" style="max-width:120px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">店舗</span></div></div>
-                <div class="field"><label>平均単価 <span class="req">*</span></label><div class="input-row"><input type="number" min="0" placeholder="例）5000" style="max-width:160px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">円</span></div></div>
+                <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input id="shopMerchandise" type="text" placeholder="例）〇〇の販売・提供内容"></div>
+                <div class="field"><label>店舗数 <span class="req">*</span></label><div class="input-row"><input id="shopCount" type="number" min="1" placeholder="例）1" style="max-width:120px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">店舗</span></div></div>
+                <div class="field"><label>平均単価 <span class="req">*</span></label><div class="input-row"><input id="shopAvgPrice" type="number" min="0" placeholder="例）5000" style="max-width:160px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">円</span></div></div>
               </div>
+              <p class="field-err" id="err-step6-info"><i class="ti ti-alert-circle"></i>店舗名・業種情報に未入力の必須項目があります。</p>
             </div>
           </div>
           <div class="card-grid">
@@ -1010,9 +1058,10 @@
             <div class="card-b">
               <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>口座情報で登録した入金先口座が表示されます。店舗ごとに別口座を指定する場合は変更してください。</span></div>
               <div class="grid2">
-                <div class="field"><label>店舗口座 <span class="req">*</span></label><input type="text" placeholder="例）〇〇銀行 〇〇支店 普通 1234567 カ）〇〇"></div>
-                <div class="field"><label>レシート名 <span class="req">*</span></label><input type="text" placeholder="例）〇〇 STORE"></div>
+                <div class="field"><label>店舗口座 <span class="req">*</span></label><input id="shopAccount" type="text" placeholder="例）〇〇銀行 〇〇支店 普通 1234567 カ）〇〇"></div>
+                <div class="field"><label>レシート名 <span class="req">*</span></label><input id="shopReceiptName" type="text" placeholder="例）〇〇 STORE"></div>
               </div>
+              <p class="field-err" id="err-step6-account"><i class="ti ti-alert-circle"></i>口座・レシート情報に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -1026,8 +1075,8 @@
                 <div class="field"><label>地図掲載希望日 <span class="help">任意</span></label><input type="date"></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
-                <div class="field"><label>緯度 <span class="help">任意</span></label><input type="text" placeholder="例）35.681236"></div>
-                <div class="field"><label>経度 <span class="help">任意</span></label><input type="text" placeholder="例）139.767125"></div>
+                <div class="field"><label>緯度 <span class="help">任意</span></label><input type="text" id="storeLatitude" placeholder="例）35.681236"></div>
+                <div class="field"><label>経度 <span class="help">任意</span></label><input type="text" id="storeLongitude" placeholder="例）139.767125"></div>
               </div>
             </div>
           </div>
@@ -1039,10 +1088,10 @@
             <div class="card-b">
               <div class="grid2">
                 <div class="field"><label>第1営業時間 <span class="help">任意</span></label>
-                  <div class="input-row"><input type="time"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time"></div>
+                  <div class="input-row"><input type="time" id="businessHours1Start"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time" id="businessHours1End"></div>
                 </div>
                 <div class="field"><label>第2営業時間 <span class="help">任意</span></label>
-                  <div class="input-row"><input type="time"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time"></div>
+                  <div class="input-row"><input type="time" id="businessHours2Start"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time" id="businessHours2End"></div>
                 </div>
               </div>
               <div class="field" style="margin-top:14px;">
@@ -1054,9 +1103,9 @@
                   <label class="opt"><input type="checkbox">木</label>
                   <label class="opt"><input type="checkbox">金</label>
                   <label class="opt"><input type="checkbox">土</label>
-                  <label class="opt"><input type="checkbox">日</label>
-                  <label class="opt"><input type="checkbox">祝日</label>
-                  <label class="opt"><input type="checkbox">祝前日</label>
+                  <label class="opt"><input type="checkbox" id="closedSunday">日</label>
+                  <label class="opt"><input type="checkbox" id="closedHoliday">祝日</label>
+                  <label class="opt"><input type="checkbox" id="closedHolidayEve">祝前日</label>
                 </div>
               </div>
             </div>
@@ -1082,7 +1131,7 @@
                 <div class="field">
                   <label>郵便番号 <span class="req">*</span></label>
                   <div class="input-row">
-                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <input id="shopZip" type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
                     <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
                   </div>
                 </div>
@@ -1091,20 +1140,20 @@
                 </div>
                 <div class="kana-pair">
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
-                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                    <select id="shopPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
                   <div class="field"><label>都道府県（全角カナ） <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input id="shopCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
                   <div class="field"><label>市区町村（全角カナ） <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>町域 <span class="req">*</span></label><input id="shopTown" type="text" data-f="town" placeholder="例）〇〇町"></div>
                   <div class="field"><label>町域（全角カナ） <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>番地 <span class="req">*</span></label><input id="shopBanchi" type="text" data-f="banchi" placeholder="例）1-2-3"></div>
                   <div class="field"><label>番地（全角カナ） <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
@@ -1112,10 +1161,11 @@
                   <div class="field"><label>建物名及び部屋番号（全角カナ） <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
                 <div class="grid2" style="margin-top:14px;">
-                  <div class="field"><label>電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
-                  <div class="field"><label>営業許可番号 <span class="help">任意</span></label><input type="text" placeholder="許可業種の場合に入力"></div>
+                  <div class="field"><label>電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input id="shopTel" type="tel" data-f="tel" placeholder="0312345678"></div></div>
+                  <div class="field"><label>営業許可番号 <span class="help">任意</span></label><input type="text" id="shopBusinessPermitNumber" placeholder="許可業種の場合に入力"></div>
                 </div>
               </div>
+              <p class="field-err" id="err-step6-addr"><i class="ti ti-alert-circle"></i>店舗所在地・連絡先に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -1140,6 +1190,7 @@
                   </div>
                 </div>
               </div>
+              <p class="field-err" id="err-step6-terminal"><i class="ti ti-alert-circle"></i>端末保持状況を選択してください。</p>
             </div>
           </div>
         </section>
@@ -1187,38 +1238,39 @@
                 <span class="dico"><i class="ti ti-certificate"></i></span>
                 <span class="meta"><span class="t">営業許可関連書類（許可証）</span><span class="s">① 該当する場合・JPEG／PDF</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                <input id="fileBusinessPermit" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-id"></i></span>
                 <span class="meta"><span class="t">本人確認書類（表面） <span class="req">*</span></span><span class="s">　①② 有効期限内・現住所記載のもの</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png">
+                <input id="idDocFront" type="file" accept=".pdf,.jpg,.jpeg,.png">
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-id"></i></span>
                 <span class="meta"><span class="t">本人確認書類（裏面）</span><span class="s">② 個人事業主は表裏の両方をご提出</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png">
+                <input id="idDocBack" type="file" accept=".pdf,.jpg,.jpeg,.png">
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-file-text"></i></span>
                 <span class="meta"><span class="t">開業届・店舗図面・設計書 など</span><span class="s">　③ 開店前で許可証が準備できない場合（いずれか）</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                <input id="fileOpeningPlan" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-clipboard-list"></i></span>
                 <span class="meta"><span class="t">販売予定の商材がわかる資料</span><span class="s">　③ メニュー表など</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                <input id="fileProductMaterial" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
               <label class="drop">
                 <span class="dico"><i class="ti ti-map"></i></span>
                 <span class="meta"><span class="t">イベント会場図面 など</span><span class="s">　④ イベント出店・開催前で WEB 情報がない場合</span></span>
                 <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                <input id="fileEventVenue" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
               </label>
+              <p class="field-err" id="err-step7-doc"><i class="ti ti-alert-circle"></i>本人確認書類（表面）をアップロードしてください。</p>
             </div>
           </div>
 
@@ -1357,43 +1409,49 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-device-mobile" aria-hidden="true"></i>ご注文内容</div>
             <div class="card-b">
-              <div class="product">
-                <div class="pimg" aria-hidden="true">
-                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="26" y="6" width="48" height="80" rx="8" fill="#0c447c"/>
-                    <rect x="31" y="13" width="38" height="46" rx="3" fill="#eaf2fb"/>
-                    <rect x="35" y="18" width="30" height="6" rx="2" fill="#9cc6f2"/>
-                    <rect x="35" y="28" width="20" height="4" rx="2" fill="#c2d8f0"/>
-                    <circle cx="37" cy="68" r="4" fill="#9cc6f2"/>
-                    <circle cx="50" cy="68" r="4" fill="#9cc6f2"/>
-                    <circle cx="63" cy="68" r="4" fill="#9cc6f2"/>
-                    <circle cx="37" cy="78" r="4" fill="#9cc6f2"/>
-                    <circle cx="50" cy="78" r="4" fill="#9cc6f2"/>
-                    <circle cx="63" cy="78" r="4" fill="#9cc6f2"/>
-                    <rect x="40" y="90" width="20" height="6" rx="3" fill="#1b66b3"/>
-                  </svg>
-                </div>
-                <div class="pinfo">
-                  <p class="pname">mPOS 決済端末</p>
-                  <p class="pdesc">キャッシュレス決済対応のモバイル決済端末（1台あたり）</p>
-                  <div class="price-row">
-                    <span class="label">単価</span>
-                    <span class="price" id="unitPrice" data-price="15400">15,400</span><span class="yen">円</span>
+              <div class="order-item">
+                <div class="order-prod">
+                  <div class="pimg" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="26" y="6" width="48" height="80" rx="8" fill="#0c447c"/>
+                      <rect x="31" y="13" width="38" height="46" rx="3" fill="#eaf2fb"/>
+                      <rect x="35" y="18" width="30" height="6" rx="2" fill="#9cc6f2"/>
+                      <rect x="35" y="28" width="20" height="4" rx="2" fill="#c2d8f0"/>
+                      <circle cx="37" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="50" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="63" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="37" cy="78" r="4" fill="#9cc6f2"/>
+                      <circle cx="50" cy="78" r="4" fill="#9cc6f2"/>
+                      <circle cx="63" cy="78" r="4" fill="#9cc6f2"/>
+                      <rect x="40" y="90" width="20" height="6" rx="3" fill="#1b66b3"/>
+                    </svg>
+                  </div>
+                  <div class="pinfo">
+                    <p class="pname">mPOS 決済端末</p>
+                    <p class="pdesc">キャッシュレス決済対応のモバイル決済端末（1台あたり）</p>
+                    <div class="unit-price">
+                      <span class="up-label">単価</span>
+                      <span class="up-val" id="unitPrice" data-price="15400">15,400</span><span class="up-yen">円</span>
+                    </div>
                   </div>
                 </div>
-                <div class="qty-box">
-                  <label for="qty">数量</label>
-                  <div class="qty-ctrl">
+                <div class="qty-area">
+                  <span class="qty-label">数 量</span>
+                  <div class="qty-stepper">
                     <button type="button" id="qtyMinus" aria-label="数量を減らす"><i class="ti ti-minus" aria-hidden="true"></i></button>
                     <input type="number" id="qty" data-f="qty" value="1" min="1" max="99" inputmode="numeric">
                     <button type="button" id="qtyPlus" aria-label="数量を増やす"><i class="ti ti-plus" aria-hidden="true"></i></button>
                   </div>
+                  <span class="qty-unit">台</span>
                 </div>
               </div>
-              <div class="subtotal">
-                <span class="stitle">合計</span>
-                <span class="calc" id="calcText">15,400円 × 1台</span>
-                <span class="samount"><span id="totalAmount">15,400</span><span class="yen">円</span></span>
+              <div class="order-total-bar">
+                <span class="calc-expr" id="calcText">15,400円 × 1台</span>
+                <div class="order-total-right">
+                  <span class="total-label">合 計</span>
+                  <span class="total-amount"><span id="totalAmount">15,400</span></span>
+                  <span class="total-yen">円</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1401,31 +1459,35 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-truck-delivery" aria-hidden="true"></i>お届け先</div>
             <div class="card-b">
+              <div class="copy-row" style="margin-bottom:14px;">
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="company" data-to="delivery"><i class="ti ti-copy"></i>本社住所と同じ</button>
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="rep" data-to="delivery"><i class="ti ti-copy"></i>代表者住所と同じ</button>
+              </div>
               <div class="addr" data-addr="delivery">
                 <div class="sub-h"><i class="ti ti-map-pin"></i>住所</div>
                 <div class="field">
                   <label>郵便番号 <span class="req">*</span></label>
                   <div class="input-row">
-                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <input id="deliveryZip" type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
                     <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
                   </div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
-                    <select data-f="pref"><option>選択してください</option><option>愛知県</option><option>東京都</option><option>大阪府</option><option>沖縄県</option></select>
+                    <select id="deliveryPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input id="deliveryCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>町域 <span class="req">*</span></label><input id="deliveryTown" type="text" data-f="town" placeholder="例）〇〇町"></div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
-                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>番地 <span class="req">*</span></label><input id="deliveryBanchi" type="text" data-f="banchi" placeholder="例）1-2-3"></div>
                   <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
@@ -1436,15 +1498,16 @@
                 <div class="sub-h"><i class="ti ti-phone"></i>電話番号</div>
                 <div class="field">
                   <label>電話番号 <span class="req">*</span></label>
-                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div>
+                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input id="deliveryTel" type="tel" data-f="tel" placeholder="0312345678"></div>
                 </div>
 
                 <div class="sub-h"><i class="ti ti-user"></i>受取人</div>
                 <div class="field">
                   <label>受取人 <span class="req">*</span></label>
-                  <input type="text" data-f="receiver" placeholder="例）〇〇 〇〇" style="max-width:280px;">
+                  <input id="deliveryReceiver" type="text" data-f="receiver" placeholder="例）〇〇 〇〇" style="max-width:280px;">
                 </div>
               </div>
+              <p class="field-err" id="err-step8-delivery"><i class="ti ti-alert-circle"></i>お届け先に未入力の必須項目があります。</p>
             </div>
           </div>
 
@@ -1479,6 +1542,49 @@
 
     </div>
   </form>
+
+  <!-- 登録確認モーダル -->
+  <div id="modalConfirm" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.55);z-index:9000;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:36px 40px;max-width:440px;width:90%;box-shadow:0 24px 60px rgba(12,34,64,0.22);text-align:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:#e9f1fb;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <i class="ti ti-help" style="font-size:26px;color:#1b66b3;"></i>
+      </div>
+      <h3 style="margin:0 0 10px;font-size:18px;color:#1b2733;">申込内容を登録しますか？</h3>
+      <p style="margin:0 0 28px;font-size:14px;color:#5a6675;line-height:1.7;">入力内容をご確認のうえ、登録してください。</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button type="button" id="modalConfirmCancel" style="font-family:inherit;font-size:14px;font-weight:600;padding:11px 28px;border-radius:8px;border:1px solid rgba(20,45,80,0.20);background:#fff;color:#5a6675;cursor:pointer;">キャンセル</button>
+        <button type="button" id="modalConfirmOk" style="font-family:inherit;font-size:14px;font-weight:700;padding:11px 28px;border-radius:8px;border:none;background:#1b66b3;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(27,102,179,0.30);">登録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登録完了モーダル -->
+  <div id="modalComplete" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.55);z-index:9000;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:36px 40px;max-width:480px;width:90%;box-shadow:0 24px 60px rgba(12,34,64,0.22);">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:#e6f4ea;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;">
+          <i class="ti ti-circle-check" style="font-size:30px;color:#2e7d32;"></i>
+        </div>
+        <h3 style="margin:0 0 6px;font-size:20px;color:#1b2733;">申込が完了しました</h3>
+        <p style="margin:0;font-size:13px;color:#5a6675;">ご申込ありがとうございます。審査・発送手続きを開始します。</p>
+      </div>
+      <div style="background:#f3f7fc;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;color:#5a6675;font-weight:500;">会員コード</span>
+          <span id="completeMemberCode" style="font-size:16px;font-weight:700;color:#0c447c;letter-spacing:.05em;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#5a6675;font-weight:500;">仮パスワード</span>
+          <span id="completeTempPassword" style="font-size:16px;font-weight:700;color:#0c447c;letter-spacing:.08em;font-family:monospace;"></span>
+        </div>
+      </div>
+      <div style="background:#fdf3e3;border:1px solid #ecd9b4;border-radius:10px;padding:14px 16px;margin-bottom:24px;display:flex;gap:10px;">
+        <i class="ti ti-mail" style="font-size:18px;color:#8a5410;margin-top:1px;flex-shrink:0;"></i>
+        <p style="margin:0;font-size:13px;color:#8a5410;line-height:1.7;">会員コード・仮パスワード・パスワード設定用URLを登録のメールアドレスへ送信しました。メールをご確認のうえ、パスワードを設定してください。</p>
+      </div>
+      <button type="button" id="modalCompleteClose" style="width:100%;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;border:none;background:#1b66b3;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(27,102,179,0.30);">閉じる</button>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -1488,7 +1594,36 @@
     label.addEventListener('click', function (e) {
       e.preventDefault();
     });
+    // チェックボックスを直接クリックした場合はエラーメッセージを表示する
+    var checkbox = label.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.checked) {
+          showAgreementError(label);
+        }
+      });
+    }
   });
+
+  function showAgreementError(row) {
+    document.querySelectorAll('.a-row-err').forEach(function (el) { el.remove(); });
+    var err = document.createElement('p');
+    err.className = 'a-row-err';
+    err.textContent = '「規約を確認」をクリックして規約をご確認ください。';
+    row.insertAdjacentElement('afterend', err);
+    var link = row.querySelector('.agreement-link');
+    if (link) {
+      link.classList.remove('highlight');
+      void link.offsetWidth;
+      link.classList.add('highlight');
+      link.addEventListener('animationend', function () {
+        link.classList.remove('highlight');
+      }, { once: true });
+    }
+    setTimeout(function () { err.remove(); }, 3_000);
+  }
 
   // 規約リンクをクリックしたとき、ラベルのトグルを止めてチェックのみを付ける
   document.querySelectorAll('.agreement-link').forEach(function (link) {
@@ -1569,6 +1704,22 @@
       nextBtn.innerHTML = '最終確認<i class="ti ti-arrow-right"></i>';
     } else {
       nextBtn.innerHTML = '次へ進む<i class="ti ti-arrow-right"></i>';
+    }
+    // 店舗情報ステップ表示時に、口座情報から店舗口座を自動入力する
+    if (current === 5) {
+      var shopAcc = document.getElementById('shopAccount');
+      if (shopAcc && shopAcc.value.trim() === '') {
+        var bkname = document.getElementById('acc-bkname').value.trim();
+        var brname = document.getElementById('acc-brname').value.trim();
+        var acctypeEl = document.querySelector('input[name="acctype"]:checked');
+        var acctype = acctypeEl ? acctypeEl.parentElement.textContent.trim() : '';
+        var accnum = document.getElementById('acc-num').value.trim();
+        var acckana = document.getElementById('acc-kana').value.trim();
+        if (bkname || brname || accnum) {
+          shopAcc.value = [bkname, brname, acctype, accnum, acckana]
+              .filter(function(v) { return v !== ''; }).join(' ');
+        }
+      }
     }
     // 最終確認ステップを表示する直前に、入力内容の確認リストを組み立てる
     if (current === total - 1) buildReview();
@@ -1779,13 +1930,63 @@
     }));
   }
 
+  // バリデーション用ヘルパー関数
+  function hasValue(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim() !== '';
+  }
+
+  function isSelected(id) {
+    var el = document.getElementById(id);
+    return el && el.value !== '' && el.value !== null;
+  }
+
+  function selectAllGrid(gridId) {
+    document.querySelectorAll('#' + gridId + ' input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = true;
+      cb.closest('.opt').classList.add('checked');
+    });
+  }
+
+  function clearAllGrid(gridId) {
+    document.querySelectorAll('#' + gridId + ' input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = false;
+      cb.closest('.opt').classList.remove('checked');
+    });
+  }
+
+  // データ収集用ヘルパー関数
+  function gf(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function af(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return '';
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    return el ? el.value.trim() : '';
+  }
+
+  function gridChk(gridId, idx) {
+    var grid = document.getElementById(gridId);
+    if (!grid) return false;
+    var inputs = grid.querySelectorAll('input[type="checkbox"]');
+    return inputs[idx] ? inputs[idx].checked : false;
+  }
+
+  function radioVal(name) {
+    var checked = document.querySelector('input[name="' + name + '"]:checked');
+    if (!checked) return '';
+    var opt = checked.closest('.opt');
+    return opt ? opt.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+
   // submit / next
   document.getElementById('wizard').addEventListener('submit', (e) => {
     e.preventDefault();
     if (current < total - 1) {
       // 事前確認（STEP 1）はすべての規約チェックボックスが確認済みでないと進めない
-      // TODO: モック用に無効化中。本番有効化時は下記コメントを解除する
-      /*
       if (current === 0) {
         var unchecked = panels[0].querySelectorAll(
             'input[type="checkbox"].req:not(:checked)');
@@ -1794,13 +1995,495 @@
           return;
         }
       }
-      */
+      // STEP 2: 取引形態のバリデーション
+      if (current === 1) {
+        var step2HasError = false;
+
+        var txChecked = document.querySelector('#txGrid input:checked, #txNone:checked');
+        var errTx = document.getElementById('err-tx-type');
+        if (!txChecked) {
+          errTx.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errTx.classList.remove('visible');
+        }
+
+        var bizkind = document.querySelector('input[name="bizkind"]:checked');
+        var errBizkind = document.getElementById('err-bizkind');
+        if (!bizkind) {
+          errBizkind.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errBizkind.classList.remove('visible');
+        }
+
+        var saleform = document.querySelector('input[name="saleform"]:checked');
+        var errSaleform = document.getElementById('err-saleform');
+        if (!saleform) {
+          errSaleform.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errSaleform.classList.remove('visible');
+        }
+
+        var opform = document.querySelector('input[name="opform"]:checked');
+        var errOpform = document.getElementById('err-opform');
+        if (!opform) {
+          errOpform.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errOpform.classList.remove('visible');
+        }
+
+        if (step2HasError) return;
+      }
+
+      // STEP 3: 決済種類のバリデーション
+      if (current === 2) {
+        var step3HasError = false;
+
+        var errQr = document.getElementById('err-qr');
+        if (!document.querySelector('#qrGrid input:checked')) {
+          errQr.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errQr.classList.remove('visible');
+        }
+
+        var errCredit = document.getElementById('err-credit');
+        if (!document.querySelector('#creditGrid input:checked')) {
+          errCredit.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errCredit.classList.remove('visible');
+        }
+
+        var errEmoney = document.getElementById('err-emoney');
+        if (!document.querySelector('#emoneyGrid input:checked')) {
+          errEmoney.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errEmoney.classList.remove('visible');
+        }
+
+        if (step3HasError) return;
+      }
+
+      // STEP 4: 法人情報のバリデーション
+      if (current === 3) {
+        var step4HasError = false;
+
+        // --- 申込者情報 ---
+        var errCorp = document.getElementById('err-step4-corp');
+        var corpOk = hasValue('houjinNumber')
+            && hasValue('companyName')
+            && hasValue('companyNameKana')
+            && hasValue('companyNameEn')
+            && hasValue('corporateEstDate')
+            && hasValue('brandName')
+            && hasValue('brandNameKana')
+            && hasValue('brandNameEn')
+            && hasValue('annualSales')
+            && isSelected('industryCategory')
+            && isSelected('industryDetail')
+            && hasValue('businessContent');
+        if (!corpOk) {
+          errCorp.classList.add('visible');
+          step4HasError = true;
+        } else {
+          errCorp.classList.remove('visible');
+        }
+
+        // --- 代表者情報 ---
+        var errRep = document.getElementById('err-step4-rep');
+        var repOk = hasValue('repLastName')
+            && hasValue('repLastNameKana')
+            && hasValue('repLastNameEn')
+            && hasValue('repFirstName')
+            && hasValue('repFirstNameKana')
+            && hasValue('repFirstNameEn')
+            && hasValue('repBirthDate');
+        if (!repOk) {
+          errRep.classList.add('visible');
+          step4HasError = true;
+        } else {
+          errRep.classList.remove('visible');
+        }
+
+        // --- 担当者情報 ---
+        var errContact = document.getElementById('err-step4-contact');
+        var contactOk = hasValue('contactLastName')
+            && hasValue('contactLastNameKana')
+            && hasValue('contactFirstName')
+            && hasValue('contactFirstNameKana')
+            && hasValue('contactDept')
+            && hasValue('contactEmail')
+            && hasValue('contactTel1');
+        if (!contactOk) {
+          errContact.classList.add('visible');
+          step4HasError = true;
+        } else {
+          errContact.classList.remove('visible');
+        }
+
+        if (step4HasError) return;
+      }
+
+      // STEP 5: 口座情報のバリデーション
+      if (current === 4) {
+        var step5HasError = false;
+
+        var errAcc = document.getElementById('err-step5-acc');
+        var accOk = hasValue('acc-bkcode')
+            && hasValue('acc-bkname')
+            && hasValue('acc-brcode')
+            && hasValue('acc-brname')
+            && document.querySelector('input[name="acctype"]:checked') !== null
+            && hasValue('acc-num')
+            && hasValue('acc-kana');
+        if (!accOk) {
+          errAcc.classList.add('visible');
+          step5HasError = true;
+        } else {
+          errAcc.classList.remove('visible');
+        }
+
+        if (step5HasError) return;
+      }
+
+      // STEP 6: 店舗情報のバリデーション
+      if (current === 5) {
+        var step6HasError = false;
+
+        // --- 店舗名・業種 ---
+        var errStep6Info = document.getElementById('err-step6-info');
+        var shopInfoOk = hasValue('shopName')
+            && hasValue('shopNameKana')
+            && hasValue('shopNameEn')
+            && hasValue('shopBrandName')
+            && hasValue('shopBrandNameKana')
+            && hasValue('shopBrandNameEn')
+            && isSelected('shopIndustryCategory')
+            && isSelected('shopIndustryDetail')
+            && hasValue('shopMerchandise')
+            && hasValue('shopCount')
+            && hasValue('shopAvgPrice');
+        if (!shopInfoOk) {
+          errStep6Info.classList.add('visible');
+          step6HasError = true;
+        } else {
+          errStep6Info.classList.remove('visible');
+        }
+
+        // --- 口座・レシート ---
+        var errStep6Account = document.getElementById('err-step6-account');
+        var shopAccountOk = hasValue('shopAccount') && hasValue('shopReceiptName');
+        if (!shopAccountOk) {
+          errStep6Account.classList.add('visible');
+          step6HasError = true;
+        } else {
+          errStep6Account.classList.remove('visible');
+        }
+
+        // --- 店舗所在地 ---
+        var errStep6Addr = document.getElementById('err-step6-addr');
+        var shopAddrOk = hasValue('shopZip')
+            && isSelected('shopPref')
+            && hasValue('shopCity')
+            && hasValue('shopTown')
+            && hasValue('shopBanchi')
+            && hasValue('shopTel');
+        if (!shopAddrOk) {
+          errStep6Addr.classList.add('visible');
+          step6HasError = true;
+        } else {
+          errStep6Addr.classList.remove('visible');
+        }
+
+        // --- 端末保持状況 ---
+        var errStep6Terminal = document.getElementById('err-step6-terminal');
+        if (!document.querySelector('input[name="terminalStatus"]:checked')) {
+          errStep6Terminal.classList.add('visible');
+          step6HasError = true;
+        } else {
+          errStep6Terminal.classList.remove('visible');
+        }
+
+        if (step6HasError) return;
+      }
+
+      // STEP 7: 書類情報のバリデーション
+      if (current === 6) {
+        var step7HasError = false;
+
+        var errStep7Doc = document.getElementById('err-step7-doc');
+        var idDocFront = document.getElementById('idDocFront');
+        if (!idDocFront || !idDocFront.files || idDocFront.files.length === 0) {
+          errStep7Doc.classList.add('visible');
+          step7HasError = true;
+        } else {
+          errStep7Doc.classList.remove('visible');
+        }
+
+        if (step7HasError) return;
+      }
+
+      // STEP 8: 発送申込のバリデーション
+      if (current === 7) {
+        var step8HasError = false;
+
+        var errStep8Delivery = document.getElementById('err-step8-delivery');
+        var deliveryOk = hasValue('deliveryZip')
+            && isSelected('deliveryPref')
+            && hasValue('deliveryCity')
+            && hasValue('deliveryTown')
+            && hasValue('deliveryBanchi')
+            && hasValue('deliveryTel')
+            && hasValue('deliveryReceiver');
+        if (!deliveryOk) {
+          errStep8Delivery.classList.add('visible');
+          step8HasError = true;
+        } else {
+          errStep8Delivery.classList.remove('visible');
+        }
+
+        if (step8HasError) return;
+      }
+
       // 通常の前進操作のため、最終確認からの修正フラグは解除する
       cameFromReview = false;
       goTo(current + 1);
     } else {
-      // ここで全ステップの入力値を収集し、登録APIへ送信してください。
-      alert('申請内容を登録しました。審査・発送手続きを開始します。');
+      // 全ステップの入力値を収集して登録 API へ送信する
+      var payload = {
+        agreedStarpay: !!(document.getElementById('chk-starpay') && document.getElementById('chk-starpay').checked),
+        agreedJcb: !!(document.getElementById('chk-jcb') && document.getElementById('chk-jcb').checked),
+        agreedRyuginVisaMcCu: !!(document.getElementById('chk-ryu1') && document.getElementById('chk-ryu1').checked),
+        agreedRyuginCuQr: !!(document.getElementById('chk-ryu2') && document.getElementById('chk-ryu2').checked),
+        agreedAgencyDelegation: !!(document.getElementById('chk-iin1') && document.getElementById('chk-iin1').checked),
+        agreedServiceTerms: !!(document.getElementById('chk-iin2') && document.getElementById('chk-iin2').checked),
+        agreedPrivacyPolicy: !!(document.getElementById('chk-iin3') && document.getElementById('chk-iin3').checked),
+        agreedAuthorityConfirmed: !!(document.querySelector('.attest input[type="checkbox"]') && document.querySelector('.attest input[type="checkbox"]').checked),
+        txTypeVisitSales: gridChk('txGrid', 0),
+        txTypeContinuousService: gridChk('txGrid', 1),
+        txTypePhoneSolicitation: gridChk('txGrid', 2),
+        txTypePrepaidService: gridChk('txGrid', 3),
+        txTypeBusinessInduction: gridChk('txGrid', 4),
+        txTypeChainSales: gridChk('txGrid', 5),
+        txTypeNoneApplicable: !!(document.getElementById('txNone') && document.getElementById('txNone').checked),
+        businessEntityType: radioVal('bizkind'),
+        salesFormat: radioVal('saleform'),
+        operationFormat: radioVal('opform'),
+        payQrWechatPay: gridChk('qrGrid', 0),
+        payQrPaypay: gridChk('qrGrid', 1),
+        payQrDBarai: gridChk('qrGrid', 2),
+        payQrAuPay: gridChk('qrGrid', 3),
+        payQrMerpay: gridChk('qrGrid', 4),
+        payQrRakutenPay: gridChk('qrGrid', 5),
+        payQrAlipayPlus: gridChk('qrGrid', 6),
+        payQrJkoPay: gridChk('qrGrid', 7),
+        payCreditJcb: gridChk('creditGrid', 0),
+        payCreditDiscover: gridChk('creditGrid', 1),
+        payCreditVisa: gridChk('creditGrid', 2),
+        payCreditMastercard: gridChk('creditGrid', 3),
+        payCreditDiners: gridChk('creditGrid', 4),
+        payCreditAmex: gridChk('creditGrid', 5),
+        payCreditBonus: radioVal('payBonus'),
+        payCreditTwoTimes: radioVal('pay2kai'),
+        payCreditInstallment: radioVal('payBunkatsu'),
+        payCreditRevolving: radioVal('payRevo'),
+        payEmoneyId: gridChk('emoneyGrid', 0),
+        payEmoneyWaon: gridChk('emoneyGrid', 1),
+        payEmoneyRakutenEdy: gridChk('emoneyGrid', 2),
+        payEmoneyNanaco: gridChk('emoneyGrid', 3),
+        payEmoneyTransitIc: gridChk('emoneyGrid', 4),
+        corporateNumber: gf('houjinNumber'),
+        corporateName: gf('companyName'),
+        corporateNameKana: gf('companyNameKana'),
+        corporateNameEn: gf('companyNameEn'),
+        establishmentDate: gf('corporateEstDate'),
+        brandName: gf('brandName'),
+        brandNameKana: gf('brandNameKana'),
+        brandNameEn: gf('brandNameEn'),
+        annualRevenue: gf('annualSales'),
+        corporateType: gf('corporateType'),
+        companyUrl: gf('companyUrl'),
+        capitalAmount: gf('capitalAmount'),
+        employeeCount: gf('employeeCount'),
+        industryCategory: gf('industryCategory'),
+        industryDetail: gf('industryDetail'),
+        businessDescription: gf('businessContent'),
+        companyZipCode: af('company', 'zip'),
+        companyPrefecture: af('company', 'pref'),
+        companyPrefectureKana: af('company', 'prefk'),
+        companyCity: af('company', 'city'),
+        companyCityKana: af('company', 'cityk'),
+        companyTown: af('company', 'town'),
+        companyTownKana: af('company', 'townk'),
+        companyStreetNumber: af('company', 'banchi'),
+        companyStreetNumberKana: af('company', 'banchik'),
+        companyBuilding: af('company', 'bldg'),
+        companyBuildingKana: af('company', 'bldgk'),
+        companyPhone: af('company', 'tel'),
+        companyFax: af('company', 'fax'),
+        companyMobile: af('company', 'mobile'),
+        repLastName: gf('repLastName'),
+        repLastNameKana: gf('repLastNameKana'),
+        repLastNameEn: gf('repLastNameEn'),
+        repFirstName: gf('repFirstName'),
+        repFirstNameKana: gf('repFirstNameKana'),
+        repFirstNameEn: gf('repFirstNameEn'),
+        repBirthDate: gf('repBirthDate'),
+        repGender: radioVal('repsex'),
+        repZipCode: af('rep', 'zip'),
+        repPrefecture: af('rep', 'pref'),
+        repPrefectureKana: af('rep', 'prefk'),
+        repCity: af('rep', 'city'),
+        repCityKana: af('rep', 'cityk'),
+        repTown: af('rep', 'town'),
+        repTownKana: af('rep', 'townk'),
+        repStreetNumber: af('rep', 'banchi'),
+        repStreetNumberKana: af('rep', 'banchik'),
+        repBuilding: af('rep', 'bldg'),
+        repPhone: af('rep', 'tel'),
+        contactLastName: gf('contactLastName'),
+        contactLastNameKana: gf('contactLastNameKana'),
+        contactFirstName: gf('contactFirstName'),
+        contactFirstNameKana: gf('contactFirstNameKana'),
+        contactZipCode: af('contact', 'zip'),
+        contactPrefecture: af('contact', 'pref'),
+        contactPrefectureKana: af('contact', 'prefk'),
+        contactCity: af('contact', 'city'),
+        contactCityKana: af('contact', 'cityk'),
+        contactTown: af('contact', 'town'),
+        contactTownKana: af('contact', 'townk'),
+        contactStreetNumber: af('contact', 'banchi'),
+        contactStreetNumberKana: af('contact', 'banchik'),
+        contactBuilding: af('contact', 'bldg'),
+        contactBuildingKana: af('contact', 'bldgk'),
+        contactDepartment: gf('contactDept'),
+        contactEmail: gf('contactEmail'),
+        contactPhone1: gf('contactTel1'),
+        bankCode: gf('acc-bkcode'),
+        bankName: gf('acc-bkname'),
+        branchCode: gf('acc-brcode'),
+        branchName: gf('acc-brname'),
+        accountType: radioVal('acctype'),
+        accountNumber: gf('acc-num'),
+        accountHolderKana: gf('acc-kana'),
+        storeName: gf('shopName'),
+        storeNameKana: gf('shopNameKana'),
+        storeNameEn: gf('shopNameEn'),
+        storeBrandName: gf('shopBrandName'),
+        storeBrandNameKana: gf('shopBrandNameKana'),
+        storeBrandNameEn: gf('shopBrandNameEn'),
+        storeIndustryCategory: gf('shopIndustryCategory'),
+        storeIndustryDetail: gf('shopIndustryDetail'),
+        storeProductDescription: gf('shopMerchandise'),
+        storeCount: gf('shopCount'),
+        storeAveragePrice: gf('shopAvgPrice'),
+        storeBankAccount: gf('shopAccount'),
+        storeReceiptName: gf('shopReceiptName'),
+        shopZipCode: gf('shopZip'),
+        shopPrefecture: gf('shopPref'),
+        shopPrefectureKana: af('shop', 'prefk'),
+        shopCity: gf('shopCity'),
+        shopCityKana: af('shop', 'cityk'),
+        shopTown: gf('shopTown'),
+        shopTownKana: af('shop', 'townk'),
+        shopStreetNumber: gf('shopBanchi'),
+        shopStreetNumberKana: af('shop', 'banchik'),
+        shopBuilding: af('shop', 'bldg'),
+        shopBuildingKana: af('shop', 'bldgk'),
+        shopPhone: gf('shopTel'),
+        terminalIcStatus: radioVal('terminalIc'),
+        terminalPossessionStatus: radioVal('terminalStatus'),
+        storeLatitude: gf('storeLatitude'),
+        storeLongitude: gf('storeLongitude'),
+        businessHours1Start: gf('businessHours1Start'),
+        businessHours1End: gf('businessHours1End'),
+        businessHours2Start: gf('businessHours2Start'),
+        businessHours2End: gf('businessHours2End'),
+        closedSunday: !!(document.getElementById('closedSunday') && document.getElementById('closedSunday').checked),
+        closedHoliday: !!(document.getElementById('closedHoliday') && document.getElementById('closedHoliday').checked),
+        closedHolidayEve: !!(document.getElementById('closedHolidayEve') && document.getElementById('closedHolidayEve').checked),
+        shopBusinessPermitNumber: gf('shopBusinessPermitNumber'),
+        mposQuantity: gf('qty'),
+        deliveryZipCode: gf('deliveryZip'),
+        deliveryPrefecture: gf('deliveryPref'),
+        deliveryPrefectureKana: af('delivery', 'prefk'),
+        deliveryCity: gf('deliveryCity'),
+        deliveryCityKana: af('delivery', 'cityk'),
+        deliveryTown: gf('deliveryTown'),
+        deliveryTownKana: af('delivery', 'townk'),
+        deliveryStreetNumber: gf('deliveryBanchi'),
+        deliveryStreetNumberKana: af('delivery', 'banchik'),
+        deliveryBuilding: af('delivery', 'bldg'),
+        deliveryBuildingKana: af('delivery', 'bldgk'),
+        deliveryPhone: gf('deliveryTel'),
+        deliveryReceiver: gf('deliveryReceiver')
+      };
+
+      var pendingPayload = payload;
+
+      var modalConfirm = document.getElementById('modalConfirm');
+      modalConfirm.style.display = 'flex';
+
+      document.getElementById('modalConfirmCancel').onclick = function() {
+        modalConfirm.style.display = 'none';
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+      };
+
+      document.getElementById('modalConfirmOk').onclick = function() {
+        modalConfirm.style.display = 'none';
+
+        var formData = new FormData();
+        formData.append('data', new Blob([JSON.stringify(pendingPayload)], {type: 'application/json'}));
+
+        var fileInputIds = ['fileBusinessPermit', 'idDocFront', 'idDocBack',
+            'fileOpeningPlan', 'fileProductMaterial', 'fileEventVenue'];
+        fileInputIds.forEach(function(inputId) {
+          var input = document.getElementById(inputId);
+          if (input && input.files) {
+            Array.from(input.files).forEach(function(file) {
+              formData.append(inputId, file);
+            });
+          }
+        });
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        nextBtn.disabled = true;
+        nextBtn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>登録中...';
+
+        fetch('/api/merchant-application/register', {
+          method: 'POST',
+          headers: { 'X-CSRF-TOKEN': csrfToken },
+          body: formData
+        })
+        .then(function(res) {
+          if (!res.ok) {
+            return res.json().then(function(data) {
+              throw new Error(data.errorMessage || 'HTTP ' + res.status);
+            });
+          }
+          return res.json();
+        })
+        .then(function(data) {
+          document.getElementById('completeMemberCode').textContent = data.memberCode;
+          document.getElementById('completeTempPassword').textContent = data.tempPassword;
+          var modalComplete = document.getElementById('modalComplete');
+          modalComplete.style.display = 'flex';
+          document.getElementById('modalCompleteClose').onclick = function() {
+            window.location.href = '/';
+          };
+        })
+        .catch(function(err) {
+          alert('登録に失敗しました。\n' + (err.message || '時間をおいて再度お試しください。'));
+          nextBtn.disabled = false;
+          nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+        });
+      };
     }
   });
 
@@ -1810,6 +2493,11 @@
       const parent = this.closest('[data-single]');
       if (parent && this.type === 'radio') {
         parent.querySelectorAll('.opt').forEach(o => o.classList.remove('checked'));
+        const payItem = this.closest('.pay-method-item');
+        if (payItem) {
+          const firstRadio = payItem.querySelector('input[type="radio"]');
+          payItem.classList.toggle('item-active', firstRadio === this);
+        }
       }
       this.closest('.opt').classList.toggle('checked', this.checked);
     });
@@ -1846,29 +2534,121 @@
     });
   });
 
-  // 都道府県 → カタカナ 自動補完（簡易）
-  const prefKana = { '愛知県': 'アイチケン', '東京都': 'トウキョウト', '大阪府': 'オオサカフ', '沖縄県': 'オキナワケン' };
-  document.querySelectorAll('select[data-f="pref"]').forEach(sel => {
+  // 都道府県 → カタカナ 自動補完
+  var prefKana = {
+    '北海道': 'ホッカイドウ', '青森県': 'アオモリケン', '岩手県': 'イワテケン',
+    '宮城県': 'ミヤギケン', '秋田県': 'アキタケン', '山形県': 'ヤマガタケン',
+    '福島県': 'フクシマケン', '茨城県': 'イバラキケン', '栃木県': 'トチギケン',
+    '群馬県': 'グンマケン', '埼玉県': 'サイタマケン', '千葉県': 'チバケン',
+    '東京都': 'トウキョウト', '神奈川県': 'カナガワケン', '新潟県': 'ニイガタケン',
+    '富山県': 'トヤマケン', '石川県': 'イシカワケン', '福井県': 'フクイケン',
+    '山梨県': 'ヤマナシケン', '長野県': 'ナガノケン', '岐阜県': 'ギフケン',
+    '静岡県': 'シズオカケン', '愛知県': 'アイチケン', '三重県': 'ミエケン',
+    '滋賀県': 'シガケン', '京都府': 'キョウトフ', '大阪府': 'オオサカフ',
+    '兵庫県': 'ヒョウゴケン', '奈良県': 'ナラケン', '和歌山県': 'ワカヤマケン',
+    '鳥取県': 'トットリケン', '島根県': 'シマネケン', '岡山県': 'オカヤマケン',
+    '広島県': 'ヒロシマケン', '山口県': 'ヤマグチケン', '徳島県': 'トクシマケン',
+    '香川県': 'カガワケン', '愛媛県': 'エヒメケン', '高知県': 'コウチケン',
+    '福岡県': 'フクオカケン', '佐賀県': 'サガケン', '長崎県': 'ナガサキケン',
+    '熊本県': 'クマモトケン', '大分県': 'オオイタケン', '宮崎県': 'ミヤザキケン',
+    '鹿児島県': 'カゴシマケン', '沖縄県': 'オキナワケン'
+  };
+  document.querySelectorAll('select[data-f="pref"]').forEach(function (sel) {
     sel.addEventListener('change', function () {
-      const k = this.closest('.addr').querySelector('[data-f="prefk"]');
+      var k = this.closest('.addr').querySelector('[data-f="prefk"]');
       if (k) k.value = prefKana[this.value] || '';
     });
   });
 
-  // 法人番号 確認ボタン（ダミー）
-  const houjin = document.getElementById('houjinLookup');
-  if (houjin) houjin.addEventListener('click', function () {
-    // ここで国税庁法人番号公表サイトのWeb-APIを呼び出し、法人名等を自動入力してください。
-    alert('法人番号から事業者情報を取得します（API連携箇所）。');
-  });
+  // 法人番号 確認ボタン
+  var houjinLookupBtn = document.getElementById('houjinLookup');
+  if (houjinLookupBtn) {
+    houjinLookupBtn.addEventListener('click', function () {
+      var numberInput = document.getElementById('houjinNumber');
+      var number = numberInput ? numberInput.value.replace(/[^0-9]/g, '') : '';
+      if (number.length !== 13) {
+        alert('法人番号を13桁の数字で入力してください。');
+        return;
+      }
+      houjinLookupBtn.disabled = true;
+      houjinLookupBtn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>検索中...';
+      fetch('/api/corporate/search?number=' + number)
+        .then(function (res) {
+          if (res.status === 404) throw new Error('NOT_FOUND');
+          if (res.status === 503) throw new Error('API_UNAVAILABLE');
+          if (!res.ok) throw new Error('API_ERROR');
+          return res.json();
+        })
+        .then(function (data) {
+          var nameEl = document.getElementById('companyName');
+          var kanaEl = document.getElementById('companyNameKana');
+          if (nameEl && data.name) nameEl.value = data.name;
+          if (kanaEl && data.furigana) kanaEl.value = data.furigana;
+        })
+        .catch(function (err) {
+          if (err.message === 'NOT_FOUND') {
+            alert('入力された法人番号に該当する法人が見つかりませんでした。');
+          } else if (err.message === 'API_UNAVAILABLE') {
+            alert('法人番号検索APIが利用できません。\nアプリケーションIDの登録が必要です。システム管理者にお問い合わせください。');
+          } else {
+            alert('法人情報の取得に失敗しました。時間をおいて再度お試しください。');
+          }
+        })
+        .finally(function () {
+          houjinLookupBtn.disabled = false;
+          houjinLookupBtn.innerHTML = '<i class="ti ti-search"></i>確認';
+        });
+    });
+  }
 
-  // 住所自動入力ボタン（ダミー）
-  document.querySelectorAll('.addr-auto').forEach(btn => {
+  // 住所自動入力ボタン
+  document.querySelectorAll('.addr-auto').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      // ここで郵便番号→住所のAPIを呼び出し、同じ住所ブロック内の各欄に反映してください。
-      alert('郵便番号から住所を自動入力します（API連携箇所）。');
+      var addrBlock = btn.closest('.addr');
+      var zipInput = addrBlock.querySelector('[data-f="zip"]');
+      var zip = zipInput ? zipInput.value.replace(/[^0-9]/g, '') : '';
+      if (zip.length !== 7) {
+        alert('郵便番号を7桁の数字で入力してください。');
+        return;
+      }
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>検索中...';
+      fetch('/api/postal-code/search?zip=' + zip)
+        .then(function (res) {
+          if (res.status === 404) throw new Error('NOT_FOUND');
+          if (!res.ok) throw new Error('API_ERROR');
+          return res.json();
+        })
+        .then(function (data) {
+          fillAddrField(addrBlock, 'pref', data.prefecture);
+          fillAddrField(addrBlock, 'prefk', data.prefectureKana
+              || prefKana[data.prefecture] || '');
+          fillAddrField(addrBlock, 'city', data.city);
+          fillAddrField(addrBlock, 'cityk', data.cityKana);
+          fillAddrField(addrBlock, 'town', data.town);
+          fillAddrField(addrBlock, 'townk', data.townKana);
+        })
+        .catch(function (err) {
+          if (err.message === 'NOT_FOUND') {
+            alert('入力された郵便番号に該当する住所が見つかりませんでした。');
+          } else {
+            alert('住所の取得に失敗しました。時間をおいて再度お試しください。');
+          }
+        })
+        .finally(function () {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-map-pin"></i>住所自動入力';
+        });
     });
   });
+
+  function fillAddrField(addrBlock, fieldName, value) {
+    if (!value) return;
+    var el = addrBlock.querySelector('[data-f="' + fieldName + '"]');
+    if (!el) return;
+    el.value = value;
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
 
   // 発送申込：mPOS端末の数量に応じて合計金額（単価 × 数量）を再計算する
   const qtyInput = document.getElementById('qty');
