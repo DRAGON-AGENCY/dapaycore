@@ -1,7 +1,11 @@
 package jp.co.dragonagency.dapaycore.controller;
 
+import jp.co.dragonagency.dapaycore.service.MemberListService;
+import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 画面テンプレートを配信するコントローラー。
@@ -10,6 +14,16 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class PageController {
+
+    private final MemberListService memberListService;
+    private final MerchantApplicationInquiryService inquiryService;
+
+    public PageController(
+            MemberListService memberListService,
+            MerchantApplicationInquiryService inquiryService) {
+        this.memberListService = memberListService;
+        this.inquiryService = inquiryService;
+    }
 
     /**
      * ルートアクセス時はトップ（index）画面を表示する。
@@ -45,10 +59,12 @@ public class PageController {
     }
 
     /**
-     * 加盟店一覧画面を表示する。運用管理ポータルの「加盟店管理」から表示する。
+     * 会員一覧画面を表示する。運用管理ポータルの「加盟店管理」から表示する。
+     * m_merchant_application と m_merchant_application_document からデータを取得してモデルへ渡す。
      */
     @GetMapping("/member_list.html")
-    public String showMemberList() {
+    public String showMemberList(Model model) {
+        model.addAttribute("members", memberListService.findAll());
         return "member_list";
     }
 
@@ -86,10 +102,18 @@ public class PageController {
     }
 
     /**
-     * 申込内容照会画面を表示する。登録済みの申込内容を読み取り専用で表示する。
+     * 申込内容照会画面を表示する。
+     * transactionCode（会員コード）に紐づく申込情報・書類情報を DB から取得してモデルへ渡す。
      */
     @GetMapping("/merchant_application_inquiry.html")
-    public String showMerchantApplicationInquiry() {
+    public String showMerchantApplicationInquiry(
+            @RequestParam(required = false) String transactionCode,
+            Model model) {
+        var merchantApp = inquiryService.findApplication(transactionCode);
+        model.addAttribute("merchantApp", merchantApp);
+        if (merchantApp != null) {
+            model.addAttribute("docMap", inquiryService.findDocumentMap(transactionCode));
+        }
         return "merchant_application_inquiry";
     }
 

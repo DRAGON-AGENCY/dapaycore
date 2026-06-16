@@ -90,6 +90,57 @@ public class PasswordSetupService {
         return new PasswordSetupResponse(true, null);
     }
 
+    /**
+     * セッション経由で本パスワードを登録する。
+     * 仮パスワードでのログイン後に呼び出す。再度の仮パスワード照合は不要。
+     *
+     * @param memberCode      会員コード（セッションから取得済み）
+     * @param newPassword     新しいパスワード
+     * @param confirmPassword 確認用パスワード
+     * @return 処理結果
+     */
+    @Transactional
+    public PasswordSetupResponse setupFromSession(
+            String memberCode,
+            String newPassword,
+            String confirmPassword) {
+        if (isBlank(newPassword) || isBlank(confirmPassword)) {
+            return new PasswordSetupResponse(false, "入力内容に不備があります。");
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            return new PasswordSetupResponse(false,
+                    "新しいパスワードと確認用パスワードが一致しません。");
+        }
+
+        if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            return new PasswordSetupResponse(false,
+                    "パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください。");
+        }
+
+        Optional<MerchantApplication> opt =
+                merchantApplicationRepository.findById(memberCode);
+        if (opt.isEmpty()) {
+            return new PasswordSetupResponse(false, "処理に失敗しました。");
+        }
+
+        MerchantApplication app = opt.get();
+
+        if (app.isPasswordSetFlg()) {
+            return new PasswordSetupResponse(false,
+                    "本パスワードはすでに登録済みです。ログイン画面からログインしてください。");
+        }
+
+        app.setPasswordHash(passwordEncoder.encode(newPassword));
+        app.setTempPasswordHash(null);
+        app.setPasswordSetFlg(true);
+        app.setUpdatedAt(LocalDateTime.now());
+        merchantApplicationRepository.save(app);
+
+        log.info("本パスワードを登録しました（セッション経由）: memberCode={}", memberCode);
+        return new PasswordSetupResponse(true, null);
+    }
+
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }

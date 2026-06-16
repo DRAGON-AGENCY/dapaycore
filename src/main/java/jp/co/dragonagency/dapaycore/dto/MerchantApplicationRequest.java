@@ -176,6 +176,12 @@ public class MerchantApplicationRequest {
     private String businessHours1End;
     private String businessHours2Start;
     private String businessHours2End;
+    private boolean closedMonday;
+    private boolean closedTuesday;
+    private boolean closedWednesday;
+    private boolean closedThursday;
+    private boolean closedFriday;
+    private boolean closedSaturday;
     private boolean closedSunday;
     private boolean closedHoliday;
     private boolean closedHolidayEve;
@@ -1499,6 +1505,54 @@ public class MerchantApplicationRequest {
 
     public void setBusinessHours2End(String businessHours2End) {
         this.businessHours2End = businessHours2End;
+    }
+
+    public boolean isClosedMonday() {
+        return closedMonday;
+    }
+
+    public void setClosedMonday(boolean closedMonday) {
+        this.closedMonday = closedMonday;
+    }
+
+    public boolean isClosedTuesday() {
+        return closedTuesday;
+    }
+
+    public void setClosedTuesday(boolean closedTuesday) {
+        this.closedTuesday = closedTuesday;
+    }
+
+    public boolean isClosedWednesday() {
+        return closedWednesday;
+    }
+
+    public void setClosedWednesday(boolean closedWednesday) {
+        this.closedWednesday = closedWednesday;
+    }
+
+    public boolean isClosedThursday() {
+        return closedThursday;
+    }
+
+    public void setClosedThursday(boolean closedThursday) {
+        this.closedThursday = closedThursday;
+    }
+
+    public boolean isClosedFriday() {
+        return closedFriday;
+    }
+
+    public void setClosedFriday(boolean closedFriday) {
+        this.closedFriday = closedFriday;
+    }
+
+    public boolean isClosedSaturday() {
+        return closedSaturday;
+    }
+
+    public void setClosedSaturday(boolean closedSaturday) {
+        this.closedSaturday = closedSaturday;
     }
 
     public boolean isClosedSunday() {

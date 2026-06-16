@@ -2,6 +2,7 @@ package jp.co.dragonagency.dapaycore.controller;
 
 import jp.co.dragonagency.dapaycore.dto.MerchantApplicationRequest;
 import jp.co.dragonagency.dapaycore.dto.MerchantApplicationResponse;
+import jp.co.dragonagency.dapaycore.service.MailService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 加盟店申込の登録 API を提供するコントローラ。
@@ -27,10 +29,13 @@ public class MerchantApplicationController {
             LoggerFactory.getLogger(MerchantApplicationController.class);
 
     private final MerchantApplicationService merchantApplicationService;
+    private final MailService mailService;
 
     public MerchantApplicationController(
-            MerchantApplicationService merchantApplicationService) {
+            MerchantApplicationService merchantApplicationService,
+            MailService mailService) {
         this.merchantApplicationService = merchantApplicationService;
+        this.mailService = mailService;
     }
 
     /**
@@ -66,6 +71,7 @@ public class MerchantApplicationController {
                     fileEventVenue);
 
             if (response.isSuccess()) {
+                sendRegistrationMailSilently(request, response);
                 return ResponseEntity.ok(response);
             }
             return ResponseEntity.badRequest().body(response);
@@ -76,5 +82,27 @@ public class MerchantApplicationController {
                     .body(new MerchantApplicationResponse(
                             false, null, null, "登録に失敗しました。時間をおいて再度お試しください。"));
         }
+    }
+
+    private void sendRegistrationMailSilently(
+            MerchantApplicationRequest request,
+            MerchantApplicationResponse response) {
+        String to = request.getContactEmail();
+        if (to == null || to.trim().isEmpty()) {
+            log.warn("登録完了メール送信スキップ: 連絡先メールアドレスが未設定 memberCode={}",
+                    response.getMemberCode());
+            return;
+        }
+        String memberCode = response.getMemberCode();
+        String tempPassword = response.getTempPassword();
+        String corporateName = request.getCorporateName();
+        String toAddress = to.trim();
+        CompletableFuture.runAsync(() -> {
+            try {
+                mailService.sendRegistrationMail(toAddress, corporateName, memberCode, tempPassword);
+            } catch (Throwable t) {
+                log.error("登録完了メール送信失敗: memberCode={}", memberCode, t);
+            }
+        });
     }
 }

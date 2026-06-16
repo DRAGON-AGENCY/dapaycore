@@ -12,6 +12,9 @@ public final class SessionAttributeNames {
     /** ログイン中ユーザの権限コードを保持するセッション属性名。 */
     public static final String AUTHORITY_CODE = "authorityCode";
 
+    /** ログイン中の加盟店会員コードを保持するセッション属性名。 */
+    public static final String MERCHANT_MEMBER_CODE = "merchantMemberCode";
+
     private SessionAttributeNames() {
     }
 }

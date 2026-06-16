@@ -228,7 +228,7 @@
   .pm-fixed-note { font-size: 12px; color: var(--text-tertiary); flex: 1; min-width: 0; }
   .pay-method-item .seg { margin: 0; flex-wrap: nowrap; }
   @media (max-width: 560px) { .opt-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  #txGrid { grid-template-columns: repeat(3, 1fr); }
+  #txGrid { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 720px) { #txGrid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 460px) { #txGrid { grid-template-columns: 1fr; } }
   .opt { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; font-size: 13.5px; color: var(--text-primary); background: var(--bg-surface); transition: border-color .15s, background .15s, box-shadow .15s; user-select: none; }
@@ -245,7 +245,7 @@
   /* segmented grid（枠を均等幅に揃える） */
   .seg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .seg-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-  .seg-grid .opt { padding: 9px 14px; }
+  .seg-grid .opt { padding: 11px 13px; }
   @media (max-width: 560px) { .seg-grid, .seg-grid.cols-2 { grid-template-columns: repeat(2, 1fr); } }
 
   /* file drop */
@@ -340,6 +340,13 @@
   .field-err { display: none; font-size: 12px; color: var(--text-danger); margin-top: 6px; align-items: center; gap: 4px; }
   .field-err.visible { display: flex; }
   .field-err i { font-size: 14px; }
+  input.input-err, select.input-err { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.15) !important; }
+  .input-suffix { align-self: center; color: var(--text-secondary); font-size: 14px; font-weight: 600; white-space: nowrap; padding-left: 4px; }
+  .time-range { display: flex; align-items: flex-end; gap: 12px; }
+  .time-range .time-block { display: flex; flex-direction: column; gap: 4px; }
+  .time-range .time-lbl { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-align: center; }
+  .time-range input[type="time"] { width: 130px; }
+  .time-range .time-sep { padding-bottom: 10px; color: var(--text-tertiary); font-size: 15px; }
   .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
   .btn:active { transform: scale(0.98); }
   .btn i { font-size: 17px; }
@@ -728,7 +735,7 @@
               </div>
               <div class="grid3">
                 <div class="field"><label>法人名 <span class="req">*</span></label><input type="text" id="companyName" placeholder="株式会社〇〇"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="companyNameKana" placeholder="カブシキガイシャ〇〇"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="companyNameKana" placeholder="ｶﾌﾞｼｷｶﾞｲｼｬ 〇〇"></div>
                 <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="companyNameEn" placeholder="〇〇 Co."></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
@@ -739,7 +746,7 @@
               </div>
               <div class="grid3" style="margin-top:14px;">
                 <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input type="text" id="brandName" placeholder="〇〇"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="brandNameKana" placeholder="〇〇"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="brandNameKana" placeholder="〇〇"></div>
                 <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="brandNameEn" placeholder="〇〇"></div>
               </div>
               <div class="field" style="margin-top:14px;"><label>会社URL <span class="help">任意</span></label><div class="input-icon"><i class="ti ti-world"></i><input type="text" id="companyUrl" placeholder="https://example.co.jp"></div></div>
@@ -798,6 +805,7 @@
                 </div>
               </div>
               <p class="field-err" id="err-step4-corp"><i class="ti ti-alert-circle"></i>申込者情報に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step4-corp-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
             </div>
           </div>
 
@@ -809,12 +817,12 @@
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前 <span class="hint">旧字体は常用漢字に置き換えてご入力ください</span></div>
               <div class="grid3">
                 <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="repLastName" placeholder="山田"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="repLastNameKana" placeholder="ヤマダ"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="repLastNameKana" placeholder="ﾔﾏﾀﾞ"></div>
                 <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repLastNameEn" placeholder="YAMADA"></div>
               </div>
               <div class="grid3" style="margin-top:14px;">
                 <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="repFirstName" placeholder="太郎"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="repFirstNameKana" placeholder="タロウ"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="repFirstNameKana" placeholder="ﾀﾛｳ"></div>
                 <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repFirstNameEn" placeholder="TARO"></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
@@ -861,6 +869,7 @@
                 <div class="field" style="margin-top:14px;"><label>自宅電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0123456789"></div></div>
               </div>
               <p class="field-err" id="err-step4-rep"><i class="ti ti-alert-circle"></i>代表者様情報に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step4-rep-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
             </div>
           </div>
 
@@ -871,11 +880,11 @@
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前</div>
               <div class="grid2">
                 <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="contactLastName" placeholder="山田"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="contactLastNameKana" placeholder="ヤマダ"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="contactLastNameKana" placeholder="ﾔﾏﾀﾞ"></div>
               </div>
               <div class="grid2" style="margin-top:14px;">
                 <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="contactFirstName" placeholder="花子"></div>
-                <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" id="contactFirstNameKana" placeholder="ハナコ"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="contactFirstNameKana" placeholder="ﾊﾅｺ"></div>
               </div>
 
               <div class="sub-h"><i class="ti ti-building-community" aria-hidden="true"></i>勤務先住所 <span class="hint">日中いらっしゃる住所をご入力ください</span></div>
@@ -919,7 +928,7 @@
 
               <div class="sub-h"><i class="ti ti-phone" aria-hidden="true"></i>担当者電話番号</div>
               <div class="field"><label>担当者電話番号1 <span class="req">*</span> <span class="help">固定電話がある場合は固定電話を記入</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" id="contactTel1" placeholder="0312345678"></div></div>
-              <div class="field" style="margin-top:14px;"><label>担当者電話番号2 <span class="help">携帯電話番号を記入</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" placeholder="09012345678"></div></div>
+              <div class="field" style="margin-top:14px;"><label>担当者電話番号2 <span class="help">携帯電話番号を記入</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" id="contactTel2" placeholder="09012345678"></div></div>
               <p class="field-err" id="err-step4-contact"><i class="ti ti-alert-circle"></i>担当者様情報に未入力の必須項目があります。</p>
             </div>
           </div>
@@ -955,12 +964,12 @@
                   <div class="acc-glabel"><i class="ti ti-building-bank" aria-hidden="true"></i>金融機関</div>
                   <div class="acc-code-grid" style="margin-bottom:18px;">
                     <div class="field"><label>金融機関コード <span class="req">*</span></label><input id="acc-bkcode" type="text" placeholder="例）0005" maxlength="4"></div>
-                    <div class="field"><label>金融機関名 <span class="req">*</span></label><input id="acc-bkname" type="text" placeholder="〇〇銀行"></div>
+                    <div class="field"><label>金融機関名 <span class="req">*</span></label><div class="input-row"><input id="acc-bkname" type="text" placeholder="例）三菱UFJ"><span class="input-suffix">銀行</span></div></div>
                   </div>
                   <div class="acc-glabel"><i class="ti ti-map-pin" aria-hidden="true"></i>支店</div>
                   <div class="acc-code-grid">
                     <div class="field"><label>支店コード <span class="req">*</span></label><input id="acc-brcode" type="text" placeholder="例）150" maxlength="3"></div>
-                    <div class="field"><label>支店名 <span class="req">*</span></label><input id="acc-brname" type="text" placeholder="〇〇支店"></div>
+                    <div class="field"><label>支店名 <span class="req">*</span></label><div class="input-row"><input id="acc-brname" type="text" placeholder="例）渋谷"><span class="input-suffix">支店</span></div></div>
                   </div>
                 </div>
                 <!-- 右：口座詳細 -->
@@ -974,10 +983,11 @@
                     </div>
                   </div>
                   <div class="field" style="margin-top:14px;"><label>口座番号 <span class="req">*</span></label><input id="acc-num" type="text" placeholder="7桁（例）1234567" maxlength="7"></div>
-                  <div class="field" style="margin-top:14px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="カ）〇〇 タロウ"></div>
+                  <div class="field" style="margin-top:14px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="ｶ) 〇〇 ﾀﾛｳ"></div>
                 </div>
               </div>
               <p class="field-err" id="err-step5-acc"><i class="ti ti-alert-circle"></i>入金先口座に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step5-acc-fmt"><i class="ti ti-alert-circle"></i>口座名義（カナ）は半角カタカナで入力してください。</p>
             </div>
           </div>
 
@@ -1005,7 +1015,7 @@
               <table>
                 <tr><th>項目</th><th>ルール</th></tr>
                 <tr><td>店舗名</td><td>全角32文字以内／記号は使用できません</td></tr>
-                <tr><td>店舗名カナ</td><td>全角カタカナのみ</td></tr>
+                <tr><td>店舗名カナ</td><td>半角カタカナのみ</td></tr>
               </table>
               <span class="ghead">■ 店舗名・屋号名の確認について</span>
               <p>「店舗名」「屋号名」は、ご提出・ご入力いただいたURLや店舗写真等で確認できるものをご入力ください。</p>
@@ -1024,12 +1034,12 @@
             <div class="card-b">
               <div class="grid3">
                 <div class="field"><label>店舗名 <span class="req">*</span></label><input id="shopName" type="text" placeholder="例）〇〇店"></div>
-                <div class="field"><label>店舗名（全角カナ） <span class="req">*</span></label><input id="shopNameKana" type="text" placeholder="例）〇〇テン"></div>
+                <div class="field"><label>店舗名（半角カナ） <span class="req">*</span></label><input id="shopNameKana" type="text" placeholder="例）〇〇 ﾃﾝ"></div>
                 <div class="field"><label>店舗名（英語表記） <span class="req">*</span></label><input id="shopNameEn" type="text" placeholder="例）〇〇 Store"></div>
               </div>
               <div class="grid3" style="margin-top:14px;">
                 <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input id="shopBrandName" type="text" placeholder="例）〇〇"></div>
-                <div class="field"><label>ブランド名（屋号）（全角カナ） <span class="req">*</span></label><input id="shopBrandNameKana" type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号）（半角カナ） <span class="req">*</span></label><input id="shopBrandNameKana" type="text" placeholder="例）〇〇"></div>
                 <div class="field"><label>ブランド名（屋号）（英語表記） <span class="req">*</span></label><input id="shopBrandNameEn" type="text" placeholder="例）〇〇"></div>
               </div>
             </div>
@@ -1038,7 +1048,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-category" aria-hidden="true"></i>店舗業種・商材</div>
             <div class="card-b">
-              <div style="display:grid; grid-template-columns:2fr 2fr 2fr 1fr 1fr; gap:14px;">
+              <div class="grid3">
                 <div class="field"><label>店舗業種（カテゴリ） <span class="req">*</span></label>
                   <select id="shopIndustryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
                 </div>
@@ -1046,10 +1056,25 @@
                   <select id="shopIndustryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
                 <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input id="shopMerchandise" type="text" placeholder="例）〇〇の販売・提供内容"></div>
-                <div class="field"><label>店舗数 <span class="req">*</span></label><div class="input-row"><input id="shopCount" type="number" min="1" placeholder="例）1" style="max-width:120px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">店舗</span></div></div>
-                <div class="field"><label>平均単価 <span class="req">*</span></label><div class="input-row"><input id="shopAvgPrice" type="number" min="0" placeholder="例）5000" style="max-width:160px;"><span style="align-self:center;color:var(--text-tertiary);font-size:14px;">円</span></div></div>
+              </div>
+              <div class="grid2" style="margin-top:18px;">
+                <div class="field">
+                  <label>店舗数 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="shopCount" type="number" min="1" value="1" inputmode="numeric" placeholder="1">
+                    <span class="input-suffix">店舗</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>平均単価 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="shopAvgPrice" type="number" min="0" placeholder="5,000">
+                    <span class="input-suffix">円</span>
+                  </div>
+                </div>
               </div>
               <p class="field-err" id="err-step6-info"><i class="ti ti-alert-circle"></i>店舗名・業種情報に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step6-shop-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
             </div>
           </div>
           <div class="card-grid">
@@ -1088,21 +1113,29 @@
             <div class="card-b">
               <div class="grid2">
                 <div class="field"><label>第1営業時間 <span class="help">任意</span></label>
-                  <div class="input-row"><input type="time" id="businessHours1Start"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time" id="businessHours1End"></div>
+                  <div class="time-range">
+                    <div class="time-block"><span class="time-lbl">開始</span><input type="time" id="businessHours1Start"></div>
+                    <span class="time-sep">〜</span>
+                    <div class="time-block"><span class="time-lbl">終了</span><input type="time" id="businessHours1End"></div>
+                  </div>
                 </div>
                 <div class="field"><label>第2営業時間 <span class="help">任意</span></label>
-                  <div class="input-row"><input type="time" id="businessHours2Start"><span style="align-self:center;color:var(--text-tertiary);">〜</span><input type="time" id="businessHours2End"></div>
+                  <div class="time-range">
+                    <div class="time-block"><span class="time-lbl">開始</span><input type="time" id="businessHours2Start"></div>
+                    <span class="time-sep">〜</span>
+                    <div class="time-block"><span class="time-lbl">終了</span><input type="time" id="businessHours2End"></div>
+                  </div>
                 </div>
               </div>
               <div class="field" style="margin-top:14px;">
                 <label>定休日 <span class="help">任意</span></label>
                 <div class="opt-grid" style="grid-template-columns:repeat(auto-fill,minmax(96px,1fr));">
-                  <label class="opt"><input type="checkbox">月</label>
-                  <label class="opt"><input type="checkbox">火</label>
-                  <label class="opt"><input type="checkbox">水</label>
-                  <label class="opt"><input type="checkbox">木</label>
-                  <label class="opt"><input type="checkbox">金</label>
-                  <label class="opt"><input type="checkbox">土</label>
+                  <label class="opt"><input type="checkbox" id="closedMonday">月</label>
+                  <label class="opt"><input type="checkbox" id="closedTuesday">火</label>
+                  <label class="opt"><input type="checkbox" id="closedWednesday">水</label>
+                  <label class="opt"><input type="checkbox" id="closedThursday">木</label>
+                  <label class="opt"><input type="checkbox" id="closedFriday">金</label>
+                  <label class="opt"><input type="checkbox" id="closedSaturday">土</label>
                   <label class="opt"><input type="checkbox" id="closedSunday">日</label>
                   <label class="opt"><input type="checkbox" id="closedHoliday">祝日</label>
                   <label class="opt"><input type="checkbox" id="closedHolidayEve">祝前日</label>
@@ -1142,7 +1175,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select id="shopPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>都道府県（全角カナ） <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>都道府県（半角カナ） <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input id="shopCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -1527,6 +1560,7 @@
           <div id="reviewArea"></div>
 
           <div class="note"><i class="ti ti-circle-check" aria-hidden="true"></i><span>「登録する」を押すと申請内容が確定し、審査・発送手続きが開始されます。</span></div>
+          <p class="field-err" id="err-submit" style="margin-top:16px;"><i class="ti ti-alert-circle"></i><span id="err-submit-msg"></span></p>
         </section>
 
       </div>
@@ -1580,7 +1614,7 @@
       </div>
       <div style="background:#fdf3e3;border:1px solid #ecd9b4;border-radius:10px;padding:14px 16px;margin-bottom:24px;display:flex;gap:10px;">
         <i class="ti ti-mail" style="font-size:18px;color:#8a5410;margin-top:1px;flex-shrink:0;"></i>
-        <p style="margin:0;font-size:13px;color:#8a5410;line-height:1.7;">会員コード・仮パスワード・パスワード設定用URLを登録のメールアドレスへ送信しました。メールをご確認のうえ、パスワードを設定してください。</p>
+        <p style="margin:0;font-size:13px;color:#8a5410;line-height:1.7;">会員コード・仮パスワード・パスワード設定用URLを登録のメールアドレスへ送信しました。メールをご確認のうえ、パスワードを設定してください。数分経ってもメールが届かない場合は、迷惑メールフォルダをご確認いただくか、お問い合わせください。</p>
       </div>
       <button type="button" id="modalCompleteClose" style="width:100%;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;border:none;background:#1b66b3;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(27,102,179,0.30);">閉じる</button>
     </div>
@@ -1716,7 +1750,9 @@
         var accnum = document.getElementById('acc-num').value.trim();
         var acckana = document.getElementById('acc-kana').value.trim();
         if (bkname || brname || accnum) {
-          shopAcc.value = [bkname, brname, acctype, accnum, acckana]
+          var bknameDisp = bkname ? bkname + '銀行' : '';
+          var brnameDisp = brname ? brname + '支店' : '';
+          shopAcc.value = [bknameDisp, brnameDisp, acctype, accnum, acckana]
               .filter(function(v) { return v !== ''; }).join(' ');
         }
       }
@@ -1768,7 +1804,11 @@
     const input = field.querySelector(
         'input[type="text"], input[type="tel"], input[type="email"],'
         + ' input[type="number"], input[type="date"]');
-    if (input) return input.value.trim();
+    if (input) {
+      var v = input.value.trim();
+      var suffix = field.querySelector('.input-suffix');
+      return suffix && v ? v + suffix.textContent.trim() : v;
+    }
     const textarea = field.querySelector('textarea');
     if (textarea) return textarea.value.trim();
     return null;
@@ -1941,6 +1981,56 @@
     return el && el.value !== '' && el.value !== null;
   }
 
+  var HANKAKU_KANA_RE = /^[ｦ-ﾟ ()]+$/;
+  var ALPHA_EN_RE = /^[A-Za-z0-9 .,\-&'\/\(\)]+$/;
+
+  function isHankakuKana(id) {
+    var el = document.getElementById(id);
+    if (!el) return true;
+    var v = el.value.trim();
+    return v === '' || HANKAKU_KANA_RE.test(v);
+  }
+
+  function isAlphaEn(id) {
+    var el = document.getElementById(id);
+    if (!el) return true;
+    var v = el.value.trim();
+    return v === '' || ALPHA_EN_RE.test(v);
+  }
+
+  function markInputErr(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('input-err');
+  }
+
+  function clearInputErr(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('input-err');
+  }
+
+  function focusFirstErr(panel) {
+    var el = (panel || document).querySelector('input.input-err, select.input-err');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function() { el.focus(); }, 300);
+  }
+
+  function checkKanaFields(ids, hasErrObj) {
+    var fmt = false;
+    ids.forEach(function(id) {
+      if (!isHankakuKana(id)) { markInputErr(id); fmt = true; hasErrObj.v = true; } else { clearInputErr(id); }
+    });
+    return fmt;
+  }
+
+  function checkEnFields(ids, hasErrObj) {
+    var fmt = false;
+    ids.forEach(function(id) {
+      if (!isAlphaEn(id)) { markInputErr(id); fmt = true; hasErrObj.v = true; } else { clearInputErr(id); }
+    });
+    return fmt;
+  }
+
   function selectAllGrid(gridId) {
     document.querySelectorAll('#' + gridId + ' input[type="checkbox"]').forEach(function(cb) {
       cb.checked = true;
@@ -2072,9 +2162,11 @@
       // STEP 4: 法人情報のバリデーション
       if (current === 3) {
         var step4HasError = false;
+        var s4err = { v: false };
 
         // --- 申込者情報 ---
         var errCorp = document.getElementById('err-step4-corp');
+        var errCorpFmt = document.getElementById('err-step4-corp-fmt');
         var corpOk = hasValue('houjinNumber')
             && hasValue('companyName')
             && hasValue('companyNameKana')
@@ -2087,28 +2179,34 @@
             && isSelected('industryCategory')
             && isSelected('industryDetail')
             && hasValue('businessContent');
-        if (!corpOk) {
-          errCorp.classList.add('visible');
-          step4HasError = true;
-        } else {
-          errCorp.classList.remove('visible');
-        }
+        if (!corpOk) { errCorp.classList.add('visible'); step4HasError = true; } else { errCorp.classList.remove('visible'); }
+        s4err.v = false;
+        var corpKanaFmt = checkKanaFields(['companyNameKana', 'brandNameKana'], s4err);
+        var corpEnFmt = checkEnFields(['companyNameEn', 'brandNameEn'], s4err);
+        if (s4err.v) { errCorpFmt.classList.add('visible'); step4HasError = true; } else { errCorpFmt.classList.remove('visible'); }
 
         // --- 代表者情報 ---
         var errRep = document.getElementById('err-step4-rep');
+        var errRepFmt = document.getElementById('err-step4-rep-fmt');
         var repOk = hasValue('repLastName')
             && hasValue('repLastNameKana')
             && hasValue('repLastNameEn')
             && hasValue('repFirstName')
             && hasValue('repFirstNameKana')
             && hasValue('repFirstNameEn')
-            && hasValue('repBirthDate');
-        if (!repOk) {
-          errRep.classList.add('visible');
-          step4HasError = true;
-        } else {
-          errRep.classList.remove('visible');
-        }
+            && hasValue('repBirthDate')
+            && document.querySelector('input[name="repsex"]:checked') !== null
+            && af('rep', 'zip') !== ''
+            && af('rep', 'pref') !== ''
+            && af('rep', 'city') !== ''
+            && af('rep', 'town') !== ''
+            && af('rep', 'banchi') !== ''
+            && af('rep', 'tel') !== '';
+        if (!repOk) { errRep.classList.add('visible'); step4HasError = true; } else { errRep.classList.remove('visible'); }
+        s4err.v = false;
+        checkKanaFields(['repLastNameKana', 'repFirstNameKana'], s4err);
+        checkEnFields(['repLastNameEn', 'repFirstNameEn'], s4err);
+        if (s4err.v) { errRepFmt.classList.add('visible'); step4HasError = true; } else { errRepFmt.classList.remove('visible'); }
 
         // --- 担当者情報 ---
         var errContact = document.getElementById('err-step4-contact');
@@ -2118,15 +2216,18 @@
             && hasValue('contactFirstNameKana')
             && hasValue('contactDept')
             && hasValue('contactEmail')
-            && hasValue('contactTel1');
-        if (!contactOk) {
-          errContact.classList.add('visible');
-          step4HasError = true;
-        } else {
-          errContact.classList.remove('visible');
-        }
+            && hasValue('contactTel1')
+            && af('contact', 'zip') !== ''
+            && af('contact', 'pref') !== ''
+            && af('contact', 'city') !== ''
+            && af('contact', 'town') !== ''
+            && af('contact', 'banchi') !== '';
+        if (!contactOk) { errContact.classList.add('visible'); step4HasError = true; } else { errContact.classList.remove('visible'); }
+        s4err.v = false;
+        checkKanaFields(['contactLastNameKana', 'contactFirstNameKana'], s4err);
+        if (s4err.v) step4HasError = true;
 
-        if (step4HasError) return;
+        if (step4HasError) { focusFirstErr(panels[3]); return; }
       }
 
       // STEP 5: 口座情報のバリデーション
@@ -2134,6 +2235,7 @@
         var step5HasError = false;
 
         var errAcc = document.getElementById('err-step5-acc');
+        var errAccFmt = document.getElementById('err-step5-acc-fmt');
         var accOk = hasValue('acc-bkcode')
             && hasValue('acc-bkname')
             && hasValue('acc-brcode')
@@ -2141,14 +2243,12 @@
             && document.querySelector('input[name="acctype"]:checked') !== null
             && hasValue('acc-num')
             && hasValue('acc-kana');
-        if (!accOk) {
-          errAcc.classList.add('visible');
-          step5HasError = true;
-        } else {
-          errAcc.classList.remove('visible');
-        }
+        if (!accOk) { errAcc.classList.add('visible'); step5HasError = true; } else { errAcc.classList.remove('visible'); }
+        var s5err = { v: false };
+        checkKanaFields(['acc-kana'], s5err);
+        if (s5err.v) { errAccFmt.classList.add('visible'); step5HasError = true; } else { errAccFmt.classList.remove('visible'); }
 
-        if (step5HasError) return;
+        if (step5HasError) { focusFirstErr(panels[4]); return; }
       }
 
       // STEP 6: 店舗情報のバリデーション
@@ -2157,6 +2257,7 @@
 
         // --- 店舗名・業種 ---
         var errStep6Info = document.getElementById('err-step6-info');
+        var errStep6ShopFmt = document.getElementById('err-step6-shop-fmt');
         var shopInfoOk = hasValue('shopName')
             && hasValue('shopNameKana')
             && hasValue('shopNameEn')
@@ -2166,14 +2267,13 @@
             && isSelected('shopIndustryCategory')
             && isSelected('shopIndustryDetail')
             && hasValue('shopMerchandise')
-            && hasValue('shopCount')
-            && hasValue('shopAvgPrice');
-        if (!shopInfoOk) {
-          errStep6Info.classList.add('visible');
-          step6HasError = true;
-        } else {
-          errStep6Info.classList.remove('visible');
-        }
+            && (function() { var n = parseInt(document.getElementById('shopCount').value, 10); return !isNaN(n) && n >= 1; })()
+            && (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); return !isNaN(n) && n >= 0; })();
+        if (!shopInfoOk) { errStep6Info.classList.add('visible'); step6HasError = true; } else { errStep6Info.classList.remove('visible'); }
+        var s6err = { v: false };
+        checkKanaFields(['shopNameKana', 'shopBrandNameKana'], s6err);
+        checkEnFields(['shopNameEn', 'shopBrandNameEn'], s6err);
+        if (s6err.v) { errStep6ShopFmt.classList.add('visible'); step6HasError = true; } else { errStep6ShopFmt.classList.remove('visible'); }
 
         // --- 口座・レシート ---
         var errStep6Account = document.getElementById('err-step6-account');
@@ -2209,7 +2309,7 @@
           errStep6Terminal.classList.remove('visible');
         }
 
-        if (step6HasError) return;
+        if (step6HasError) { focusFirstErr(panels[5]); return; }
       }
 
       // STEP 7: 書類情報のバリデーション
@@ -2364,10 +2464,11 @@
         contactDepartment: gf('contactDept'),
         contactEmail: gf('contactEmail'),
         contactPhone1: gf('contactTel1'),
+        contactPhone2: gf('contactTel2'),
         bankCode: gf('acc-bkcode'),
-        bankName: gf('acc-bkname'),
+        bankName: gf('acc-bkname') ? gf('acc-bkname') + '銀行' : '',
         branchCode: gf('acc-brcode'),
-        branchName: gf('acc-brname'),
+        branchName: gf('acc-brname') ? gf('acc-brname') + '支店' : '',
         accountType: radioVal('acctype'),
         accountNumber: gf('acc-num'),
         accountHolderKana: gf('acc-kana'),
@@ -2404,6 +2505,12 @@
         businessHours1End: gf('businessHours1End'),
         businessHours2Start: gf('businessHours2Start'),
         businessHours2End: gf('businessHours2End'),
+        closedMonday: !!(document.getElementById('closedMonday') && document.getElementById('closedMonday').checked),
+        closedTuesday: !!(document.getElementById('closedTuesday') && document.getElementById('closedTuesday').checked),
+        closedWednesday: !!(document.getElementById('closedWednesday') && document.getElementById('closedWednesday').checked),
+        closedThursday: !!(document.getElementById('closedThursday') && document.getElementById('closedThursday').checked),
+        closedFriday: !!(document.getElementById('closedFriday') && document.getElementById('closedFriday').checked),
+        closedSaturday: !!(document.getElementById('closedSaturday') && document.getElementById('closedSaturday').checked),
         closedSunday: !!(document.getElementById('closedSunday') && document.getElementById('closedSunday').checked),
         closedHoliday: !!(document.getElementById('closedHoliday') && document.getElementById('closedHoliday').checked),
         closedHolidayEve: !!(document.getElementById('closedHolidayEve') && document.getElementById('closedHolidayEve').checked),
@@ -2437,6 +2544,8 @@
 
       document.getElementById('modalConfirmOk').onclick = function() {
         modalConfirm.style.display = 'none';
+        var errSubmitEl = document.getElementById('err-submit');
+        if (errSubmitEl) errSubmitEl.classList.remove('visible');
 
         var formData = new FormData();
         formData.append('data', new Blob([JSON.stringify(pendingPayload)], {type: 'application/json'}));
@@ -2456,12 +2565,19 @@
         nextBtn.disabled = true;
         nextBtn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>登録中...';
 
+        var abortCtrl = new AbortController();
+        var timeoutId = setTimeout(function() {
+          abortCtrl.abort();
+        }, 60000);
+
         fetch('/api/merchant-application/register', {
           method: 'POST',
           headers: { 'X-CSRF-TOKEN': csrfToken },
-          body: formData
+          body: formData,
+          signal: abortCtrl.signal
         })
         .then(function(res) {
+          clearTimeout(timeoutId);
           if (!res.ok) {
             return res.json().then(function(data) {
               throw new Error(data.errorMessage || 'HTTP ' + res.status);
@@ -2479,7 +2595,17 @@
           };
         })
         .catch(function(err) {
-          alert('登録に失敗しました。\n' + (err.message || '時間をおいて再度お試しください。'));
+          clearTimeout(timeoutId);
+          var msg = err.name === 'AbortError'
+            ? '通信がタイムアウトしました。時間をおいて再度お試しください。'
+            : (err.message || '時間をおいて再度お試しください。');
+          var errSubmitEl2 = document.getElementById('err-submit');
+          var errSubmitMsg = document.getElementById('err-submit-msg');
+          if (errSubmitEl2 && errSubmitMsg) {
+            errSubmitMsg.textContent = '登録に失敗しました。' + msg;
+            errSubmitEl2.classList.add('visible');
+            errSubmitEl2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
           nextBtn.disabled = false;
           nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
         });
@@ -2534,24 +2660,24 @@
     });
   });
 
-  // 都道府県 → カタカナ 自動補完
+  // 都道府県 → 半角カタカナ 自動補完
   var prefKana = {
-    '北海道': 'ホッカイドウ', '青森県': 'アオモリケン', '岩手県': 'イワテケン',
-    '宮城県': 'ミヤギケン', '秋田県': 'アキタケン', '山形県': 'ヤマガタケン',
-    '福島県': 'フクシマケン', '茨城県': 'イバラキケン', '栃木県': 'トチギケン',
-    '群馬県': 'グンマケン', '埼玉県': 'サイタマケン', '千葉県': 'チバケン',
-    '東京都': 'トウキョウト', '神奈川県': 'カナガワケン', '新潟県': 'ニイガタケン',
-    '富山県': 'トヤマケン', '石川県': 'イシカワケン', '福井県': 'フクイケン',
-    '山梨県': 'ヤマナシケン', '長野県': 'ナガノケン', '岐阜県': 'ギフケン',
-    '静岡県': 'シズオカケン', '愛知県': 'アイチケン', '三重県': 'ミエケン',
-    '滋賀県': 'シガケン', '京都府': 'キョウトフ', '大阪府': 'オオサカフ',
-    '兵庫県': 'ヒョウゴケン', '奈良県': 'ナラケン', '和歌山県': 'ワカヤマケン',
-    '鳥取県': 'トットリケン', '島根県': 'シマネケン', '岡山県': 'オカヤマケン',
-    '広島県': 'ヒロシマケン', '山口県': 'ヤマグチケン', '徳島県': 'トクシマケン',
-    '香川県': 'カガワケン', '愛媛県': 'エヒメケン', '高知県': 'コウチケン',
-    '福岡県': 'フクオカケン', '佐賀県': 'サガケン', '長崎県': 'ナガサキケン',
-    '熊本県': 'クマモトケン', '大分県': 'オオイタケン', '宮崎県': 'ミヤザキケン',
-    '鹿児島県': 'カゴシマケン', '沖縄県': 'オキナワケン'
+    '北海道': 'ﾎｯｶｲﾄﾞｳ', '青森県': 'ｱｵﾓﾘｹﾝ', '岩手県': 'ｲﾜﾃｹﾝ',
+    '宮城県': 'ﾐﾔｷﾞｹﾝ', '秋田県': 'ｱｷﾀｹﾝ', '山形県': 'ﾔﾏｶﾞﾀｹﾝ',
+    '福島県': 'ﾌｸｼﾏｹﾝ', '茨城県': 'ｲﾊﾞﾗｷｹﾝ', '栃木県': 'ﾄﾁｷﾞｹﾝ',
+    '群馬県': 'ｸﾞﾝﾏｹﾝ', '埼玉県': 'ｻｲﾀﾏｹﾝ', '千葉県': 'ﾁﾊﾞｹﾝ',
+    '東京都': 'ﾄｳｷｮｳﾄ', '神奈川県': 'ｶﾅｶﾞﾜｹﾝ', '新潟県': 'ﾆｲｶﾞﾀｹﾝ',
+    '富山県': 'ﾄﾔﾏｹﾝ', '石川県': 'ｲｼｶﾜｹﾝ', '福井県': 'ﾌｸｲｹﾝ',
+    '山梨県': 'ﾔﾏﾅｼｹﾝ', '長野県': 'ﾅｶﾞﾉｹﾝ', '岐阜県': 'ｷﾞﾌｹﾝ',
+    '静岡県': 'ｼｽﾞｵｶｹﾝ', '愛知県': 'ｱｲﾁｹﾝ', '三重県': 'ﾐｴｹﾝ',
+    '滋賀県': 'ｼｶﾞｹﾝ', '京都府': 'ｷｮｳﾄﾌ', '大阪府': 'ｵｵｻｶﾌ',
+    '兵庫県': 'ﾋｮｳｺﾞｹﾝ', '奈良県': 'ﾅﾗｹﾝ', '和歌山県': 'ﾜｶﾔﾏｹﾝ',
+    '鳥取県': 'ﾄｯﾄﾘｹﾝ', '島根県': 'ｼﾏﾈｹﾝ', '岡山県': 'ｵｶﾔﾏｹﾝ',
+    '広島県': 'ﾋﾛｼﾏｹﾝ', '山口県': 'ﾔﾏｸﾞﾁｹﾝ', '徳島県': 'ﾄｸｼﾏｹﾝ',
+    '香川県': 'ｶｶﾞﾜｹﾝ', '愛媛県': 'ｴﾋﾒｹﾝ', '高知県': 'ｺｳﾁｹﾝ',
+    '福岡県': 'ﾌｸｵｶｹﾝ', '佐賀県': 'ｻｶﾞｹﾝ', '長崎県': 'ﾅｶﾞｻｷｹﾝ',
+    '熊本県': 'ｸﾏﾓﾄｹﾝ', '大分県': 'ｵｵｲﾀｹﾝ', '宮崎県': 'ﾐﾔｻﾞｷｹﾝ',
+    '鹿児島県': 'ｶｺﾞｼﾏｹﾝ', '沖縄県': 'ｵｷﾅﾜｹﾝ'
   };
   document.querySelectorAll('select[data-f="pref"]').forEach(function (sel) {
     sel.addEventListener('change', function () {

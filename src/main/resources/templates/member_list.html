@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -166,7 +166,7 @@
     letter-spacing: 0.03em;
   }
 
-  /* 絞込み対象 (会員コード・法人名カナ) のチェックボックス行 */
+  /* 絞込み対象 (会員コード・法人名) のチェックボックス行 */
   .search-targets {
     display: flex;
     align-items: center;
@@ -396,18 +396,46 @@
   .data-table {
     width: 100%;
     /* 狭い iframe 幅では横スクロールで全列を表示する（基準幅未満での見切れ防止）。 */
-    min-width: 760px;
+    min-width: 1000px;
     border-collapse: collapse;
     table-layout: fixed;
   }
 
   /* 列幅は比率（合計 100%）で指定し、表示幅に応じて伸縮させる。 */
-  .data-table col.c-code { width: 12%; }
-  .data-table col.c-kana { width: 22%; }
-  .data-table col.c-name { width: 20%; }
-  .data-table col.c-number { width: 14%; }
-  .data-table col.c-industry { width: 14%; }
-  .data-table col.c-rep { width: 18%; }
+  .data-table col.c-code   { width: 12%; }
+  .data-table col.c-name   { width: 34%; }
+  .data-table col.c-rep    { width: 18%; }
+  .data-table col.c-status { width: 14%; }
+  .data-table col.c-docs   { width: 6%; }
+  .data-table col.c-date   { width: 12%; }
+
+  /* ステータスバッジ */
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 4em; padding: 2px 8px; border-radius: 10px;
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+  .badge-unreviewed { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+  .badge-reviewing  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .badge-approved   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .badge-rejected   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+  /* 添付書類セル */
+  .data-table tbody td.docs {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-sub);
+  }
+  .data-table tbody td.docs[data-none="true"] {
+    color: var(--text-muted);
+  }
+
+  /* 申込日セル */
+  .data-table tbody td.date {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--text-sub);
+  }
 
   .data-table thead th {
     position: sticky;
@@ -531,7 +559,7 @@
           <input type="checkbox" id="target-code" checked /> 会員コード
         </label>
         <label class="check">
-          <input type="checkbox" id="target-kana" /> 法人名（カナ）
+          <input type="checkbox" id="target-name" /> 法人名
         </label>
       </div>
       <div class="search-row">
@@ -566,53 +594,41 @@
         <table class="data-table">
           <colgroup>
             <col class="c-code">
-            <col class="c-kana">
             <col class="c-name">
-            <col class="c-number">
-            <col class="c-industry">
             <col class="c-rep">
+            <col class="c-status">
+            <col class="c-docs">
+            <col class="c-date">
           </colgroup>
           <thead>
             <tr>
               <th>会員コード</th>
-              <th>法人名（カナ）</th>
               <th>法人名</th>
-              <th>法人番号</th>
-              <th>業種</th>
               <th>代表者氏名</th>
+              <th>ステータス</th>
+              <th>添付書類</th>
+              <th>申込日</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="data-row" data-code="01-001"><td class="code">01-001</td><td class="kana">アカサカセイカテン</td><td class="name">赤坂生花店</td><td class="number">7010001010001</td><td class="industry">生花小売</td><td class="rep">田中 一郎</td></tr>
-            <tr class="data-row" data-code="01-003"><td class="code">01-003</td><td class="kana">フローリストムラタ</td><td class="name">フローリスト ムラタ</td><td class="number">7010001010002</td><td class="industry">フラワーショップ</td><td class="rep">佐藤 花子</td></tr>
-            <tr class="data-row" data-code="01-005"><td class="code">01-005</td><td class="kana">ハナノイウエ</td><td class="name">花のいのうえ</td><td class="number">7010001010003</td><td class="industry">生花小売</td><td class="rep">鈴木 健太</td></tr>
-            <tr class="data-row" data-code="01-006"><td class="code">01-006</td><td class="kana">ナガヒサハナテン</td><td class="name">長久花店</td><td class="number">7010001010004</td><td class="industry">生花店</td><td class="rep">高橋 美咲</td></tr>
-            <tr class="data-row" data-code="01-007"><td class="code">01-007</td><td class="kana">オオノセイカテン</td><td class="name">大野生花店</td><td class="number">7010001010005</td><td class="industry">生花小売</td><td class="rep">渡辺 修</td></tr>
-            <tr class="data-row" data-code="01-008"><td class="code">01-008</td><td class="kana">スガワラセイカテン</td><td class="name">すがわら生花店</td><td class="number">7010001010006</td><td class="industry">生花店</td><td class="rep">伊藤 直樹</td></tr>
-            <tr class="data-row" data-code="01-009"><td class="code">01-009</td><td class="kana">チグサセイカテン</td><td class="name">千草生花店</td><td class="number">7010001010007</td><td class="industry">花卉・園芸</td><td class="rep">山本 陽子</td></tr>
-            <tr class="data-row" data-code="01-012"><td class="code">01-012</td><td class="kana">タケウチセイカテン</td><td class="name">竹内生花店</td><td class="number">7010001010008</td><td class="industry">生花小売</td><td class="rep">中村 大輔</td></tr>
-            <tr class="data-row" data-code="01-014"><td class="code">01-014</td><td class="kana">ウノセイカテン</td><td class="name">宇野生花店</td><td class="number">7010001010009</td><td class="industry">生花店</td><td class="rep">小林 さやか</td></tr>
-            <tr class="data-row" data-code="01-015"><td class="code">01-015</td><td class="kana">フラワーショップクロダ</td><td class="name">フラワーショップくろだ</td><td class="number">7010001010010</td><td class="industry">フラワーショップ</td><td class="rep">加藤 義明</td></tr>
-            <tr class="data-row" data-code="01-016"><td class="code">01-016</td><td class="kana">アラキセイカテン</td><td class="name">荒木生花店</td><td class="number">7010001010011</td><td class="industry">生花小売</td><td class="rep">吉田 香</td></tr>
-            <tr class="data-row" data-code="01-019"><td class="code">01-019</td><td class="kana">ハナコイズミ</td><td class="name">花のこいずみ</td><td class="number">7010001010012</td><td class="industry">生花店</td><td class="rep">山田 太郎</td></tr>
-            <tr class="data-row" data-code="01-020"><td class="code">01-020</td><td class="kana">フラワーブティックエハラ</td><td class="name">フラワーブティックエハラ</td><td class="number">7010001010013</td><td class="industry">フラワーショップ</td><td class="rep">佐々木 亮</td></tr>
-            <tr class="data-row" data-code="01-023"><td class="code">01-023</td><td class="kana">マルタナカセイカセイカブ</td><td class="name">丸タ田中青果生花部</td><td class="number">7010001010014</td><td class="industry">青果・生花</td><td class="rep">松本 和子</td></tr>
-            <tr class="data-row" data-code="01-024"><td class="code">01-024</td><td class="kana">ハナショップナカムラ</td><td class="name">花ショップなかむら</td><td class="number">7010001010015</td><td class="industry">フラワーショップ</td><td class="rep">井上 隆</td></tr>
-            <tr class="data-row" data-code="01-029"><td class="code">01-029</td><td class="kana">タカツセイカテン</td><td class="name">高附生花店</td><td class="number">7010001010016</td><td class="industry">生花小売</td><td class="rep">木村 真由美</td></tr>
-            <tr class="data-row" data-code="01-030"><td class="code">01-030</td><td class="kana">トウキョウハナヤ</td><td class="name">東京花屋</td><td class="number">7010001010017</td><td class="industry">生花店</td><td class="rep">林 俊夫</td></tr>
-            <tr class="data-row" data-code="01-031"><td class="code">01-031</td><td class="kana">フラワーショップクロダ ワッカナイテン</td><td class="name">フラワーショップくろだ 稚内店</td><td class="number">7010001010018</td><td class="industry">フラワーショップ</td><td class="rep">清水 恵</td></tr>
-            <tr class="data-row" data-code="01-032"><td class="code">01-032</td><td class="kana">フラワーショップクロダ エサシテン</td><td class="name">フラワーショップくろだ 枝幸店</td><td class="number">7010001010019</td><td class="industry">フラワーショップ</td><td class="rep">斎藤 誠</td></tr>
-            <tr class="data-row" data-code="01-033"><td class="code">01-033</td><td class="kana">トミタセイカテン</td><td class="name">富田生花店</td><td class="number">7010001010020</td><td class="industry">生花小売</td><td class="rep">山口 愛</td></tr>
-            <tr class="data-row" data-code="01-034"><td class="code">01-034</td><td class="kana">ハナクラブ</td><td class="name">花くらぶ</td><td class="number">7010001010021</td><td class="industry">生花店</td><td class="rep">阿部 浩</td></tr>
-            <tr class="data-row" data-code="01-037"><td class="code">01-037</td><td class="kana">ハナクウカン サイカ</td><td class="name">花空間 彩華</td><td class="number">7010001010022</td><td class="industry">花卉・園芸</td><td class="rep">森 ゆかり</td></tr>
-            <tr class="data-row" data-code="01-039"><td class="code">01-039</td><td class="kana">フラワーショップヤマ</td><td class="name">フラワーショップとやま</td><td class="number">7010001010023</td><td class="industry">フラワーショップ</td><td class="rep">池田 茂</td></tr>
-            <tr class="data-row" data-code="01-043"><td class="code">01-043</td><td class="kana">ハナスエヒロヤ</td><td class="name">花すえひろや</td><td class="number">7010001010024</td><td class="industry">生花店</td><td class="rep">橋本 明美</td></tr>
-            <tr class="data-row" data-code="01-044"><td class="code">01-044</td><td class="kana">フラワーショップ アンド アートギャラリー ハナエ</td><td class="name">フラワーショップ&アートギャラリー花絵</td><td class="number">7010001010025</td><td class="industry">花卉・園芸</td><td class="rep">石川 拓也</td></tr>
-            <tr class="data-row" data-code="01-045"><td class="code">01-045</td><td class="kana">シキサイ</td><td class="name">四季彩</td><td class="number">7010001010026</td><td class="industry">生花店</td><td class="rep">前田 久美子</td></tr>
-            <tr class="data-row" data-code="01-047"><td class="code">01-047</td><td class="kana">フラワーショップハナタロウ</td><td class="name">フラワーショップ花太郎</td><td class="number">7010001010027</td><td class="industry">フラワーショップ</td><td class="rep">藤田 健</td></tr>
-            <tr class="data-row" data-code="01-048"><td class="code">01-048</td><td class="kana">ヨイハナノサキ</td><td class="name">良い花のさきき</td><td class="number">7010001010028</td><td class="industry">生花小売</td><td class="rep">後藤 真理</td></tr>
-            <tr class="data-row" data-code="01-049"><td class="code">01-049</td><td class="kana">ホンダハナヤ</td><td class="name">本多はなや</td><td class="number">7010001010029</td><td class="industry">生花店</td><td class="rep">岡田 信夫</td></tr>
-            <tr class="data-row" data-code="01-050"><td class="code">01-050</td><td class="kana">レブンハナヤ</td><td class="name">礼文はなや</td><td class="number">7010001010030</td><td class="industry">花卉・園芸</td><td class="rep">長谷川 涼子</td></tr>
+            <tr th:each="member : ${members}"
+                class="data-row"
+                th:attr="data-code=${member.memberCode},data-status=${member.applicationStatus}">
+              <td class="code" th:text="${member.memberCode}"></td>
+              <td class="name" th:text="${member.corporateName}"></td>
+              <td              th:text="${member.repName}"></td>
+              <td>
+                <span th:class="'badge ' + ${member.statusClass}"
+                      th:text="${member.statusLabel}"></span>
+              </td>
+              <td class="docs"
+                  th:attr="data-none=${member.documentCount == 0}"
+                  th:text="${member.documentCount > 0 ? member.documentCount + '件' : 'なし'}"></td>
+              <td class="date"
+                  th:text="${member.submittedAt != null
+                              ? #temporals.format(member.submittedAt, 'yyyy/MM/dd')
+                              : '-'}"></td>
+            </tr>
             <!-- 絞込み結果が0件のときに表示する空状態の行 -->
             <tr id="empty-row" class="empty-row" style="display:none;">
               <td class="empty-cell" colspan="6">該当する会員がいません。</td>
@@ -664,7 +680,7 @@
       var filteredRows = allRows.slice();
       var keywordInput = document.getElementById('search-keyword');
       var targetCodeCheckbox = document.getElementById('target-code');
-      var targetKanaCheckbox = document.getElementById('target-kana');
+      var targetNameCheckbox = document.getElementById('target-name');
       var searchButton = document.querySelector('.btn-search');
       var clearButton = document.querySelector('.btn-clear');
       var emptyRow = document.getElementById('empty-row');
@@ -792,15 +808,15 @@
         render();
       });
 
-      // 選択された対象 (会員コード・法人名カナ) でキーワードの部分一致絞込みを
+      // 選択された対象 (会員コード・法人名) でキーワードの部分一致絞込みを
       // 行い、1ページ目から再表示する。どちらも未選択の場合は両方を対象とする。
       function applyFilter() {
         var query = normalize(keywordInput.value);
         var byCode = targetCodeCheckbox.checked;
-        var byKana = targetKanaCheckbox.checked;
-        if (!byCode && !byKana) {
+        var byName = targetNameCheckbox.checked;
+        if (!byCode && !byName) {
           byCode = true;
-          byKana = true;
+          byName = true;
         }
         if (query === '') {
           filteredRows = allRows.slice();
@@ -813,10 +829,10 @@
                 return true;
               }
             }
-            if (byKana) {
-              var kanaCell = row.querySelector('td.kana');
-              var kana = kanaCell ? normalize(kanaCell.textContent) : '';
-              if (kana.indexOf(query) !== -1) {
+            if (byName) {
+              var nameCell = row.querySelector('td.name');
+              var name = nameCell ? normalize(nameCell.textContent) : '';
+              if (name.indexOf(query) !== -1) {
                 return true;
               }
             }
@@ -831,7 +847,7 @@
       function clearFilter() {
         keywordInput.value = '';
         targetCodeCheckbox.checked = true;
-        targetKanaCheckbox.checked = false;
+        targetNameCheckbox.checked = false;
         updateKeywordPlaceholder();
         filteredRows = allRows.slice();
         currentPage = 1;
@@ -841,11 +857,10 @@
       // 選択中の対象に合わせて入力欄のプレースホルダを切り替える
       function updateKeywordPlaceholder() {
         keywordInput.placeholder =
-            targetKanaCheckbox.checked
-                ? '法人名（カナ）で絞込み' : '会員コードで絞込み';
+            targetNameCheckbox.checked ? '法人名で絞込み' : '会員コードで絞込み';
       }
 
-      // 会員コード・法人名カナはどちらか一方のみ選択可能。一方を選択すると
+      // 会員コード・法人名はどちらか一方のみ選択可能。一方を選択すると
       // もう一方を解除し、最低1つは選択を維持する (ラジオ的な動作)。
       function selectSingleTarget(selected, other) {
         if (selected.checked) {
@@ -862,10 +877,10 @@
 
       // 対象チェックボックスは一方のみ選択とし、切替時に即座に絞込みを反映する
       targetCodeCheckbox.addEventListener('change', function () {
-        selectSingleTarget(targetCodeCheckbox, targetKanaCheckbox);
+        selectSingleTarget(targetCodeCheckbox, targetNameCheckbox);
       });
-      targetKanaCheckbox.addEventListener('change', function () {
-        selectSingleTarget(targetKanaCheckbox, targetCodeCheckbox);
+      targetNameCheckbox.addEventListener('change', function () {
+        selectSingleTarget(targetNameCheckbox, targetCodeCheckbox);
       });
 
       // 入力欄で Enter キーを押したときも絞込みを実行する
