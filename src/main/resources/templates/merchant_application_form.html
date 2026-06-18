@@ -184,6 +184,8 @@
   .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
   .grid3 .field { margin-bottom: 0; }
   @media (max-width: 720px) { .grid3 { grid-template-columns: 1fr; } }
+  .grid-shop-info { display: grid; grid-template-columns: 1fr 1fr 1fr 140px 160px; gap: 14px; align-items: end; }
+  .grid-shop-info .field { margin-bottom: 0; }
   .sub-h { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); padding-bottom: 7px; margin: 20px 0 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 7px; }
   .sub-h:first-child { margin-top: 0; }
   .sub-h i { font-size: 15px; color: var(--accent); }
@@ -726,6 +728,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>申込者情報</div>
             <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ｶﾌﾞｼｷｶﾞｲｼｬ）</span></div>
               <div class="field">
                 <label>法人番号 <span class="req">*</span></label>
                 <div class="input-row">
@@ -814,6 +817,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-user" aria-hidden="true"></i>代表者様情報</div>
             <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ﾔﾏﾀﾞ ﾀﾛｳ）</span></div>
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前 <span class="hint">旧字体は常用漢字に置き換えてご入力ください</span></div>
               <div class="grid3">
                 <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="repLastName" placeholder="山田"></div>
@@ -877,6 +881,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-headset" aria-hidden="true"></i>担当者様情報 <span class="badge">お申込内容・審査等でご連絡することがあります</span></div>
             <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ﾔﾏﾀﾞ ﾊﾅｺ）</span></div>
               <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前</div>
               <div class="grid2">
                 <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="contactLastName" placeholder="山田"></div>
@@ -924,6 +929,7 @@
                 </div>
                 <div class="field" style="margin-top:14px;"><label>部署名 <span class="req">*</span> <span class="help">ない場合は「なし」と記入</span></label><input type="text" id="contactDept" placeholder="例）〇〇部"></div>
                 <div class="field" style="margin-top:14px;"><label>メールアドレス <span class="req">*</span></label><div class="input-icon"><i class="ti ti-at"></i><input type="email" id="contactEmail" placeholder="mail@example.co.jp"></div></div>
+                <div class="note warn" style="margin-top:8px;"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span>メールアドレスを誤って入力すると、新規登録完了メール（仮パスワードを含む）が届きません。正確にご入力ください。</span></div>
               </div>
 
               <div class="sub-h"><i class="ti ti-phone" aria-hidden="true"></i>担当者電話番号</div>
@@ -983,7 +989,8 @@
                     </div>
                   </div>
                   <div class="field" style="margin-top:14px;"><label>口座番号 <span class="req">*</span></label><input id="acc-num" type="text" placeholder="7桁（例）1234567" maxlength="7"></div>
-                  <div class="field" style="margin-top:14px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="ｶ) 〇〇 ﾀﾛｳ"></div>
+                  <div class="note" style="margin:12px 0 4px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>口座名義は半角カタカナで入力してください。（例：ｶ) ｶﾌﾞｼｷｶﾞｲｼｬ）</span></div>
+                  <div class="field" style="margin-top:4px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="ｶ) 〇〇 ﾀﾛｳ"></div>
                 </div>
               </div>
               <p class="field-err" id="err-step5-acc"><i class="ti ti-alert-circle"></i>入金先口座に未入力の必須項目があります。</p>
@@ -1032,6 +1039,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-building-store" aria-hidden="true"></i>店舗名・ブランド名</div>
             <div class="card-b">
+              <div class="note" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：〇〇 ﾃﾝ）</span></div>
               <div class="grid3">
                 <div class="field"><label>店舗名 <span class="req">*</span></label><input id="shopName" type="text" placeholder="例）〇〇店"></div>
                 <div class="field"><label>店舗名（半角カナ） <span class="req">*</span></label><input id="shopNameKana" type="text" placeholder="例）〇〇 ﾃﾝ"></div>
@@ -1048,7 +1056,7 @@
           <div class="card">
             <div class="card-h"><i class="ti ti-category" aria-hidden="true"></i>店舗業種・商材</div>
             <div class="card-b">
-              <div class="grid3">
+              <div class="grid-shop-info">
                 <div class="field"><label>店舗業種（カテゴリ） <span class="req">*</span></label>
                   <select id="shopIndustryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
                 </div>
@@ -1056,8 +1064,6 @@
                   <select id="shopIndustryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
                 <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input id="shopMerchandise" type="text" placeholder="例）〇〇の販売・提供内容"></div>
-              </div>
-              <div class="grid2" style="margin-top:18px;">
                 <div class="field">
                   <label>店舗数 <span class="req">*</span></label>
                   <div class="input-row">
@@ -1603,13 +1609,9 @@
         <p style="margin:0;font-size:13px;color:#5a6675;">ご申込ありがとうございます。審査・発送手続きを開始します。</p>
       </div>
       <div style="background:#f3f7fc;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;color:#5a6675;font-weight:500;">会員コード</span>
           <span id="completeMemberCode" style="font-size:16px;font-weight:700;color:#0c447c;letter-spacing:.05em;"></span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;color:#5a6675;font-weight:500;">仮パスワード</span>
-          <span id="completeTempPassword" style="font-size:16px;font-weight:700;color:#0c447c;letter-spacing:.08em;font-family:monospace;"></span>
         </div>
       </div>
       <div style="background:#fdf3e3;border:1px solid #ecd9b4;border-radius:10px;padding:14px 16px;margin-bottom:24px;display:flex;gap:10px;">
@@ -2008,17 +2010,56 @@
     if (el) el.classList.remove('input-err');
   }
 
+  function markAddrErr(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return;
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    if (el) el.classList.add('input-err');
+  }
+
+  function clearAddrErr(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return;
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    if (el) el.classList.remove('input-err');
+  }
+
+  function chkReqField(id, errObj) {
+    if (!hasValue(id)) { markInputErr(id); errObj.v = true; } else { clearInputErr(id); }
+  }
+
+  function chkSelField(id, errObj) {
+    if (!isSelected(id)) { markInputErr(id); errObj.v = true; } else { clearInputErr(id); }
+  }
+
+  function chkAddrField(addrName, fieldName, errObj) {
+    if (af(addrName, fieldName) === '') { markAddrErr(addrName, fieldName); errObj.v = true; } else { clearAddrErr(addrName, fieldName); }
+  }
+
   function focusFirstErr(panel) {
-    var el = (panel || document).querySelector('input.input-err, select.input-err');
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(function() { el.focus(); }, 300);
+    var el = (panel || document).querySelector('input.input-err, select.input-err, textarea.input-err');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() { el.focus(); }, 300);
+      return;
+    }
+    var errMsg = (panel || document).querySelector('.field-err.visible');
+    if (errMsg) {
+      errMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   function checkKanaFields(ids, hasErrObj) {
     var fmt = false;
     ids.forEach(function(id) {
-      if (!isHankakuKana(id)) { markInputErr(id); fmt = true; hasErrObj.v = true; } else { clearInputErr(id); }
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.value.trim();
+      if (v !== '' && !HANKAKU_KANA_RE.test(v)) {
+        markInputErr(id); fmt = true; hasErrObj.v = true;
+      } else if (v !== '') {
+        clearInputErr(id);
+      }
     });
     return fmt;
   }
@@ -2026,7 +2067,14 @@
   function checkEnFields(ids, hasErrObj) {
     var fmt = false;
     ids.forEach(function(id) {
-      if (!isAlphaEn(id)) { markInputErr(id); fmt = true; hasErrObj.v = true; } else { clearInputErr(id); }
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.value.trim();
+      if (v !== '' && !ALPHA_EN_RE.test(v)) {
+        markInputErr(id); fmt = true; hasErrObj.v = true;
+      } else if (v !== '') {
+        clearInputErr(id);
+      }
     });
     return fmt;
   }
@@ -2125,7 +2173,7 @@
           errOpform.classList.remove('visible');
         }
 
-        if (step2HasError) return;
+        if (step2HasError) { focusFirstErr(panels[1]); return; }
       }
 
       // STEP 3: 決済種類のバリデーション
@@ -2156,7 +2204,7 @@
           errEmoney.classList.remove('visible');
         }
 
-        if (step3HasError) return;
+        if (step3HasError) { focusFirstErr(panels[2]); return; }
       }
 
       // STEP 4: 法人情報のバリデーション
@@ -2167,19 +2215,13 @@
         // --- 申込者情報 ---
         var errCorp = document.getElementById('err-step4-corp');
         var errCorpFmt = document.getElementById('err-step4-corp-fmt');
-        var corpOk = hasValue('houjinNumber')
-            && hasValue('companyName')
-            && hasValue('companyNameKana')
-            && hasValue('companyNameEn')
-            && hasValue('corporateEstDate')
-            && hasValue('brandName')
-            && hasValue('brandNameKana')
-            && hasValue('brandNameEn')
-            && hasValue('annualSales')
-            && isSelected('industryCategory')
-            && isSelected('industryDetail')
-            && hasValue('businessContent');
-        if (!corpOk) { errCorp.classList.add('visible'); step4HasError = true; } else { errCorp.classList.remove('visible'); }
+        var s4corp = { v: false };
+        ['houjinNumber','companyName','companyNameKana','companyNameEn','corporateEstDate',
+         'brandName','brandNameKana','brandNameEn','annualSales','businessContent'
+        ].forEach(function(id) { chkReqField(id, s4corp); });
+        chkSelField('industryCategory', s4corp);
+        chkSelField('industryDetail', s4corp);
+        if (s4corp.v) { errCorp.classList.add('visible'); step4HasError = true; } else { errCorp.classList.remove('visible'); }
         s4err.v = false;
         var corpKanaFmt = checkKanaFields(['companyNameKana', 'brandNameKana'], s4err);
         var corpEnFmt = checkEnFields(['companyNameEn', 'brandNameEn'], s4err);
@@ -2188,21 +2230,13 @@
         // --- 代表者情報 ---
         var errRep = document.getElementById('err-step4-rep');
         var errRepFmt = document.getElementById('err-step4-rep-fmt');
-        var repOk = hasValue('repLastName')
-            && hasValue('repLastNameKana')
-            && hasValue('repLastNameEn')
-            && hasValue('repFirstName')
-            && hasValue('repFirstNameKana')
-            && hasValue('repFirstNameEn')
-            && hasValue('repBirthDate')
-            && document.querySelector('input[name="repsex"]:checked') !== null
-            && af('rep', 'zip') !== ''
-            && af('rep', 'pref') !== ''
-            && af('rep', 'city') !== ''
-            && af('rep', 'town') !== ''
-            && af('rep', 'banchi') !== ''
-            && af('rep', 'tel') !== '';
-        if (!repOk) { errRep.classList.add('visible'); step4HasError = true; } else { errRep.classList.remove('visible'); }
+        var s4rep = { v: false };
+        ['repLastName','repLastNameKana','repLastNameEn','repFirstName',
+         'repFirstNameKana','repFirstNameEn','repBirthDate'
+        ].forEach(function(id) { chkReqField(id, s4rep); });
+        if (!document.querySelector('input[name="repsex"]:checked')) { s4rep.v = true; }
+        ['zip','pref','city','town','banchi','tel'].forEach(function(f) { chkAddrField('rep', f, s4rep); });
+        if (s4rep.v) { errRep.classList.add('visible'); step4HasError = true; } else { errRep.classList.remove('visible'); }
         s4err.v = false;
         checkKanaFields(['repLastNameKana', 'repFirstNameKana'], s4err);
         checkEnFields(['repLastNameEn', 'repFirstNameEn'], s4err);
@@ -2210,19 +2244,12 @@
 
         // --- 担当者情報 ---
         var errContact = document.getElementById('err-step4-contact');
-        var contactOk = hasValue('contactLastName')
-            && hasValue('contactLastNameKana')
-            && hasValue('contactFirstName')
-            && hasValue('contactFirstNameKana')
-            && hasValue('contactDept')
-            && hasValue('contactEmail')
-            && hasValue('contactTel1')
-            && af('contact', 'zip') !== ''
-            && af('contact', 'pref') !== ''
-            && af('contact', 'city') !== ''
-            && af('contact', 'town') !== ''
-            && af('contact', 'banchi') !== '';
-        if (!contactOk) { errContact.classList.add('visible'); step4HasError = true; } else { errContact.classList.remove('visible'); }
+        var s4cont = { v: false };
+        ['contactLastName','contactLastNameKana','contactFirstName','contactFirstNameKana',
+         'contactDept','contactEmail','contactTel1'
+        ].forEach(function(id) { chkReqField(id, s4cont); });
+        ['zip','pref','city','town','banchi'].forEach(function(f) { chkAddrField('contact', f, s4cont); });
+        if (s4cont.v) { errContact.classList.add('visible'); step4HasError = true; } else { errContact.classList.remove('visible'); }
         s4err.v = false;
         checkKanaFields(['contactLastNameKana', 'contactFirstNameKana'], s4err);
         if (s4err.v) step4HasError = true;
@@ -2236,14 +2263,11 @@
 
         var errAcc = document.getElementById('err-step5-acc');
         var errAccFmt = document.getElementById('err-step5-acc-fmt');
-        var accOk = hasValue('acc-bkcode')
-            && hasValue('acc-bkname')
-            && hasValue('acc-brcode')
-            && hasValue('acc-brname')
-            && document.querySelector('input[name="acctype"]:checked') !== null
-            && hasValue('acc-num')
-            && hasValue('acc-kana');
-        if (!accOk) { errAcc.classList.add('visible'); step5HasError = true; } else { errAcc.classList.remove('visible'); }
+        var s5acc = { v: false };
+        ['acc-bkcode','acc-bkname','acc-brcode','acc-brname','acc-num','acc-kana'
+        ].forEach(function(id) { chkReqField(id, s5acc); });
+        if (!document.querySelector('input[name="acctype"]:checked')) { s5acc.v = true; }
+        if (s5acc.v) { errAcc.classList.add('visible'); step5HasError = true; } else { errAcc.classList.remove('visible'); }
         var s5err = { v: false };
         checkKanaFields(['acc-kana'], s5err);
         if (s5err.v) { errAccFmt.classList.add('visible'); step5HasError = true; } else { errAccFmt.classList.remove('visible'); }
@@ -2258,18 +2282,14 @@
         // --- 店舗名・業種 ---
         var errStep6Info = document.getElementById('err-step6-info');
         var errStep6ShopFmt = document.getElementById('err-step6-shop-fmt');
-        var shopInfoOk = hasValue('shopName')
-            && hasValue('shopNameKana')
-            && hasValue('shopNameEn')
-            && hasValue('shopBrandName')
-            && hasValue('shopBrandNameKana')
-            && hasValue('shopBrandNameEn')
-            && isSelected('shopIndustryCategory')
-            && isSelected('shopIndustryDetail')
-            && hasValue('shopMerchandise')
-            && (function() { var n = parseInt(document.getElementById('shopCount').value, 10); return !isNaN(n) && n >= 1; })()
-            && (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); return !isNaN(n) && n >= 0; })();
-        if (!shopInfoOk) { errStep6Info.classList.add('visible'); step6HasError = true; } else { errStep6Info.classList.remove('visible'); }
+        var s6info = { v: false };
+        ['shopName','shopNameKana','shopNameEn','shopBrandName','shopBrandNameKana','shopBrandNameEn','shopMerchandise'
+        ].forEach(function(id) { chkReqField(id, s6info); });
+        chkSelField('shopIndustryCategory', s6info);
+        chkSelField('shopIndustryDetail', s6info);
+        (function() { var n = parseInt(document.getElementById('shopCount').value, 10); if (isNaN(n) || n < 1) { markInputErr('shopCount'); s6info.v = true; } else { clearInputErr('shopCount'); } })();
+        (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); if (isNaN(n) || n < 0) { markInputErr('shopAvgPrice'); s6info.v = true; } else { clearInputErr('shopAvgPrice'); } })();
+        if (s6info.v) { errStep6Info.classList.add('visible'); step6HasError = true; } else { errStep6Info.classList.remove('visible'); }
         var s6err = { v: false };
         checkKanaFields(['shopNameKana', 'shopBrandNameKana'], s6err);
         checkEnFields(['shopNameEn', 'shopBrandNameEn'], s6err);
@@ -2277,28 +2297,17 @@
 
         // --- 口座・レシート ---
         var errStep6Account = document.getElementById('err-step6-account');
-        var shopAccountOk = hasValue('shopAccount') && hasValue('shopReceiptName');
-        if (!shopAccountOk) {
-          errStep6Account.classList.add('visible');
-          step6HasError = true;
-        } else {
-          errStep6Account.classList.remove('visible');
-        }
+        var s6acc = { v: false };
+        chkReqField('shopAccount', s6acc);
+        chkReqField('shopReceiptName', s6acc);
+        if (s6acc.v) { errStep6Account.classList.add('visible'); step6HasError = true; } else { errStep6Account.classList.remove('visible'); }
 
         // --- 店舗所在地 ---
         var errStep6Addr = document.getElementById('err-step6-addr');
-        var shopAddrOk = hasValue('shopZip')
-            && isSelected('shopPref')
-            && hasValue('shopCity')
-            && hasValue('shopTown')
-            && hasValue('shopBanchi')
-            && hasValue('shopTel');
-        if (!shopAddrOk) {
-          errStep6Addr.classList.add('visible');
-          step6HasError = true;
-        } else {
-          errStep6Addr.classList.remove('visible');
-        }
+        var s6addr = { v: false };
+        ['shopZip','shopCity','shopTown','shopBanchi','shopTel'].forEach(function(id) { chkReqField(id, s6addr); });
+        chkSelField('shopPref', s6addr);
+        if (s6addr.v) { errStep6Addr.classList.add('visible'); step6HasError = true; } else { errStep6Addr.classList.remove('visible'); }
 
         // --- 端末保持状況 ---
         var errStep6Terminal = document.getElementById('err-step6-terminal');
@@ -2325,7 +2334,7 @@
           errStep7Doc.classList.remove('visible');
         }
 
-        if (step7HasError) return;
+        if (step7HasError) { focusFirstErr(panels[6]); return; }
       }
 
       // STEP 8: 発送申込のバリデーション
@@ -2333,21 +2342,13 @@
         var step8HasError = false;
 
         var errStep8Delivery = document.getElementById('err-step8-delivery');
-        var deliveryOk = hasValue('deliveryZip')
-            && isSelected('deliveryPref')
-            && hasValue('deliveryCity')
-            && hasValue('deliveryTown')
-            && hasValue('deliveryBanchi')
-            && hasValue('deliveryTel')
-            && hasValue('deliveryReceiver');
-        if (!deliveryOk) {
-          errStep8Delivery.classList.add('visible');
-          step8HasError = true;
-        } else {
-          errStep8Delivery.classList.remove('visible');
-        }
+        var s8dlv = { v: false };
+        ['deliveryZip','deliveryCity','deliveryTown','deliveryBanchi','deliveryTel','deliveryReceiver'
+        ].forEach(function(id) { chkReqField(id, s8dlv); });
+        chkSelField('deliveryPref', s8dlv);
+        if (s8dlv.v) { errStep8Delivery.classList.add('visible'); step8HasError = true; } else { errStep8Delivery.classList.remove('visible'); }
 
-        if (step8HasError) return;
+        if (step8HasError) { focusFirstErr(panels[7]); return; }
       }
 
       // 通常の前進操作のため、最終確認からの修正フラグは解除する
@@ -2534,6 +2535,8 @@
       var pendingPayload = payload;
 
       var modalConfirm = document.getElementById('modalConfirm');
+      var modalConfirmOk = document.getElementById('modalConfirmOk');
+      modalConfirmOk.disabled = false;
       modalConfirm.style.display = 'flex';
 
       document.getElementById('modalConfirmCancel').onclick = function() {
@@ -2542,7 +2545,8 @@
         nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
       };
 
-      document.getElementById('modalConfirmOk').onclick = function() {
+      modalConfirmOk.onclick = function() {
+        modalConfirmOk.disabled = true;
         modalConfirm.style.display = 'none';
         var errSubmitEl = document.getElementById('err-submit');
         if (errSubmitEl) errSubmitEl.classList.remove('visible');
@@ -2587,7 +2591,6 @@
         })
         .then(function(data) {
           document.getElementById('completeMemberCode').textContent = data.memberCode;
-          document.getElementById('completeTempPassword').textContent = data.tempPassword;
           var modalComplete = document.getElementById('modalComplete');
           modalComplete.style.display = 'flex';
           document.getElementById('modalCompleteClose').onclick = function() {

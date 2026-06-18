@@ -20,3 +20,27 @@ CREATE TABLE IF NOT EXISTS m_employee (
 CREATE UNIQUE INDEX IF NOT EXISTS ux_m_employee_email ON m_employee (email);
 
 ALTER TABLE m_employee OWNER TO dapaycore;
+
+ALTER TABLE m_employee ADD COLUMN IF NOT EXISTS delete_flag BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 社員番号の採番に使用するシーケンス。
+-- 同時登録によるレースコンディションを防ぐため、アプリ側ではなく DB 側で採番する。
+CREATE SEQUENCE IF NOT EXISTS seq_employee_number;
+
+-- 既存データがある場合はシーケンスをその最大値で初期化する。
+-- 何度実行しても安全 (冪等)。
+DO $$
+DECLARE
+    current_max BIGINT;
+BEGIN
+    SELECT COALESCE(
+        MAX(CAST(regexp_replace(employee_number, '\D+', '', 'g') AS BIGINT)), 0
+    )
+    INTO current_max
+    FROM m_employee
+    WHERE employee_number ~ '^[a-z]+[0-9]+$';
+
+    IF current_max > 0 THEN
+        PERFORM setval('seq_employee_number', current_max, true);
+    END IF;
+END $$;

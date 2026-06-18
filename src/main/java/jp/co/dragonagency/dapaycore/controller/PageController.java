@@ -1,5 +1,6 @@
 package jp.co.dragonagency.dapaycore.controller;
 
+import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
 import org.springframework.stereotype.Controller;
@@ -17,12 +18,15 @@ public class PageController {
 
     private final MemberListService memberListService;
     private final MerchantApplicationInquiryService inquiryService;
+    private final FeeRateService feeRateService;
 
     public PageController(
             MemberListService memberListService,
-            MerchantApplicationInquiryService inquiryService) {
+            MerchantApplicationInquiryService inquiryService,
+            FeeRateService feeRateService) {
         this.memberListService = memberListService;
         this.inquiryService = inquiryService;
+        this.feeRateService = feeRateService;
     }
 
     /**
@@ -164,9 +168,11 @@ public class PageController {
     /**
      * 手数料一覧画面を表示する。
      * 運用管理ポータルの「手数料一覧」から表示する。
+     * m_fee_rate と m_merchant_application からデータを取得してモデルへ渡す。
      */
     @GetMapping("/operation_fee_list.html")
-    public String showOperationFeeList() {
+    public String showOperationFeeList(Model model) {
+        model.addAttribute("feeRates", feeRateService.findAllForList());
         return "operation_fee_list";
     }
 

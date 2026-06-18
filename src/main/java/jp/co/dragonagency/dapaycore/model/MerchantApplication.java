@@ -2037,6 +2037,9 @@ public class MerchantApplication {
     @Column(name = "password_set_flg")
     private boolean passwordSetFlg;
 
+    @Column(name = "delete_flag")
+    private boolean deleteFlag;
+
     public String getTempPasswordHash() {
         return tempPasswordHash;
     }
@@ -2059,6 +2062,14 @@ public class MerchantApplication {
 
     public void setPasswordSetFlg(boolean passwordSetFlg) {
         this.passwordSetFlg = passwordSetFlg;
+    }
+
+    public boolean isDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 
     @Override

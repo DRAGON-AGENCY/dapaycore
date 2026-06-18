@@ -54,10 +54,10 @@ public class EmployeePageController {
     /**
      * 社員編集 (登録・更新) 画面を表示する。
      * メンテナンスは管理者のみのため、管理者以外は一覧へ戻す。
-     * 編集モードでは選択された社員の内容を読み込む。
+     * 編集モードでは選択された社員の内容を社員番号で読み込む。
      *
      * @param mode モード (new=新規登録、それ以外=編集)
-     * @param email 編集対象の社員のメールアドレス
+     * @param employeeNumber 編集対象の社員番号
      * @param session ログイン状態と権限を保持するセッション
      * @param model 画面へ渡すモデル
      * @return 社員編集画面のビュー名。権限不足時は一覧へのリダイレクト
@@ -65,20 +65,19 @@ public class EmployeePageController {
     @GetMapping("/employee_edit.html")
     public String employeeEdit(
             @RequestParam(name = "mode", required = false) String mode,
-            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "employeeNumber", required = false) String employeeNumber,
             HttpSession session,
             Model model) {
         String authorityCode = getAuthorityCode(session);
 
-        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
         // メンテナンスは管理者 (01) のみ。それ以外は一覧へ戻す
-        // if (!AUTHORITY_ADMINISTRATOR.equals(authorityCode)) {
-        //     return REDIRECT_EMPLOYEE_LIST;
-        // }
+        if (!AUTHORITY_ADMINISTRATOR.equals(authorityCode)) {
+            return REDIRECT_EMPLOYEE_LIST;
+        }
 
-        // 編集モードでは選択された社員の内容を読み込む
+        // 編集モードでは選択された社員の内容を社員番号で読み込む
         if (!MODE_NEW.equals(mode)) {
-            Employee employee = employeeService.findByEmail(email);
+            Employee employee = employeeService.findByEmployeeNumber(employeeNumber);
             model.addAttribute(ATTRIBUTE_EMPLOYEE, employee);
         }
         model.addAttribute(ATTRIBUTE_MODE, mode);

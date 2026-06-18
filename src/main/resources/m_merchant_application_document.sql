@@ -26,3 +26,7 @@ CREATE INDEX IF NOT EXISTS ix_m_merchant_application_document_app
     ON m_merchant_application_document (member_code);
 
 ALTER TABLE m_merchant_application_document OWNER TO dapaycore;
+
+-- 書類の論理削除フラグ。申込を論理削除したとき書類も同時に論理削除する。
+ALTER TABLE m_merchant_application_document
+    ADD COLUMN IF NOT EXISTS delete_flag BOOLEAN NOT NULL DEFAULT FALSE;

@@ -47,6 +47,9 @@ public class MerchantApplicationDocument {
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
 
+    @Column(name = "delete_flag")
+    private boolean deleteFlag;
+
     public long getDocumentId() {
         return documentId;
     }
@@ -101,5 +104,13 @@ public class MerchantApplicationDocument {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public boolean isDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 }

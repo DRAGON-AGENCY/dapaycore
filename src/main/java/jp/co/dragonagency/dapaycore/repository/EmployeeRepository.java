@@ -24,34 +24,29 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
     Optional<Employee> findByEmail(String email);
 
     /**
-     * 全社員を社員番号の昇順で取得する。
+     * 論理削除されていない全社員を社員番号の昇順で取得する。
      *
      * @return 社員の一覧
      */
-    List<Employee> findAllByOrderByEmployeeNumberAsc();
+    List<Employee> findAllByDeleteFlagFalseOrderByEmployeeNumberAsc();
 
     /**
-     * 社員番号が最大の社員を 1 件取得する。新規登録時の自動採番に使用する。
-     *
-     * @return 社員番号が最大の社員。社員が存在しない場合は空
-     */
-    Optional<Employee> findFirstByOrderByEmployeeNumberDesc();
-
-    /**
-     * 指定したメールアドレスの社員が存在するかどうかを返す。
+     * 論理削除されていない社員の中で、指定したメールアドレスの社員が存在するか返す。
      *
      * @param email メールアドレス
      * @return 存在する場合は true
      */
-    boolean existsByEmail(String email);
+    boolean existsByEmailAndDeleteFlagFalse(String email);
 
     /**
-     * 指定した社員番号以外で、指定したメールアドレスの社員が存在するか返す。
+     * 論理削除されていない社員の中で、指定した社員番号以外に
+     * 指定したメールアドレスの社員が存在するか返す。
      * 編集時に自分自身を除外してメールアドレスの重複を判定するために使用する。
      *
      * @param email メールアドレス
      * @param employeeNumber 除外する社員番号
      * @return 存在する場合は true
      */
-    boolean existsByEmailAndEmployeeNumberNot(String email, String employeeNumber);
+    boolean existsByEmailAndEmployeeNumberNotAndDeleteFlagFalse(
+            String email, String employeeNumber);
 }

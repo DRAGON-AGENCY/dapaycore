@@ -55,6 +55,9 @@ public class Employee {
     @Column(name = "update_user_id")
     private String updateUserId;
 
+    @Column(name = "delete_flag")
+    private boolean deleteFlag;
+
     public String getEmployeeNumber() {
         return employeeNumber;
     }
@@ -157,6 +160,14 @@ public class Employee {
 
     public void setUpdateUserId(String updateUserId) {
         this.updateUserId = updateUserId;
+    }
+
+    public boolean isDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 
     @Override

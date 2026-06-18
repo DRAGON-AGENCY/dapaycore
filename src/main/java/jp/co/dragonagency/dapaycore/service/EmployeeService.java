@@ -2,9 +2,9 @@ package jp.co.dragonagency.dapaycore.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,8 @@ public class EmployeeService {
     private static final String AUTHORITY_VIEWER = "03";
     private static final String EMPLOYEE_NUMBER_PREFIX = "user";
     private static final int EMPLOYEE_NUMBER_DIGITS = 3;
-    private static final int FIRST_EMPLOYEE_NUMBER = 1;
+    private static final String SQL_NEXT_EMPLOYEE_NUMBER =
+            "SELECT nextval('seq_employee_number')";
 
     // パスワードを連続して間違えられる上限。これに達するとロック扱いとする
     private static final int MAX_PASSWORD_ERROR_COUNT = 5;
@@ -91,12 +92,15 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     public EmployeeService(
             EmployeeRepository employeeRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JdbcTemplate jdbcTemplate) {
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
@@ -104,8 +108,9 @@ public class EmployeeService {
      *
      * @return 社員の一覧
      */
+    @Transactional(readOnly = true)
     public List<Employee> findAllEmployees() {
-        return employeeRepository.findAllByOrderByEmployeeNumberAsc();
+        return employeeRepository.findAllByDeleteFlagFalseOrderByEmployeeNumberAsc();
     }
 
     /**
@@ -114,24 +119,34 @@ public class EmployeeService {
      * @param email メールアドレス
      * @return 該当する社員。存在しない場合は null
      */
+    @Transactional(readOnly = true)
     public Employee findByEmail(String email) {
         if (email == null || email.isBlank()) {
             return null;
         }
-        return employeeRepository.findByEmail(email).orElse(null);
+        Employee employee = employeeRepository.findByEmail(email).orElse(null);
+        if (employee != null && employee.isDeleteFlag()) {
+            return null;
+        }
+        return employee;
     }
 
     /**
-     * 社員番号を指定して社員を 1 件取得する。
+     * 社員番号を指定して社員を 1 件取得する。論理削除済みは返さない。
      *
      * @param employeeNumber 社員番号
-     * @return 該当する社員。存在しない場合は null
+     * @return 該当する社員。存在しない場合または論理削除済みの場合は null
      */
+    @Transactional(readOnly = true)
     public Employee findByEmployeeNumber(String employeeNumber) {
         if (employeeNumber == null || employeeNumber.isBlank()) {
             return null;
         }
-        return employeeRepository.findById(employeeNumber).orElse(null);
+        Employee employee = employeeRepository.findById(employeeNumber).orElse(null);
+        if (employee != null && employee.isDeleteFlag()) {
+            return null;
+        }
+        return employee;
     }
 
     /**
@@ -151,7 +166,7 @@ public class EmployeeService {
             return new LoginResult(false, MESSAGE_LOGIN_FAILED, null, null);
         }
         Employee employee = employeeRepository.findById(number).orElse(null);
-        if (employee == null) {
+        if (employee == null || employee.isDeleteFlag()) {
             return new LoginResult(false, MESSAGE_LOGIN_FAILED, null, null);
         }
         // 既にロック上限に達している場合は照合せずロックを通知する
@@ -231,11 +246,17 @@ public class EmployeeService {
     @Transactional
     public EmployeeResponse deleteEmployee(String employeeNumber) {
         String targetEmployeeNumber = trimToEmpty(employeeNumber);
-        if (targetEmployeeNumber.isEmpty()
-                || !employeeRepository.existsById(targetEmployeeNumber)) {
+        if (targetEmployeeNumber.isEmpty()) {
             return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
         }
-        employeeRepository.deleteById(targetEmployeeNumber);
+        Employee employee =
+                employeeRepository.findById(targetEmployeeNumber).orElse(null);
+        if (employee == null || employee.isDeleteFlag()) {
+            return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
+        }
+        employee.setDeleteFlag(true);
+        employee.setUpdatedAt(LocalDateTime.now());
+        employeeRepository.save(employee);
         return new EmployeeResponse(true, null);
     }
 
@@ -247,7 +268,7 @@ public class EmployeeService {
             String department, String authorityCode, String phoneNumber,
             String faxNumber, String password, int passwordErrorCount,
             String loginUserId) {
-        if (employeeRepository.existsByEmail(email)) {
+        if (employeeRepository.existsByEmailAndDeleteFlagFalse(email)) {
             return new EmployeeResponse(false, MESSAGE_EMAIL_DUPLICATED);
         }
         String passwordMessage = validatePassword(password);
@@ -293,7 +314,7 @@ public class EmployeeService {
         if (employee == null) {
             return new EmployeeResponse(false, MESSAGE_EMPLOYEE_NOT_FOUND);
         }
-        if (employeeRepository.existsByEmailAndEmployeeNumberNot(
+        if (employeeRepository.existsByEmailAndEmployeeNumberNotAndDeleteFlagFalse(
                 email, employeeNumber)) {
             return new EmployeeResponse(false, MESSAGE_EMAIL_DUPLICATED);
         }
@@ -408,37 +429,18 @@ public class EmployeeService {
     }
 
     /**
-     * 既存の最大社員番号を基に、次の社員番号を採番する。
+     * DB シーケンスから次の社員番号を採番する。
      * 形式は「user」+ 0 埋め 3 桁の連番 (例: user011)。
+     * nextval はトランザクションのロールバック後も値を消費するため重複しない。
      *
      * @return 新しい社員番号
      */
     private String generateNextEmployeeNumber() {
-        Optional<Employee> latest =
-                employeeRepository.findFirstByOrderByEmployeeNumberDesc();
-        int nextNumber = FIRST_EMPLOYEE_NUMBER;
-        if (latest.isPresent()) {
-            nextNumber =
-                    extractEmployeeNumber(latest.get().getEmployeeNumber()) + 1;
-        }
+        int nextNumber = jdbcTemplate.queryForObject(
+                SQL_NEXT_EMPLOYEE_NUMBER, Integer.class);
         return String.format(
                 "%s%0" + EMPLOYEE_NUMBER_DIGITS + "d",
                 EMPLOYEE_NUMBER_PREFIX, nextNumber);
-    }
-
-    /**
-     * 社員番号から末尾の数値部分を取り出す。
-     * 数値として解釈できない場合は 0 を返す。
-     *
-     * @param employeeNumber 社員番号
-     * @return 数値部分
-     */
-    private int extractEmployeeNumber(String employeeNumber) {
-        String digits = employeeNumber.replaceAll("\\D", "");
-        if (digits.isEmpty()) {
-            return 0;
-        }
-        return Integer.parseInt(digits);
     }
 
     /**

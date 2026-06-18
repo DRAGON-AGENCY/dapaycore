@@ -77,8 +77,7 @@
   }
 
   .container {
-    /* iframe 等の狭い表示幅でも全列を表示するため最小幅は設けない */
-    min-width: 0;
+    min-width: var(--container-min);
     max-width: var(--container-max);
     width: 100%;
     margin: 0 auto;
@@ -486,6 +485,10 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .data-table tbody tr.data-row.row-even td {
+    background-color: #f7f9fc;
+  }
+
   .data-table tbody tr.data-row:hover td {
     background: var(--bg-hover);
     cursor: pointer;
@@ -570,10 +573,8 @@
         </button>
         <button class="btn btn-clear" type="button">クリア</button>
         <!-- 新規登録 (管理者のみ表示)。社員管理画面 (新規モード) で登録する -->
-        <!-- TODO: モック用に一時無効化。本番稼働時は th:if を復元すること。 -->
-        <!-- <button class="btn btn-new" type="button" id="new-employee-btn"
-                th:if="${authorityCode == '01'}"> -->
-        <button class="btn btn-new" type="button" id="new-employee-btn">
+        <button class="btn btn-new" type="button" id="new-employee-btn"
+                th:if="${authorityCode == '01'}">
           <span>＋</span>
           <span>新規登録</span>
         </button>
@@ -620,9 +621,9 @@
             </tr>
           </thead>
           <tbody>
-            <!-- 行クリックでの編集遷移にメールアドレスを使うため data 属性で保持する -->
+            <!-- 行クリックでの編集遷移に社員番号 (PK) を使うため data 属性で保持する -->
             <tr class="data-row" th:each="employee : ${employees}"
-                th:data-email="${employee.email}">
+                th:data-number="${employee.employeeNumber}">
               <td class="number" th:text="${employee.employeeNumber}"></td>
               <td class="name" th:text="${employee.employeeName}"></td>
               <td class="kana" th:text="${employee.employeeNameKana}"></td>
@@ -676,15 +677,14 @@
     // 表の社員 (行) を選択したら、同じ枠 (iframe) 内で社員編集画面へ遷移する
     document.querySelectorAll('.data-table tbody tr.data-row').forEach(function (row) {
       row.addEventListener('click', function () {
-        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
-        // if (currentAuthorityCode !== ADMINISTRATOR_AUTHORITY_CODE) {
-        //   permissionError.style.display = 'block';
-        //   return;
-        // }
-        // permissionError.style.display = 'none';
-        var email = row.getAttribute('data-email') || '';
+        if (currentAuthorityCode !== ADMINISTRATOR_AUTHORITY_CODE) {
+          permissionError.style.display = 'block';
+          return;
+        }
+        permissionError.style.display = 'none';
+        var employeeNumber = row.getAttribute('data-number') || '';
         window.location.href =
-            '/employee_edit.html?email=' + encodeURIComponent(email);
+            '/employee_edit.html?employeeNumber=' + encodeURIComponent(employeeNumber);
       });
     });
 
@@ -765,6 +765,7 @@
         });
         for (var index = startIndex; index < endIndex; index++) {
           filteredRows[index].style.display = '';
+          filteredRows[index].classList.toggle('row-even', (index - startIndex) % 2 !== 0);
         }
 
         // 絞込み結果が0件のときは空状態の行を表示する

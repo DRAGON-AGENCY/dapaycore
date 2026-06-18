@@ -64,7 +64,7 @@
   }
 
   .container {
-    min-width: 0;
+    min-width: 1200px;
     max-width: 1760px;
     width: 100%;
     margin: 0 auto;
@@ -478,6 +478,7 @@
       pageTitle.textContent = '手数料 変更';
       saveBtn.textContent = '更新する';
       deleteBtn.removeAttribute('hidden');
+      document.getElementById('member-code').readOnly = true;
       loadRecord(recordId);
     }
 
@@ -515,6 +516,8 @@
       if (!startDate) { errors.push('適用開始日を入力してください。'); }
       if (!feeRate || isNaN(parseFloat(feeRate))) {
         errors.push('手数料率を入力してください。');
+      } else if (parseFloat(feeRate) <= 0) {
+        errors.push('手数料率は0より大きい値を入力してください。');
       }
 
       var endDate = document.getElementById('end-date').value;
@@ -579,6 +582,9 @@
     }
 
     function submitDelete() {
+      var confirmBtn = document.getElementById('dialog-confirm');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = '処理中...';
       fetch('/api/fee/' + encodeURIComponent(recordId), {
         method: 'DELETE',
         headers: { 'X-CSRF-TOKEN': getCsrfToken() }
@@ -590,6 +596,8 @@
       .catch(function (err) {
         errorBox.textContent = err.message || '削除に失敗しました。';
         errorBox.className = 'error-box visible';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = '削除する';
       });
     }
 

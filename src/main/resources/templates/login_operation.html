@@ -213,31 +213,10 @@
     return null;
   }
 
-  // ★モック運用中★ 社員番号・パスワードのチェックを無効化し、自由にログインできるようにしています。
-  // 入力内容に関わらず、ポータルの権限制御が正しく働くよう管理者(user001)でセッションを確立して遷移します。
-  // 本番化する際は、下の「本番用」ブロックのコメントを解除し、このモック処理を削除してください。
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     hideLoginError();
-    loginButton.disabled = true;
 
-    // モック：固定の管理者アカウントでログインし、認証結果に関わらずポータルへ遷移する
-    fetch('/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken
-      },
-      body: JSON.stringify({ employeeNumber: 'user001', password: 'password' })
-    })
-      .then(function () {
-        window.location.href = 'operation_management_portal.html';
-      })
-      .catch(function () {
-        window.location.href = 'operation_management_portal.html';
-      });
-
-    /* ===== 本番用：入力チェック＋入力値での認証（モック中は無効化） =====
     const employeeNumber = employeeNumberInput.value;
     const password = pw.value;
 
@@ -279,7 +258,6 @@
         showLoginError('通信エラーが発生しました。時間をおいて再度お試しください。');
         loginButton.disabled = false;
       });
-    ===== ここまで本番用 ===== */
   });
 </script>
 </body>

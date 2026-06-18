@@ -111,33 +111,6 @@
     background: #9aa7b8;
   }
 
-  /* ヘッダー */
-  .header-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 6px;
-  }
-
-  .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background-color: var(--bg-white);
-    border: 1px solid var(--border-input);
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: var(--fs-base);
-    color: var(--text-main);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-  }
-
-  .btn-back:hover {
-    background-color: var(--bg-hover);
-    border-color: var(--border-input);
-  }
-
   .page-title {
     font-size: var(--fs-lg);
     font-weight: 700;
@@ -403,7 +376,7 @@
 
   /* 列幅は比率（合計 100%）で指定し、表示幅に応じて伸縮させる。 */
   .data-table col.c-code   { width: 12%; }
-  .data-table col.c-name   { width: 34%; }
+  .data-table col.c-name   { width: 38%; }
   .data-table col.c-rep    { width: 18%; }
   .data-table col.c-status { width: 14%; }
   .data-table col.c-docs   { width: 6%; }
@@ -505,6 +478,19 @@
   .data-table tbody tr.data-row:hover td {
     background: var(--bg-hover);
     cursor: pointer;
+  }
+
+  /* ゼブラ縞: JS の render() が .row-even を付与するためページ切替後も正しく縞になる */
+  .data-table tbody tr.data-row.row-even td {
+    background-color: #f7f9fc;
+  }
+
+  /* 否決行を淡赤で識別 (data-status を CSS のフックとして使用) */
+  .data-table tbody tr.data-row[data-status="REJECTED"] td {
+    background-color: #fff5f5;
+  }
+  .data-table tbody tr.data-row[data-status="REJECTED"]:hover td {
+    background-color: var(--bg-hover);
   }
 
   /* 絞込み結果が0件のときの空状態 */
@@ -751,6 +737,15 @@
           filteredRows[index].style.display = '';
         }
 
+        // ゼブラ縞クラスを表示位置に合わせて再割り当てする（ページ切替・絞込み後も正しい縞模様を保つ）
+        for (var stripeIndex = startIndex; stripeIndex < endIndex; stripeIndex++) {
+          if ((stripeIndex - startIndex) % 2 === 0) {
+            filteredRows[stripeIndex].classList.remove('row-even');
+          } else {
+            filteredRows[stripeIndex].classList.add('row-even');
+          }
+        }
+
         // 絞込み結果が0件のときは空状態の行を表示する
         if (emptyRow) {
           emptyRow.style.display = (totalItems === 0) ? '' : 'none';
@@ -915,6 +910,12 @@
         td.className = 'c-action';
         tr.appendChild(td);
       });
+      // c-action 列を追加した分、空状態行の colspan を 1 増やす
+      var emptyCell = document.querySelector('#empty-row td.empty-cell');
+      if (emptyCell) {
+        var currentColspan = parseInt(emptyCell.getAttribute('colspan') || '1', 10);
+        emptyCell.setAttribute('colspan', currentColspan + 1);
+      }
     })();
   </script>
 </body>

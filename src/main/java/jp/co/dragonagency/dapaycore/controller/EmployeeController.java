@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jp.co.dragonagency.dapaycore.dto.EmployeeRequest;
 import jp.co.dragonagency.dapaycore.dto.EmployeeResponse;
-import jp.co.dragonagency.dapaycore.model.Employee;
 import jp.co.dragonagency.dapaycore.security.SessionAttributeNames;
 import jp.co.dragonagency.dapaycore.service.EmployeeService;
 
@@ -21,9 +20,8 @@ import jp.co.dragonagency.dapaycore.service.EmployeeService;
 @Controller
 public class EmployeeController {
 
-    // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
-    // private static final String AUTHORITY_ADMINISTRATOR = "01";
-    // private static final String MESSAGE_FORBIDDEN = "権限がありません。";
+    private static final String AUTHORITY_ADMINISTRATOR = "01";
+    private static final String MESSAGE_FORBIDDEN = "権限がありません。";
 
     private final EmployeeService employeeService;
 
@@ -46,10 +44,9 @@ public class EmployeeController {
     public EmployeeResponse save(
             @RequestBody EmployeeRequest request,
             HttpSession session) {
-        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
-        // if (!isAdministrator(session)) {
-        //     return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
-        // }
+        if (!isAdministrator(session)) {
+            return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
+        }
         return employeeService.saveEmployee(request, getLoginUserId(session));
     }
 
@@ -68,17 +65,15 @@ public class EmployeeController {
     public EmployeeResponse delete(
             @RequestBody EmployeeRequest request,
             HttpSession session) {
-        // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
-        // if (!isAdministrator(session)) {
-        //     return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
-        // }
+        if (!isAdministrator(session)) {
+            return new EmployeeResponse(false, MESSAGE_FORBIDDEN);
+        }
         return employeeService.deleteEmployee(request.getEmployeeNumber());
     }
 
     /**
      * 操作中のログインユーザの社員番号を取得する。
-     * セッションにはログイン時の社員番号が保持されているため、
-     * その社員番号で社員を引き当てて存在を確認したうえで返す。
+     * セッションにはログイン認証済みの社員番号が保持されているため直接返す。
      *
      * @param session ログイン状態を保持するセッション
      * @return ログインユーザの社員番号。特定できない場合は null
@@ -89,24 +84,18 @@ public class EmployeeController {
         if (loginUserId == null) {
             return null;
         }
-        Employee loginUser =
-                employeeService.findByEmployeeNumber(loginUserId.toString());
-        if (loginUser == null) {
-            return null;
-        }
-        return loginUser.getEmployeeNumber();
+        return loginUserId.toString();
     }
 
-    // TODO: モック用に一時無効化。本番稼働時は以下のコメントを解除すること。
-    // /**
-    //  * セッションの権限コードが管理者 (01) かどうかを判定する。
-    //  *
-    //  * @param session 判定対象のセッション
-    //  * @return 管理者の場合は true
-    //  */
-    // private boolean isAdministrator(HttpSession session) {
-    //     Object authorityCode =
-    //             session.getAttribute(SessionAttributeNames.AUTHORITY_CODE);
-    //     return AUTHORITY_ADMINISTRATOR.equals(authorityCode);
-    // }
+    /**
+     * セッションの権限コードが管理者 (01) かどうかを判定する。
+     *
+     * @param session 判定対象のセッション
+     * @return 管理者の場合は true
+     */
+    private boolean isAdministrator(HttpSession session) {
+        Object authorityCode =
+                session.getAttribute(SessionAttributeNames.AUTHORITY_CODE);
+        return AUTHORITY_ADMINISTRATOR.equals(authorityCode);
+    }
 }

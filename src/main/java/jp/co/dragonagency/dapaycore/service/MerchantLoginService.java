@@ -42,7 +42,7 @@ public class MerchantLoginService {
                     false, "メールアドレスとパスワードを入力してください。", false, null);
         }
 
-        Optional<MerchantApplication> opt = repository.findByContactEmail(email.trim());
+        Optional<MerchantApplication> opt = repository.findByContactEmailAndDeleteFlagFalse(email.trim());
         if (opt.isEmpty()) {
             return new MerchantLoginResponse(false, ERROR_CREDENTIALS, false, null);
         }

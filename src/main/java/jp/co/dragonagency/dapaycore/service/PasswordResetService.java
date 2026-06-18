@@ -51,7 +51,7 @@ public class PasswordResetService {
         }
 
         Optional<MerchantApplication> opt =
-                merchantApplicationRepository.findByContactEmail(email.trim());
+                merchantApplicationRepository.findByContactEmailAndDeleteFlagFalse(email.trim());
         if (opt.isEmpty()) {
             log.info("パスワード再設定リクエスト: 対象なし email={}", email.trim());
             return false;

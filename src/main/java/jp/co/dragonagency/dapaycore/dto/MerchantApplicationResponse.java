@@ -1,5 +1,7 @@
 package jp.co.dragonagency.dapaycore.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 加盟店申込登録の処理結果を返すレスポンス DTO。
  */
@@ -34,6 +36,7 @@ public class MerchantApplicationResponse {
         this.memberCode = memberCode;
     }
 
+    @JsonIgnore
     public String getTempPassword() {
         return tempPassword;
     }

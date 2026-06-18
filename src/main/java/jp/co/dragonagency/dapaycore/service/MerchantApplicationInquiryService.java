@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,7 @@ public class MerchantApplicationInquiryService {
         if (memberCode == null || memberCode.isBlank()) {
             return null;
         }
-        return applicationRepository.findById(memberCode).orElse(null);
+        return applicationRepository.findByMemberCodeAndDeleteFlagFalse(memberCode).orElse(null);
     }
 
     /**
@@ -44,7 +47,7 @@ public class MerchantApplicationInquiryService {
         if (memberCode == null || memberCode.isBlank()) {
             return Map.of();
         }
-        return documentRepository.findByMemberCode(memberCode).stream()
+        return documentRepository.findByMemberCodeAndDeleteFlagFalse(memberCode).stream()
                 .collect(Collectors.toMap(
                         MerchantApplicationDocument::getDocumentType,
                         d -> d,
@@ -62,8 +65,10 @@ public class MerchantApplicationInquiryService {
         if (memberCode == null || memberCode.isBlank()) {
             throw new IllegalArgumentException("会員コードが指定されていません");
         }
-        MerchantApplication e = applicationRepository.findById(memberCode)
+        MerchantApplication e = applicationRepository.findByMemberCodeAndDeleteFlagFalse(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("申込情報が見つかりません: " + memberCode));
+
+        validateUpdateData(data);
 
         e.setApplicationStatus(s(data, "applicationStatus"));
 
@@ -271,16 +276,231 @@ public class MerchantApplicationInquiryService {
         applicationRepository.save(e);
     }
 
+    private static void validateUpdateData(Map<String, String> data) {
+        List<String> errors = new ArrayList<>();
+
+        // STEP 1: 事前確認（全同意が必須）
+        if (!"true".equals(data.get("agreedStarpay"))) {
+            errors.add("StarPay決済サービス加盟店規約への確認が必要です");
+        }
+        if (!"true".equals(data.get("agreedJcb"))) {
+            errors.add("JCB加盟店規約・加盟店特約への確認が必要です");
+        }
+        if (!"true".equals(data.get("agreedRyuginVisaMcCu"))) {
+            errors.add("琉球銀行加盟店規約（Visa/Mastercard/銀聯）への確認が必要です");
+        }
+        if (!"true".equals(data.get("agreedRyuginCuQr"))) {
+            errors.add("銀聯QRコード決済サービス利用加盟店規約への確認が必要です");
+        }
+        if (!"true".equals(data.get("agreedAgencyDelegation"))) {
+            errors.add("代理申請の委任への同意が必要です");
+        }
+        if (!"true".equals(data.get("agreedServiceTerms"))) {
+            errors.add("当社サービス利用規約への同意が必要です");
+        }
+        if (!"true".equals(data.get("agreedPrivacyPolicy"))) {
+            errors.add("当社プライバシーポリシーへの同意が必要です");
+        }
+        if (!"true".equals(data.get("agreedAuthorityConfirmed"))) {
+            errors.add("代表者・契約締結権限の確認が必要です");
+        }
+
+        // STEP 2: 取引形態
+        boolean txAny = "true".equals(data.get("txTypeVisitSales"))
+                || "true".equals(data.get("txTypeContinuousService"))
+                || "true".equals(data.get("txTypePhoneSolicitation"))
+                || "true".equals(data.get("txTypePrepaidService"))
+                || "true".equals(data.get("txTypeBusinessInduction"))
+                || "true".equals(data.get("txTypeChainSales"))
+                || "true".equals(data.get("txTypeNoneApplicable"));
+        if (!txAny) {
+            errors.add("取引形態を1つ以上選択してください");
+        }
+        requireField(data, "businessEntityType", "法人区分", errors);
+        requireField(data, "salesFormat", "販売形態", errors);
+        requireField(data, "operationFormat", "運営形態", errors);
+
+        // STEP 3: 決済種類
+        boolean qrAny = "true".equals(data.get("payQrWechatPay"))
+                || "true".equals(data.get("payQrPaypay"))
+                || "true".equals(data.get("payQrDBarai"))
+                || "true".equals(data.get("payQrAuPay"))
+                || "true".equals(data.get("payQrMerpay"))
+                || "true".equals(data.get("payQrRakutenPay"))
+                || "true".equals(data.get("payQrAlipayPlus"))
+                || "true".equals(data.get("payQrJkoPay"));
+        if (!qrAny) {
+            errors.add("QRコード決済を1つ以上選択してください");
+        }
+
+        boolean creditAny = "true".equals(data.get("payCreditJcb"))
+                || "true".equals(data.get("payCreditVisa"))
+                || "true".equals(data.get("payCreditMastercard"))
+                || "true".equals(data.get("payCreditDiscover"))
+                || "true".equals(data.get("payCreditDiners"))
+                || "true".equals(data.get("payCreditAmex"));
+        if (!creditAny) {
+            errors.add("クレジットカード決済を1つ以上選択してください");
+        }
+
+        boolean emoneyAny = "true".equals(data.get("payEmoneyId"))
+                || "true".equals(data.get("payEmoneyWaon"))
+                || "true".equals(data.get("payEmoneyRakutenEdy"))
+                || "true".equals(data.get("payEmoneyNanaco"))
+                || "true".equals(data.get("payEmoneyTransitIc"));
+        if (!emoneyAny) {
+            errors.add("電子マネー決済を1つ以上選択してください");
+        }
+
+        // STEP 4: 法人情報
+        requireField(data, "corporateNumber", "法人番号", errors);
+        requireField(data, "corporateName", "法人名", errors);
+        requireField(data, "corporateNameKana", "法人名（カナ）", errors);
+        requireField(data, "corporateNameEn", "法人名（英語）", errors);
+        requireField(data, "establishmentDate", "法人設立年月日", errors);
+        requireField(data, "brandName", "ブランド名（屋号）", errors);
+        requireField(data, "brandNameKana", "ブランド名（カナ）", errors);
+        requireField(data, "brandNameEn", "ブランド名（英語）", errors);
+        requireField(data, "annualRevenue", "年商", errors);
+        requireField(data, "industryCategory", "業種（カテゴリー）", errors);
+        requireField(data, "industryDetail", "業種（詳細）", errors);
+        requireField(data, "businessDescription", "事業内容及び取扱商材", errors);
+
+        // 代表者
+        requireField(data, "repLastName", "代表者 姓", errors);
+        requireField(data, "repLastNameKana", "代表者 姓（カナ）", errors);
+        requireField(data, "repLastNameEn", "代表者 姓（英語）", errors);
+        requireField(data, "repFirstName", "代表者 名", errors);
+        requireField(data, "repFirstNameKana", "代表者 名（カナ）", errors);
+        requireField(data, "repFirstNameEn", "代表者 名（英語）", errors);
+        requireField(data, "repBirthDate", "代表者 生年月日", errors);
+        requireField(data, "repGender", "代表者 性別", errors);
+        requireField(data, "repZipCode", "代表者 郵便番号", errors);
+        requireField(data, "repPrefecture", "代表者 都道府県", errors);
+        requireField(data, "repCity", "代表者 市区町村", errors);
+        requireField(data, "repTown", "代表者 町域", errors);
+        requireField(data, "repStreetNumber", "代表者 番地", errors);
+        requireField(data, "repPhone", "代表者 電話番号", errors);
+
+        // 担当者
+        requireField(data, "contactLastName", "担当者 姓", errors);
+        requireField(data, "contactLastNameKana", "担当者 姓（カナ）", errors);
+        requireField(data, "contactFirstName", "担当者 名", errors);
+        requireField(data, "contactFirstNameKana", "担当者 名（カナ）", errors);
+        requireField(data, "contactDepartment", "担当者 部署名", errors);
+        requireField(data, "contactEmail", "担当者 メールアドレス", errors);
+        requireField(data, "contactPhone1", "担当者 電話番号1", errors);
+        requireField(data, "contactZipCode", "担当者 郵便番号", errors);
+        requireField(data, "contactPrefecture", "担当者 都道府県", errors);
+        requireField(data, "contactCity", "担当者 市区町村", errors);
+        requireField(data, "contactTown", "担当者 町域", errors);
+        requireField(data, "contactStreetNumber", "担当者 番地", errors);
+
+        // STEP 5: 口座情報
+        requireField(data, "bankCode", "金融機関コード", errors);
+        requireField(data, "bankName", "金融機関名", errors);
+        requireField(data, "branchCode", "支店コード", errors);
+        requireField(data, "branchName", "支店名", errors);
+        requireField(data, "accountType", "預金種別", errors);
+        requireField(data, "accountNumber", "口座番号", errors);
+        requireField(data, "accountHolderKana", "口座名義（カナ）", errors);
+
+        // STEP 6: 店舗情報
+        requireField(data, "storeName", "店舗名", errors);
+        requireField(data, "storeNameKana", "店舗名（カナ）", errors);
+        requireField(data, "storeNameEn", "店舗名（英語）", errors);
+        requireField(data, "storeBrandName", "店舗ブランド名", errors);
+        requireField(data, "storeBrandNameKana", "店舗ブランド名（カナ）", errors);
+        requireField(data, "storeBrandNameEn", "店舗ブランド名（英語）", errors);
+        requireField(data, "storeIndustryCategory", "店舗業種（カテゴリ）", errors);
+        requireField(data, "storeIndustryDetail", "店舗業種（詳細）", errors);
+        requireField(data, "storeProductDescription", "店舗商材の詳細", errors);
+
+        String storeCountStr = data.get("storeCount");
+        if (storeCountStr == null || storeCountStr.isBlank()) {
+            errors.add("店舗数は必須です");
+        } else {
+            try {
+                int cnt = Integer.parseInt(storeCountStr.trim());
+                if (cnt < 1) {
+                    errors.add("店舗数は1以上を入力してください");
+                }
+            } catch (NumberFormatException ignore) {
+                errors.add("店舗数に正しい数値を入力してください");
+            }
+        }
+
+        String avgPriceStr = data.get("storeAveragePrice");
+        if (avgPriceStr == null || avgPriceStr.isBlank()) {
+            errors.add("平均単価は必須です");
+        } else {
+            try {
+                int price = Integer.parseInt(avgPriceStr.trim());
+                if (price < 0) {
+                    errors.add("平均単価は0以上を入力してください");
+                }
+            } catch (NumberFormatException ignore) {
+                errors.add("平均単価に正しい数値を入力してください");
+            }
+        }
+
+        requireField(data, "storeBankAccount", "店舗口座", errors);
+        requireField(data, "storeReceiptName", "レシート名", errors);
+        requireField(data, "shopZipCode", "店舗 郵便番号", errors);
+        requireField(data, "shopPrefecture", "店舗 都道府県", errors);
+        requireField(data, "shopCity", "店舗 市区町村", errors);
+        requireField(data, "shopTown", "店舗 町域", errors);
+        requireField(data, "shopStreetNumber", "店舗 番地", errors);
+        requireField(data, "shopPhone", "店舗 電話番号", errors);
+        requireField(data, "terminalPossessionStatus", "端末保持状況", errors);
+
+        // STEP 8: 発送情報
+        String mposQuantityStr = data.get("mposQuantity");
+        if (mposQuantityStr == null || mposQuantityStr.isBlank()) {
+            errors.add("端末台数は必須です");
+        } else {
+            try {
+                int qty = Integer.parseInt(mposQuantityStr.trim());
+                if (qty < 1) {
+                    errors.add("端末台数は1以上を入力してください");
+                }
+            } catch (NumberFormatException ignore) {
+                errors.add("端末台数に正しい数値を入力してください");
+            }
+        }
+        requireField(data, "deliveryZipCode", "お届け先 郵便番号", errors);
+        requireField(data, "deliveryPrefecture", "お届け先 都道府県", errors);
+        requireField(data, "deliveryCity", "お届け先 市区町村", errors);
+        requireField(data, "deliveryTown", "お届け先 町域", errors);
+        requireField(data, "deliveryStreetNumber", "お届け先 番地", errors);
+        requireField(data, "deliveryPhone", "お届け先 電話番号", errors);
+        requireField(data, "deliveryReceiver", "受取人", errors);
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join("\n", errors));
+        }
+    }
+
+    private static void requireField(
+            Map<String, String> data, String key, String label, List<String> errors) {
+        String v = data.get(key);
+        if (v == null || v.isBlank()) {
+            errors.add(label + "は必須です");
+        }
+    }
+
     /**
-     * 申込情報および添付書類を削除する。
+     * 申込情報を論理削除する（delete_flag を true に設定）。
      */
     @Transactional
     public void deleteApplication(String memberCode) {
         if (memberCode == null || memberCode.isBlank()) {
             throw new IllegalArgumentException("会員コードが指定されていません");
         }
-        documentRepository.deleteByMemberCode(memberCode);
-        applicationRepository.deleteById(memberCode);
+        MerchantApplication e = applicationRepository.findByMemberCodeAndDeleteFlagFalse(memberCode)
+                .orElseThrow(() -> new IllegalArgumentException("申込情報が見つかりません: " + memberCode));
+        e.setDeleteFlag(true);
+        documentRepository.logicalDeleteByMemberCode(memberCode);
     }
 
     private static String s(Map<String, String> d, String k) {
@@ -294,12 +514,26 @@ public class MerchantApplicationInquiryService {
 
     private static LocalDate d(Map<String, String> d, String k) {
         String v = d.get(k);
-        return (v == null || v.isBlank()) ? null : LocalDate.parse(v);
+        if (v == null || v.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(v);
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("日付の形式が正しくありません: " + k, ex);
+        }
     }
 
     private static LocalTime t(Map<String, String> d, String k) {
         String v = d.get(k);
-        return (v == null || v.isBlank()) ? null : LocalTime.parse(v);
+        if (v == null || v.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalTime.parse(v);
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("時刻の形式が正しくありません: " + k, ex);
+        }
     }
 
     private static Integer i(Map<String, String> d, String k) {

@@ -228,3 +228,6 @@ CREATE TABLE IF NOT EXISTS m_merchant_application (
 );
 
 ALTER TABLE m_merchant_application OWNER TO dapaycore;
+
+ALTER TABLE m_merchant_application
+    ADD COLUMN IF NOT EXISTS delete_flag BOOLEAN NOT NULL DEFAULT FALSE;
