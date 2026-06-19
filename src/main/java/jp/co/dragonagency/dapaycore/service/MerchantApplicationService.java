@@ -82,15 +82,13 @@ public class MerchantApplicationService {
             return new MerchantApplicationResponse(false, null, null, "リクエストが不正です。");
         }
 
-        validateRequest(request);
-
         String memberCode = generateNextMemberCode();
         String tempPassword = generateTempPassword();
         LocalDateTime now = LocalDateTime.now();
 
         MerchantApplication application = buildApplication(request, memberCode, now);
         application.setTempPasswordHash(passwordEncoder.encode(tempPassword));
-        merchantApplicationRepository.save(application);
+        merchantApplicationRepository.saveAndFlush(application);
 
         List<MerchantApplicationDocument> docs = new ArrayList<>();
         collectDocumentFiles(docs, memberCode, businessPermits,
@@ -109,151 +107,6 @@ public class MerchantApplicationService {
 
         log.info("加盟店申込を登録しました: memberCode={} 書類{}件", memberCode, docs.size());
         return new MerchantApplicationResponse(true, memberCode, tempPassword, null);
-    }
-
-    /**
-     * 申込リクエストの入力値を検証する。
-     * 不正な値がある場合は IllegalArgumentException をスローする。
-     */
-    private void validateRequest(MerchantApplicationRequest req) {
-        List<String> errors = new ArrayList<>();
-
-        // STEP 1: 全規約同意が必須
-        if (!req.isAgreedStarpay()) errors.add("StarPay決済サービス加盟店規約への確認が必要です");
-        if (!req.isAgreedJcb()) errors.add("JCB加盟店規約・加盟店特約への確認が必要です");
-        if (!req.isAgreedRyuginVisaMcCu()) errors.add("琉球銀行加盟店規約（Visa/Mastercard/銀聯）への確認が必要です");
-        if (!req.isAgreedRyuginCuQr()) errors.add("銀聯QRコード決済サービス利用加盟店規約への確認が必要です");
-        if (!req.isAgreedAgencyDelegation()) errors.add("代理申請の委任への同意が必要です");
-        if (!req.isAgreedServiceTerms()) errors.add("当社サービス利用規約への同意が必要です");
-        if (!req.isAgreedPrivacyPolicy()) errors.add("当社プライバシーポリシーへの同意が必要です");
-        if (!req.isAgreedAuthorityConfirmed()) errors.add("代表者・契約締結権限の確認が必要です");
-
-        // STEP 2: 取引形態
-        boolean txAny = req.isTxTypeVisitSales() || req.isTxTypeContinuousService()
-                || req.isTxTypePhoneSolicitation() || req.isTxTypePrepaidService()
-                || req.isTxTypeBusinessInduction() || req.isTxTypeChainSales()
-                || req.isTxTypeNoneApplicable();
-        if (!txAny) errors.add("取引形態を1つ以上選択してください");
-        requireField(req.getBusinessEntityType(), "法人区分", errors);
-        requireField(req.getSalesFormat(), "販売形態", errors);
-        requireField(req.getOperationFormat(), "運営形態", errors);
-
-        // STEP 3: 決済種類
-        boolean qrAny = req.isPayQrWechatPay() || req.isPayQrPaypay() || req.isPayQrDBarai()
-                || req.isPayQrAuPay() || req.isPayQrMerpay() || req.isPayQrRakutenPay()
-                || req.isPayQrAlipayPlus() || req.isPayQrJkoPay();
-        if (!qrAny) errors.add("QRコード決済を1つ以上選択してください");
-        boolean creditAny = req.isPayCreditJcb() || req.isPayCreditVisa()
-                || req.isPayCreditMastercard() || req.isPayCreditDiscover()
-                || req.isPayCreditDiners() || req.isPayCreditAmex();
-        if (!creditAny) errors.add("クレジットカード決済を1つ以上選択してください");
-        boolean emoneyAny = req.isPayEmoneyId() || req.isPayEmoneyWaon()
-                || req.isPayEmoneyRakutenEdy() || req.isPayEmoneyNanaco()
-                || req.isPayEmoneyTransitIc();
-        if (!emoneyAny) errors.add("電子マネー決済を1つ以上選択してください");
-
-        // STEP 4: 申込者情報
-        requireField(req.getCorporateName(), "法人名", errors);
-        requireField(req.getCorporateNameKana(), "法人名（カナ）", errors);
-        requireField(req.getCorporateNameEn(), "法人名（英語）", errors);
-        requireField(req.getBrandName(), "ブランド名（屋号）", errors);
-        requireField(req.getBrandNameKana(), "ブランド名（カナ）", errors);
-        requireField(req.getBrandNameEn(), "ブランド名（英語）", errors);
-        requireField(req.getAnnualRevenue(), "年商", errors);
-        requireField(req.getIndustryCategory(), "業種（カテゴリー）", errors);
-        requireField(req.getIndustryDetail(), "業種（詳細）", errors);
-        requireField(req.getBusinessDescription(), "事業内容及び取扱商材", errors);
-        // STEP 4: 代表者情報
-        requireField(req.getRepLastName(), "代表者 姓", errors);
-        requireField(req.getRepLastNameKana(), "代表者 姓（カナ）", errors);
-        requireField(req.getRepLastNameEn(), "代表者 姓（英語）", errors);
-        requireField(req.getRepFirstName(), "代表者 名", errors);
-        requireField(req.getRepFirstNameKana(), "代表者 名（カナ）", errors);
-        requireField(req.getRepFirstNameEn(), "代表者 名（英語）", errors);
-        requireField(req.getRepBirthDate(), "代表者 生年月日", errors);
-        requireField(req.getRepGender(), "代表者 性別", errors);
-        requireField(req.getRepZipCode(), "代表者 郵便番号", errors);
-        requireField(req.getRepPrefecture(), "代表者 都道府県", errors);
-        requireField(req.getRepCity(), "代表者 市区町村", errors);
-        requireField(req.getRepTown(), "代表者 町域", errors);
-        requireField(req.getRepStreetNumber(), "代表者 番地", errors);
-        requireField(req.getRepPhone(), "代表者 電話番号", errors);
-        // STEP 4: 担当者情報
-        requireField(req.getContactLastName(), "担当者 姓", errors);
-        requireField(req.getContactLastNameKana(), "担当者 姓（カナ）", errors);
-        requireField(req.getContactFirstName(), "担当者 名", errors);
-        requireField(req.getContactFirstNameKana(), "担当者 名（カナ）", errors);
-        requireField(req.getContactDepartment(), "担当者 部署名", errors);
-        requireField(req.getContactEmail(), "担当者 メールアドレス", errors);
-        requireField(req.getContactPhone1(), "担当者 電話番号", errors);
-        requireField(req.getContactZipCode(), "担当者 郵便番号", errors);
-        requireField(req.getContactPrefecture(), "担当者 都道府県", errors);
-        requireField(req.getContactCity(), "担当者 市区町村", errors);
-        requireField(req.getContactTown(), "担当者 町域", errors);
-        requireField(req.getContactStreetNumber(), "担当者 番地", errors);
-
-        // STEP 4: 法人番号の桁数（DBカラム VARCHAR(13) に対応）
-        if (req.getCorporateNumber() != null && !req.getCorporateNumber().trim().isEmpty()
-                && req.getCorporateNumber().trim().length() > 13) {
-            errors.add("法人番号は13桁以内で入力してください");
-        }
-
-        // STEP 5: 口座情報
-        requireField(req.getBankCode(), "金融機関コード", errors);
-        requireField(req.getBankName(), "金融機関名", errors);
-        requireField(req.getBranchCode(), "支店コード", errors);
-        requireField(req.getBranchName(), "支店名", errors);
-        requireField(req.getAccountType(), "預金種別", errors);
-        requireField(req.getAccountNumber(), "口座番号", errors);
-        requireField(req.getAccountHolderKana(), "口座名義（カナ）", errors);
-        // 口座番号は日本の標準 7 桁（DBカラム VARCHAR(7) に対応）
-        if (req.getAccountNumber() != null && !req.getAccountNumber().trim().isEmpty()
-                && req.getAccountNumber().trim().length() > 7) {
-            errors.add("口座番号は7桁以内で入力してください");
-        }
-
-        // STEP 6: 店舗情報
-        requireField(req.getStoreName(), "店舗名", errors);
-        requireField(req.getStoreNameKana(), "店舗名（カナ）", errors);
-        requireField(req.getStoreNameEn(), "店舗名（英語）", errors);
-        requireField(req.getStoreBrandName(), "店舗ブランド名", errors);
-        requireField(req.getStoreBrandNameKana(), "店舗ブランド名（カナ）", errors);
-        requireField(req.getStoreBrandNameEn(), "店舗ブランド名（英語）", errors);
-        requireField(req.getStoreIndustryCategory(), "店舗業種（カテゴリ）", errors);
-        requireField(req.getStoreIndustryDetail(), "店舗業種（詳細）", errors);
-        requireField(req.getStoreProductDescription(), "店舗商材の詳細", errors);
-        Integer storeCount = parseInt(req.getStoreCount());
-        if (storeCount == null || storeCount < 1) errors.add("店舗数は1以上を入力してください");
-        Integer storeAvgPrice = parseInt(req.getStoreAveragePrice());
-        if (storeAvgPrice == null || storeAvgPrice < 0) errors.add("平均単価は0以上を入力してください");
-        requireField(req.getStoreBankAccount(), "店舗口座", errors);
-        requireField(req.getStoreReceiptName(), "レシート名", errors);
-        requireField(req.getShopZipCode(), "店舗 郵便番号", errors);
-        requireField(req.getShopPrefecture(), "店舗 都道府県", errors);
-        requireField(req.getShopCity(), "店舗 市区町村", errors);
-        requireField(req.getShopTown(), "店舗 町域", errors);
-        requireField(req.getShopStreetNumber(), "店舗 番地", errors);
-        requireField(req.getShopPhone(), "店舗 電話番号", errors);
-        requireField(req.getTerminalPossessionStatus(), "端末保持状況", errors);
-
-        // STEP 8: 発送情報
-        requireField(req.getDeliveryZipCode(), "お届け先 郵便番号", errors);
-        requireField(req.getDeliveryPrefecture(), "お届け先 都道府県", errors);
-        requireField(req.getDeliveryCity(), "お届け先 市区町村", errors);
-        requireField(req.getDeliveryTown(), "お届け先 町域", errors);
-        requireField(req.getDeliveryStreetNumber(), "お届け先 番地", errors);
-        requireField(req.getDeliveryPhone(), "お届け先 電話番号", errors);
-        requireField(req.getDeliveryReceiver(), "受取人", errors);
-
-        if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(String.join(" / ", errors));
-        }
-    }
-
-    private void requireField(String value, String fieldName, List<String> errors) {
-        if (value == null || value.trim().isEmpty()) {
-            errors.add(fieldName + "は必須です");
-        }
     }
 
     private MerchantApplication buildApplication(

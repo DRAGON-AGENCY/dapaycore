@@ -337,11 +337,11 @@
   /* footer actions (sticky) */
   .actions { position: sticky; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 14px 28px; border-top: 0.5px solid var(--border); background: var(--bg-surface); }
   .actions .prog { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
-  .actions .step1-err { display: none; font-size: 13px; color: #c0392b; align-items: center; gap: 5px; }
+  .actions .step1-err { display: none; font-size: 15px; font-weight: 700; color: #c0392b; align-items: center; gap: 5px; }
   .actions .step1-err.visible { display: inline-flex; }
-  .field-err { display: none; font-size: 12px; color: var(--text-danger); margin-top: 6px; align-items: center; gap: 4px; }
+  .field-err { display: none; font-size: 14px; font-weight: 700; color: var(--text-danger); margin-top: 6px; align-items: center; gap: 4px; }
   .field-err.visible { display: flex; }
-  .field-err i { font-size: 14px; }
+  .field-err i { font-size: 16px; }
   input.input-err, select.input-err { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.15) !important; }
   .input-suffix { align-self: center; color: var(--text-secondary); font-size: 14px; font-weight: 600; white-space: nowrap; padding-left: 4px; }
   .time-range { display: flex; align-items: flex-end; gap: 12px; }
@@ -732,7 +732,7 @@
               <div class="field">
                 <label>法人番号 <span class="req">*</span></label>
                 <div class="input-row">
-                  <input type="text" id="houjinNumber" placeholder="例）1234567890123" style="max-width:200px;">
+                  <input type="text" id="houjinNumber" placeholder="例）1234567890123" maxlength="13" style="max-width:200px;">
                   <button type="button" class="btn btn-ghost btn-sm" id="houjinLookup"><i class="ti ti-search"></i>確認</button>
                 </div>
               </div>
@@ -762,10 +762,10 @@
               <div class="sub-h"><i class="ti ti-category" aria-hidden="true"></i>業種情報</div>
               <div class="grid2">
                 <div class="field"><label>業種（カテゴリー） <span class="req">*</span></label>
-                  <select id="industryCategory"><option>選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
+                  <select id="industryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
                 </div>
                 <div class="field"><label>業種（詳細） <span class="req">*</span></label>
-                  <select id="industryDetail"><option>選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
+                  <select id="industryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
                 </div>
               </div>
               <div class="field" style="margin-top:14px;"><label>事業内容及び取扱商材 <span class="req">*</span></label><input type="text" id="businessContent" placeholder="例）〇〇の製造・販売、〇〇サービスの提供"></div>
@@ -783,7 +783,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -799,7 +799,7 @@
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
                 <div class="grid3" style="margin-top:14px;">
                   <div class="field"><label>本社電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
@@ -855,7 +855,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -909,7 +909,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -925,7 +925,7 @@
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
                 </div>
                 <div class="field" style="margin-top:14px;"><label>部署名 <span class="req">*</span> <span class="help">ない場合は「なし」と記入</span></label><input type="text" id="contactDept" placeholder="例）〇〇部"></div>
                 <div class="field" style="margin-top:14px;"><label>メールアドレス <span class="req">*</span></label><div class="input-icon"><i class="ti ti-at"></i><input type="email" id="contactEmail" placeholder="mail@example.co.jp"></div></div>
@@ -1050,6 +1050,8 @@
                 <div class="field"><label>ブランド名（屋号）（半角カナ） <span class="req">*</span></label><input id="shopBrandNameKana" type="text" placeholder="例）〇〇"></div>
                 <div class="field"><label>ブランド名（屋号）（英語表記） <span class="req">*</span></label><input id="shopBrandNameEn" type="text" placeholder="例）〇〇"></div>
               </div>
+              <p class="field-err" id="err-step6-name"><i class="ti ti-alert-circle"></i>店舗名・ブランド名に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step6-name-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
             </div>
           </div>
 
@@ -1074,13 +1076,12 @@
                 <div class="field">
                   <label>平均単価 <span class="req">*</span></label>
                   <div class="input-row">
-                    <input id="shopAvgPrice" type="number" min="0" placeholder="5,000">
+                    <input id="shopAvgPrice" type="number" min="1" placeholder="5,000">
                     <span class="input-suffix">円</span>
                   </div>
                 </div>
               </div>
-              <p class="field-err" id="err-step6-info"><i class="ti ti-alert-circle"></i>店舗名・業種情報に未入力の必須項目があります。</p>
-              <p class="field-err" id="err-step6-shop-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
+              <p class="field-err" id="err-step6-info"><i class="ti ti-alert-circle"></i>店舗業種・商材に未入力の必須項目があります。</p>
             </div>
           </div>
           <div class="card-grid">
@@ -1181,7 +1182,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select id="shopPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>都道府県（半角カナ） <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>都道府県（半角カナ） <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input id="shopCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -1515,7 +1516,7 @@
                   <div class="field"><label>都道府県 <span class="req">*</span></label>
                     <select id="deliveryPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
                   </div>
-                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
                 </div>
                 <div class="kana-pair" style="margin-top:14px;">
                   <div class="field"><label>市区町村 <span class="req">*</span></label><input id="deliveryCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
@@ -1741,8 +1742,25 @@
     } else {
       nextBtn.innerHTML = '次へ進む<i class="ti ti-arrow-right"></i>';
     }
-    // 店舗情報ステップ表示時に、口座情報から店舗口座を自動入力する
+    // 店舗情報ステップ表示時に、法人情報から店舗名・ブランド名を自動入力する
     if (current === 5) {
+      var prefillMap = [
+        ['shopName',          'companyName'],
+        ['shopNameKana',      'companyNameKana'],
+        ['shopNameEn',        'companyNameEn'],
+        ['shopBrandName',     'brandName'],
+        ['shopBrandNameKana', 'brandNameKana'],
+        ['shopBrandNameEn',   'brandNameEn']
+      ];
+      prefillMap.forEach(function(pair) {
+        var dest = document.getElementById(pair[0]);
+        var src  = document.getElementById(pair[1]);
+        if (dest && src && dest.value.trim() === '') {
+          dest.value = src.value;
+        }
+      });
+
+      // 口座情報から店舗口座を自動入力する
       var shopAcc = document.getElementById('shopAccount');
       if (shopAcc && shopAcc.value.trim() === '') {
         var bkname = document.getElementById('acc-bkname').value.trim();
@@ -2221,6 +2239,7 @@
         ].forEach(function(id) { chkReqField(id, s4corp); });
         chkSelField('industryCategory', s4corp);
         chkSelField('industryDetail', s4corp);
+        ['zip','pref','city','cityk','town','townk','banchi','banchik','tel','fax','mobile'].forEach(function(f) { chkAddrField('company', f, s4corp); });
         if (s4corp.v) { errCorp.classList.add('visible'); step4HasError = true; } else { errCorp.classList.remove('visible'); }
         s4err.v = false;
         var corpKanaFmt = checkKanaFields(['companyNameKana', 'brandNameKana'], s4err);
@@ -2235,7 +2254,7 @@
          'repFirstNameKana','repFirstNameEn','repBirthDate'
         ].forEach(function(id) { chkReqField(id, s4rep); });
         if (!document.querySelector('input[name="repsex"]:checked')) { s4rep.v = true; }
-        ['zip','pref','city','town','banchi','tel'].forEach(function(f) { chkAddrField('rep', f, s4rep); });
+        ['zip','pref','city','cityk','town','townk','banchi','banchik','tel'].forEach(function(f) { chkAddrField('rep', f, s4rep); });
         if (s4rep.v) { errRep.classList.add('visible'); step4HasError = true; } else { errRep.classList.remove('visible'); }
         s4err.v = false;
         checkKanaFields(['repLastNameKana', 'repFirstNameKana'], s4err);
@@ -2248,7 +2267,7 @@
         ['contactLastName','contactLastNameKana','contactFirstName','contactFirstNameKana',
          'contactDept','contactEmail','contactTel1'
         ].forEach(function(id) { chkReqField(id, s4cont); });
-        ['zip','pref','city','town','banchi'].forEach(function(f) { chkAddrField('contact', f, s4cont); });
+        ['zip','pref','city','cityk','town','townk','banchi','banchik'].forEach(function(f) { chkAddrField('contact', f, s4cont); });
         if (s4cont.v) { errContact.classList.add('visible'); step4HasError = true; } else { errContact.classList.remove('visible'); }
         s4err.v = false;
         checkKanaFields(['contactLastNameKana', 'contactFirstNameKana'], s4err);
@@ -2279,21 +2298,27 @@
       if (current === 5) {
         var step6HasError = false;
 
-        // --- 店舗名・業種 ---
+        // --- 店舗名・ブランド名 ---
+        var errStep6Name = document.getElementById('err-step6-name');
+        var errStep6NameFmt = document.getElementById('err-step6-name-fmt');
+        var s6name = { v: false };
+        ['shopName','shopNameKana','shopNameEn','shopBrandName','shopBrandNameKana','shopBrandNameEn'
+        ].forEach(function(id) { chkReqField(id, s6name); });
+        if (s6name.v) { errStep6Name.classList.add('visible'); step6HasError = true; } else { errStep6Name.classList.remove('visible'); }
+        var s6nameFmt = { v: false };
+        checkKanaFields(['shopNameKana', 'shopBrandNameKana'], s6nameFmt);
+        checkEnFields(['shopNameEn', 'shopBrandNameEn'], s6nameFmt);
+        if (s6nameFmt.v) { errStep6NameFmt.classList.add('visible'); step6HasError = true; } else { errStep6NameFmt.classList.remove('visible'); }
+
+        // --- 店舗業種・商材 ---
         var errStep6Info = document.getElementById('err-step6-info');
-        var errStep6ShopFmt = document.getElementById('err-step6-shop-fmt');
         var s6info = { v: false };
-        ['shopName','shopNameKana','shopNameEn','shopBrandName','shopBrandNameKana','shopBrandNameEn','shopMerchandise'
-        ].forEach(function(id) { chkReqField(id, s6info); });
+        chkReqField('shopMerchandise', s6info);
         chkSelField('shopIndustryCategory', s6info);
         chkSelField('shopIndustryDetail', s6info);
         (function() { var n = parseInt(document.getElementById('shopCount').value, 10); if (isNaN(n) || n < 1) { markInputErr('shopCount'); s6info.v = true; } else { clearInputErr('shopCount'); } })();
-        (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); if (isNaN(n) || n < 0) { markInputErr('shopAvgPrice'); s6info.v = true; } else { clearInputErr('shopAvgPrice'); } })();
+        (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); if (isNaN(n) || n < 1) { markInputErr('shopAvgPrice'); s6info.v = true; } else { clearInputErr('shopAvgPrice'); } })();
         if (s6info.v) { errStep6Info.classList.add('visible'); step6HasError = true; } else { errStep6Info.classList.remove('visible'); }
-        var s6err = { v: false };
-        checkKanaFields(['shopNameKana', 'shopBrandNameKana'], s6err);
-        checkEnFields(['shopNameEn', 'shopBrandNameEn'], s6err);
-        if (s6err.v) { errStep6ShopFmt.classList.add('visible'); step6HasError = true; } else { errStep6ShopFmt.classList.remove('visible'); }
 
         // --- 口座・レシート ---
         var errStep6Account = document.getElementById('err-step6-account');
@@ -2307,6 +2332,7 @@
         var s6addr = { v: false };
         ['shopZip','shopCity','shopTown','shopBanchi','shopTel'].forEach(function(id) { chkReqField(id, s6addr); });
         chkSelField('shopPref', s6addr);
+        ['cityk','townk','banchik'].forEach(function(f) { chkAddrField('shop', f, s6addr); });
         if (s6addr.v) { errStep6Addr.classList.add('visible'); step6HasError = true; } else { errStep6Addr.classList.remove('visible'); }
 
         // --- 端末保持状況 ---
@@ -2346,6 +2372,7 @@
         ['deliveryZip','deliveryCity','deliveryTown','deliveryBanchi','deliveryTel','deliveryReceiver'
         ].forEach(function(id) { chkReqField(id, s8dlv); });
         chkSelField('deliveryPref', s8dlv);
+        ['cityk','townk','banchik'].forEach(function(f) { chkAddrField('delivery', f, s8dlv); });
         if (s8dlv.v) { errStep8Delivery.classList.add('visible'); step8HasError = true; } else { errStep8Delivery.classList.remove('visible'); }
 
         if (step8HasError) { focusFirstErr(panels[7]); return; }

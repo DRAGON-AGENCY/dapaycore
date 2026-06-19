@@ -1199,6 +1199,15 @@
     req('industryCategory', '業種（カテゴリー）', 'STEP 4');
     req('industryDetail', '業種（詳細）', 'STEP 4');
     req('businessDescription', '事業内容及び取扱商材', 'STEP 4');
+    req('companyZipCode', '本社 郵便番号', 'STEP 4');
+    req('companyPrefecture', '本社 都道府県', 'STEP 4');
+    req('companyCity', '本社 市区町村', 'STEP 4');
+    req('companyCityKana', '本社 市区町村（カナ）', 'STEP 4');
+    req('companyTown', '本社 町域', 'STEP 4');
+    req('companyTownKana', '本社 町域（カナ）', 'STEP 4');
+    req('companyStreetNumber', '本社 番地', 'STEP 4');
+    req('companyStreetNumberKana', '本社 番地（カナ）', 'STEP 4');
+    req('companyPhone', '本社電話番号', 'STEP 4');
     req('repLastName', '代表者 姓', 'STEP 4');
     req('repLastNameKana', '代表者 姓（カナ）', 'STEP 4');
     req('repLastNameEn', '代表者 姓（英語）', 'STEP 4');
@@ -1212,6 +1221,9 @@
     req('repCity', '代表者 市区町村', 'STEP 4');
     req('repTown', '代表者 町域', 'STEP 4');
     req('repStreetNumber', '代表者 番地', 'STEP 4');
+    req('repCityKana', '代表者 市区町村（カナ）', 'STEP 4');
+    req('repTownKana', '代表者 町域（カナ）', 'STEP 4');
+    req('repStreetNumberKana', '代表者 番地（カナ）', 'STEP 4');
     req('repPhone', '代表者 電話番号', 'STEP 4');
     req('contactLastName', '担当者 姓', 'STEP 4');
     req('contactLastNameKana', '担当者 姓（カナ）', 'STEP 4');
@@ -1225,6 +1237,9 @@
     req('contactCity', '担当者 市区町村', 'STEP 4');
     req('contactTown', '担当者 町域', 'STEP 4');
     req('contactStreetNumber', '担当者 番地', 'STEP 4');
+    req('contactCityKana', '担当者 市区町村（カナ）', 'STEP 4');
+    req('contactTownKana', '担当者 町域（カナ）', 'STEP 4');
+    req('contactStreetNumberKana', '担当者 番地（カナ）', 'STEP 4');
 
     // STEP 5: 口座情報
     req('bankCode', '金融機関コード', 'STEP 5');
@@ -1258,7 +1273,7 @@
       markNameErr('storeAveragePrice');
     } else {
       var price = parseInt(data.storeAveragePrice, 10);
-      if (isNaN(price) || price < 0) { errors.push('平均単価は0以上を入力してください（STEP 6）'); markNameErr('storeAveragePrice'); }
+      if (isNaN(price) || price < 1) { errors.push('平均単価は1以上を入力してください（STEP 6）'); markNameErr('storeAveragePrice'); }
       else { clearNameErr('storeAveragePrice'); }
     }
     req('storeBankAccount', '店舗口座', 'STEP 6');
@@ -1268,6 +1283,9 @@
     req('shopCity', '店舗 市区町村', 'STEP 6');
     req('shopTown', '店舗 町域', 'STEP 6');
     req('shopStreetNumber', '店舗 番地', 'STEP 6');
+    req('shopCityKana', '店舗 市区町村（カナ）', 'STEP 6');
+    req('shopTownKana', '店舗 町域（カナ）', 'STEP 6');
+    req('shopStreetNumberKana', '店舗 番地（カナ）', 'STEP 6');
     req('shopPhone', '店舗 電話番号', 'STEP 6');
     req('terminalPossessionStatus', '端末保持状況', 'STEP 6');
 
@@ -1277,6 +1295,9 @@
     req('deliveryCity', 'お届け先 市区町村', 'STEP 8');
     req('deliveryTown', 'お届け先 町域', 'STEP 8');
     req('deliveryStreetNumber', 'お届け先 番地', 'STEP 8');
+    req('deliveryCityKana', 'お届け先 市区町村（カナ）', 'STEP 8');
+    req('deliveryTownKana', 'お届け先 町域（カナ）', 'STEP 8');
+    req('deliveryStreetNumberKana', 'お届け先 番地（カナ）', 'STEP 8');
     req('deliveryPhone', 'お届け先 電話番号', 'STEP 8');
     req('deliveryReceiver', '受取人', 'STEP 8');
 
