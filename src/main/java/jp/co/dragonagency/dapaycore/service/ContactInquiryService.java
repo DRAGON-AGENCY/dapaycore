@@ -2,16 +2,21 @@ package jp.co.dragonagency.dapaycore.service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.co.dragonagency.dapaycore.dto.ContactInquiryListItemDto;
 import jp.co.dragonagency.dapaycore.dto.ContactInquiryRequest;
 import jp.co.dragonagency.dapaycore.dto.ContactInquiryResponse;
 import jp.co.dragonagency.dapaycore.model.ContactInquiry;
 import jp.co.dragonagency.dapaycore.repository.ContactInquiryRepository;
+import jp.co.dragonagency.dapaycore.repository.MerchantApplicationRepository;
 
 /**
  * お問い合わせの送信・一覧取得を担うサービス。
@@ -49,14 +54,17 @@ public class ContactInquiryService {
             "お問い合わせ内容は 1000 文字以内で入力してください。";
 
     private final ContactInquiryRepository contactInquiryRepository;
+    private final MerchantApplicationRepository merchantApplicationRepository;
 
     public ContactInquiryService(
-            ContactInquiryRepository contactInquiryRepository) {
+            ContactInquiryRepository contactInquiryRepository,
+            MerchantApplicationRepository merchantApplicationRepository) {
         this.contactInquiryRepository = contactInquiryRepository;
+        this.merchantApplicationRepository = merchantApplicationRepository;
     }
 
     /**
-     * 全お問い合わせを受付日時の降順で取得する。
+     * 全お問い合わせを受付日時の降順で取得する。加盟店向け画面で使用する。
      *
      * @return お問い合わせの一覧
      */
@@ -65,14 +73,62 @@ public class ContactInquiryService {
     }
 
     /**
+     * 運用管理向けのお問い合わせ履歴一覧を返す。
+     * m_merchant_application と突合して法人名（カナ）を付加する。
+     *
+     * @return お問い合わせ履歴一覧（会員コード・法人名カナを含む）
+     */
+    public List<ContactInquiryListItemDto> findAllInquiriesForOperation() {
+        List<ContactInquiry> inquiries =
+                contactInquiryRepository.findAllByOrderByCreatedAtDesc();
+
+        List<String> memberCodes = inquiries.stream()
+                .map(ContactInquiry::getMemberCode)
+                .filter(code -> code != null && !code.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<String, String> codeToKana = new HashMap<>();
+        if (!memberCodes.isEmpty()) {
+            merchantApplicationRepository.findAllById(memberCodes)
+                    .forEach(app -> codeToKana.put(
+                            app.getMemberCode(),
+                            app.getCorporateNameKana() != null
+                                    ? app.getCorporateNameKana() : ""));
+        }
+
+        return inquiries.stream()
+                .map(inq -> toOperationDto(inq, codeToKana))
+                .collect(Collectors.toList());
+    }
+
+    private ContactInquiryListItemDto toOperationDto(
+            ContactInquiry inq, Map<String, String> codeToKana) {
+        ContactInquiryListItemDto dto = new ContactInquiryListItemDto();
+        dto.setInquiryNumber(inq.getInquiryNumber());
+        String code = inq.getMemberCode() != null ? inq.getMemberCode() : "";
+        dto.setMemberCode(code);
+        dto.setCorporateNameKana(codeToKana.getOrDefault(code, ""));
+        dto.setCategory(inq.getCategory());
+        dto.setSubject(inq.getSubject());
+        dto.setBody(inq.getBody());
+        dto.setStatus(inq.getStatus());
+        dto.setCreatedAt(inq.getCreatedAt());
+        dto.setUpdatedAt(inq.getUpdatedAt());
+        return dto;
+    }
+
+    /**
      * お問い合わせを送信（新規登録）する。
      * 入力値を検査し、問題があれば失敗結果を返す。
      *
-     * @param request 画面から送信されたお問い合わせ内容
+     * @param request    画面から送信されたお問い合わせ内容
+     * @param memberCode セッションから取得した会員コード
      * @return 処理結果
      */
     @Transactional
-    public ContactInquiryResponse submitInquiry(ContactInquiryRequest request) {
+    public ContactInquiryResponse submitInquiry(
+            ContactInquiryRequest request, String memberCode) {
         if (request == null) {
             return new ContactInquiryResponse(false, MESSAGE_INVALID_INPUT);
         }
@@ -88,6 +144,7 @@ public class ContactInquiryService {
 
         ContactInquiry inquiry = new ContactInquiry();
         inquiry.setInquiryNumber(generateNextInquiryNumber());
+        inquiry.setMemberCode(memberCode);
         inquiry.setCategory(category);
         inquiry.setSubject(subject);
         inquiry.setBody(body);

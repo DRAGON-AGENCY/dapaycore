@@ -9,10 +9,7 @@ import java.time.LocalDateTime;
 public class MemberListItemDto {
 
     private String memberCode;
-    private String corporateNameKana;
     private String corporateName;
-    private String corporateNumber;
-    private String industryCategory;
     private String repName;
     private String applicationStatus;
     private LocalDateTime submittedAt;
@@ -20,20 +17,14 @@ public class MemberListItemDto {
 
     public MemberListItemDto(
             String memberCode,
-            String corporateNameKana,
             String corporateName,
-            String corporateNumber,
-            String industryCategory,
             String repLastName,
             String repFirstName,
             String applicationStatus,
             LocalDateTime submittedAt,
             long documentCount) {
         this.memberCode = memberCode;
-        this.corporateNameKana = corporateNameKana != null ? corporateNameKana : "";
         this.corporateName = corporateName != null ? corporateName : "";
-        this.corporateNumber = corporateNumber != null ? corporateNumber : "";
-        this.industryCategory = industryCategory != null ? industryCategory : "";
         this.repName = buildRepName(repLastName, repFirstName);
         this.applicationStatus = applicationStatus;
         this.submittedAt = submittedAt;
@@ -58,20 +49,8 @@ public class MemberListItemDto {
         return memberCode;
     }
 
-    public String getCorporateNameKana() {
-        return corporateNameKana;
-    }
-
     public String getCorporateName() {
         return corporateName;
-    }
-
-    public String getCorporateNumber() {
-        return corporateNumber;
-    }
-
-    public String getIndustryCategory() {
-        return industryCategory;
     }
 
     public String getRepName() {

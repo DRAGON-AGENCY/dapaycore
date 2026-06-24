@@ -484,6 +484,8 @@
                   <span th:class="${'brand-chip ' + (merchantApp.payEmoneyRakutenEdy ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyRakutenEdy ? 'ti-circle-check' : 'ti-minus')}"></i>楽天Edy</span>
                   <span th:class="${'brand-chip ' + (merchantApp.payEmoneyNanaco ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyNanaco ? 'ti-circle-check' : 'ti-minus')}"></i>nanaco</span>
                   <span th:class="${'brand-chip ' + (merchantApp.payEmoneyTransitIc ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyTransitIc ? 'ti-circle-check' : 'ti-minus')}"></i>交通系IC</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyQuickPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyQuickPay ? 'ti-circle-check' : 'ti-minus')}"></i>QUICPay</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyApplePay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyApplePay ? 'ti-circle-check' : 'ti-minus')}"></i>Apple Pay</span>
                 </div>
                 <div class="ev ck-brand-grid">
                   <label class="ck-brand-item"><input type="checkbox" name="payEmoneyId" class="ck" th:checked="${merchantApp.payEmoneyId}">iD</label>
@@ -491,6 +493,8 @@
                   <label class="ck-brand-item"><input type="checkbox" name="payEmoneyRakutenEdy" class="ck" th:checked="${merchantApp.payEmoneyRakutenEdy}">楽天Edy</label>
                   <label class="ck-brand-item"><input type="checkbox" name="payEmoneyNanaco" class="ck" th:checked="${merchantApp.payEmoneyNanaco}">nanaco</label>
                   <label class="ck-brand-item"><input type="checkbox" name="payEmoneyTransitIc" class="ck" th:checked="${merchantApp.payEmoneyTransitIc}">交通系IC</label>
+                  <label class="ck-brand-item"><input type="checkbox" name="payEmoneyQuickPay" class="ck" th:checked="${merchantApp.payEmoneyQuickPay}">QUICPay</label>
+                  <label class="ck-brand-item"><input type="checkbox" name="payEmoneyApplePay" class="ck" th:checked="${merchantApp.payEmoneyApplePay}">Apple Pay</label>
                 </div>
               </div>
             </div>
@@ -1183,7 +1187,8 @@
     if (!creditAny) errors.push('クレジットカード決済を1つ以上選択してください（STEP 3）');
     var emoneyAny = data.payEmoneyId === 'true' || data.payEmoneyWaon === 'true'
       || data.payEmoneyRakutenEdy === 'true' || data.payEmoneyNanaco === 'true'
-      || data.payEmoneyTransitIc === 'true';
+      || data.payEmoneyTransitIc === 'true' || data.payEmoneyQuickPay === 'true'
+      || data.payEmoneyApplePay === 'true';
     if (!emoneyAny) errors.push('電子マネー決済を1つ以上選択してください（STEP 3）');
 
     // STEP 4: 法人情報

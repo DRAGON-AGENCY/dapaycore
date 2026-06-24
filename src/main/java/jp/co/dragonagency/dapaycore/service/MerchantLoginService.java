@@ -6,7 +6,7 @@ import jp.co.dragonagency.dapaycore.repository.MerchantApplicationRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * 加盟店のログイン認証を担うサービス。
@@ -30,6 +30,7 @@ public class MerchantLoginService {
 
     /**
      * メールアドレスとパスワードで認証する。
+     * パスワードが一致した最初のアカウントで認証する。
      * 仮パスワードで一致した場合は本パスワード登録が必要なことを返す。
      *
      * @param email    メールアドレス
@@ -42,23 +43,23 @@ public class MerchantLoginService {
                     false, "メールアドレスとパスワードを入力してください。", false, null);
         }
 
-        Optional<MerchantApplication> opt = repository.findByContactEmailAndDeleteFlagFalse(email.trim());
-        if (opt.isEmpty()) {
+        List<MerchantApplication> apps =
+                repository.findByContactEmailAndDeleteFlagFalse(email.trim());
+        if (apps.isEmpty()) {
             return new MerchantLoginResponse(false, ERROR_CREDENTIALS, false, null);
         }
 
-        MerchantApplication app = opt.get();
-
-        if (app.isPasswordSetFlg()
-                && app.getPasswordHash() != null
-                && passwordEncoder.matches(password, app.getPasswordHash())) {
-            return new MerchantLoginResponse(true, null, false, app.getMemberCode());
-        }
-
-        if (!app.isPasswordSetFlg()
-                && app.getTempPasswordHash() != null
-                && passwordEncoder.matches(password, app.getTempPasswordHash())) {
-            return new MerchantLoginResponse(true, null, true, app.getMemberCode());
+        for (MerchantApplication app : apps) {
+            if (app.isPasswordSetFlg()
+                    && app.getPasswordHash() != null
+                    && passwordEncoder.matches(password, app.getPasswordHash())) {
+                return new MerchantLoginResponse(true, null, false, app.getMemberCode());
+            }
+            if (!app.isPasswordSetFlg()
+                    && app.getTempPasswordHash() != null
+                    && passwordEncoder.matches(password, app.getTempPasswordHash())) {
+                return new MerchantLoginResponse(true, null, true, app.getMemberCode());
+            }
         }
 
         return new MerchantLoginResponse(false, ERROR_CREDENTIALS, false, null);

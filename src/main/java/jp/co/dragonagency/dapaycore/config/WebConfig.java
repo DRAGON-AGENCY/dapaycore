@@ -5,13 +5,15 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import jp.co.dragonagency.dapaycore.interceptor.CsrfProtectionInterceptor;
+import jp.co.dragonagency.dapaycore.interceptor.MerchantAuthInterceptor;
 import jp.co.dragonagency.dapaycore.interceptor.OperationAuthInterceptor;
 
 /**
  * Spring MVC の追加設定。
- * CSRF 検査インターセプターと運用管理認証インターセプターを登録する。
+ * CSRF 検査インターセプター、運用管理認証インターセプター、加盟店認証インターセプターを登録する。
  * 静的リソース・favicon・error は CSRF 検査対象外とする。
  * 運用管理認証インターセプターは運用管理ポータルのパスにのみ適用する。
+ * 加盟店認証インターセプターは申込・照会ポータルのログイン後画面にのみ適用する。
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -57,6 +59,14 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/fee/**",
                         "/api/member/*/name",
                         "/operation_transfer.html",
-                        "/content_placeholder.html");
+                        "/operation_contact_inquiry_list.html");
+
+        registry.addInterceptor(new MerchantAuthInterceptor())
+                .addPathPatterns(
+                        "/merchant_application_wizard.html",
+                        "/settlement_inquiry.html",
+                        "/transfer_list.html",
+                        "/transfer_detail.html",
+                        "/merchant_inquiry.html");
     }
 }

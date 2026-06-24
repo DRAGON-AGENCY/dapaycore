@@ -54,6 +54,8 @@ public class MerchantApplicationRequest {
     private boolean payEmoneyRakutenEdy;
     private boolean payEmoneyNanaco;
     private boolean payEmoneyTransitIc;
+    private boolean payEmoneyQuickPay;
+    private boolean payEmoneyApplePay;
 
     // STEP 4: 法人情報
     private String corporateNumber;
@@ -529,6 +531,22 @@ public class MerchantApplicationRequest {
 
     public void setPayEmoneyTransitIc(boolean payEmoneyTransitIc) {
         this.payEmoneyTransitIc = payEmoneyTransitIc;
+    }
+
+    public boolean isPayEmoneyQuickPay() {
+        return payEmoneyQuickPay;
+    }
+
+    public void setPayEmoneyQuickPay(boolean payEmoneyQuickPay) {
+        this.payEmoneyQuickPay = payEmoneyQuickPay;
+    }
+
+    public boolean isPayEmoneyApplePay() {
+        return payEmoneyApplePay;
+    }
+
+    public void setPayEmoneyApplePay(boolean payEmoneyApplePay) {
+        this.payEmoneyApplePay = payEmoneyApplePay;
     }
 
     public String getCorporateNumber() {

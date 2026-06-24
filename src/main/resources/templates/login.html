@@ -208,6 +208,12 @@
   </main>
 
 <script>
+  // iframeの中にロードされた場合（セッション切れによる認証リダイレクト等）は
+  // トップウィンドウをログイン画面に遷移させて、iframe内表示を回避する。
+  if (window.self !== window.top) {
+    window.top.location.replace(window.location.href);
+  }
+
   var pw = document.getElementById('password');
   var toggle = document.getElementById('pwToggle');
   toggle.addEventListener('click', function () {
@@ -246,9 +252,9 @@
     .then(function (data) {
       if (data.success) {
         if (data.requiresPasswordSetup) {
-          window.location.href = '/password-setup.html';
+          window.top.location.href = '/password-setup.html';
         } else {
-          window.location.href = '/merchant_application_wizard.html';
+          window.top.location.href = '/merchant_application_wizard.html';
         }
       } else {
         showError(data.errorMessage || 'ログインに失敗しました。');

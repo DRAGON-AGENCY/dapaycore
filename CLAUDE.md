@@ -597,4 +597,78 @@ tbody tr.data-row:hover td.c-action::after {
 - 新規画面を作成するとき、および既存画面を改修するときは、
   `<title>` が上記基準に合っているか確認・修正すること。
 
+---
+
+## JUnit 単体テスト作成規約
+
+本プロジェクトのすべての JUnit テストに適用する。手数料管理に限らず、
+新規機能・既存機能の改修を問わず以下の規約に従うこと。
+
+### テストメソッドの命名
+
+**テストメソッド名には必ずテスト仕様書の項番を含める。**
+形式は **`T{項番}_{テスト対象}_{条件と期待結果}()`** で統一する。
+
+```java
+// サービス層の例
+void T11_findById_存在するidのときFeeRateResponseを返す()
+void T20_create_memberCodeがnullのとき会員コードは必須ですエラーが含まれる()
+
+// コントローラ層の例
+void T45_getMemberName_存在するmemberCodeのとき200OKとmemberNameを返す()
+void T82_csrfMetaTag_レンダリングされたHTMLのcontent属性に非空トークンが埋め込まれる()
+```
+
+- **`T` は大文字固定**。項番は仕様書の番号をそのまま使う（T01, T11, T82 など）。
+- 1 つの仕様書項番に複数の `@Test` が必要な場合はサフィックスを付ける（T82b, T82c）。
+- 条件・期待結果は**日本語**で記述し、テスト内容を一読で把握できるようにする。
+- 仕様書に対応しない補助テスト（実装詳細の確認など）は項番を付けず、
+  内容を説明する名前だけにする。
+
+### 項番の採番ルール
+
+- **項番は各機能の単体テスト仕様書に記載された番号をそのまま使う。**
+  Claude が独自に採番しない。仕様書に番号がなければ担当者に確認する。
+- 新しいテストを追加するときは、既存の項番との重複がないことを確認する。
+
+既存の使用済み項番を確認するコマンド（プロジェクトルートで実行）:
+
+```bash
+grep -rh "void T[0-9]" src/test --include="*.java" | sort
+```
+
+### テストクラスの種別と使い分け
+
+| 種別 | アノテーション | 用途 |
+|------|--------------|------|
+| 純粋単体テスト | `@ExtendWith(MockitoExtension.class)` | サービス・ユーティリティなどの Java ロジック検証 |
+| Web 層テスト | `@WebMvcTest(XxxController.class)` | Thymeleaf レンダリング・HTTP ステータス・レスポンスボディの検証 |
+
+- DB・JPA・外部サービスに依存するテストは `@MockBean` / `@Mock` でモック化する。
+- `@WebMvcTest` はサービス層を含まないスライステストのため、コントローラが使う
+  サービスはすべて `@MockBean` で宣言する。
+- `OperationAuthInterceptor` の対象パス（`/operation_fee_edit.html` など）を
+  `@WebMvcTest` でテストするときは `.sessionAttr("loginUser", "user001")` を付ける。
+
+### テストクラスとファイル配置
+
+- テストクラス名は対象クラス名の末尾に `Test` を付ける（例: `FeeRateService` → `FeeRateServiceTest`）。
+- パッケージは対象クラスと同一にする（`src/test/java/...` 以下）。
+- 1 つのテストクラスが複数の仕様書項番を担当してよい。その場合、コメントで項番範囲を明示する。
+
+### 現在の項番割り当て（手数料管理画面 仕様書より・2026-06-23 時点）
+
+仕様書: `C:\work\自社mPOS精算システム\単体テスト仕様書_手数料管理画面_v1.03.xlsx`
+
+| 項番範囲 | テストクラス | 対象 |
+|----------|-------------|------|
+| T01〜T02 | `PageControllerTest` | 画面表示（PageController） |
+| T11〜T44 | `FeeRateServiceTest` | 手数料レートサービス |
+| T45〜T60 | `FeeRateApiControllerTest` | 手数料レート API コントローラ |
+| T61〜T67 | （未作成） | operation_fee_list.html テンプレート表示 |
+| T68〜T81 | （未作成） | operation_fee_list.html 画面操作（JavaScript） |
+| T82〜T82c | `CsrfMetaTagRenderingTest` | operation_fee_edit.html CSRF meta タグレンダリング |
+| T83〜T111 | （未作成） | operation_fee_edit.html 画面操作（JavaScript） |
+| —（項番なし） | `CsrfTokenControllerAdviceTest` | CSRF ControllerAdvice 補助テスト（仕様書対応なし） |
+
 

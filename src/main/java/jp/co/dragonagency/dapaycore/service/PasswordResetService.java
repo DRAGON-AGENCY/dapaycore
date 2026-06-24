@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 /**
  * パスワード再設定（仮パスワード再発行）を担うサービス。
@@ -50,14 +50,14 @@ public class PasswordResetService {
             return false;
         }
 
-        Optional<MerchantApplication> opt =
+        List<MerchantApplication> apps =
                 merchantApplicationRepository.findByContactEmailAndDeleteFlagFalse(email.trim());
-        if (opt.isEmpty()) {
+        if (apps.isEmpty()) {
             log.info("パスワード再設定リクエスト: 対象なし email={}", email.trim());
             return false;
         }
 
-        MerchantApplication app = opt.get();
+        MerchantApplication app = apps.get(0);
         String newTempPassword = generateTempPassword();
 
         app.setTempPasswordHash(passwordEncoder.encode(newTempPassword));

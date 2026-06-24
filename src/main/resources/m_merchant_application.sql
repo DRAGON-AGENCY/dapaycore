@@ -231,3 +231,9 @@ ALTER TABLE m_merchant_application OWNER TO dapaycore;
 
 ALTER TABLE m_merchant_application
     ADD COLUMN IF NOT EXISTS delete_flag BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE m_merchant_application
+    ADD COLUMN IF NOT EXISTS pay_emoney_quick_pay BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE m_merchant_application
+    ADD COLUMN IF NOT EXISTS pay_emoney_apple_pay BOOLEAN NOT NULL DEFAULT FALSE;

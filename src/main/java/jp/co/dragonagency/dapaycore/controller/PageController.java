@@ -3,6 +3,7 @@ package jp.co.dragonagency.dapaycore.controller;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -210,6 +211,25 @@ public class PageController {
     @GetMapping("/transfer_detail.html")
     public String showTransferDetail() {
         return "transfer_detail";
+    }
+
+    /**
+     * マイポータル向け申込内容照会画面を表示する。
+     * セッションの会員コードをもとに申込情報・書類情報を取得してモデルへ渡す。
+     *
+     * @param session HTTP セッション
+     * @param model   画面へ渡すモデル
+     * @return マイポータル申込内容照会画面のビュー名
+     */
+    @GetMapping("/merchant_inquiry.html")
+    public String showMerchantInquiry(HttpSession session, Model model) {
+        String memberCode = (String) session.getAttribute("merchantMemberCode");
+        var merchantApp = inquiryService.findApplication(memberCode);
+        model.addAttribute("merchantApp", merchantApp);
+        if (merchantApp != null) {
+            model.addAttribute("docMap", inquiryService.findDocumentMap(memberCode));
+        }
+        return "merchant_inquiry";
     }
 
     /**

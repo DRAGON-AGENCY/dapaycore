@@ -122,6 +122,8 @@ public class MerchantApplicationInquiryService {
         e.setPayEmoneyRakutenEdy(b(data, "payEmoneyRakutenEdy"));
         e.setPayEmoneyNanaco(b(data, "payEmoneyNanaco"));
         e.setPayEmoneyTransitIc(b(data, "payEmoneyTransitIc"));
+        e.setPayEmoneyQuickPay(b(data, "payEmoneyQuickPay"));
+        e.setPayEmoneyApplePay(b(data, "payEmoneyApplePay"));
 
         // STEP 4 法人情報
         e.setCorporateNumber(s(data, "corporateNumber"));
@@ -347,7 +349,9 @@ public class MerchantApplicationInquiryService {
                 || "true".equals(data.get("payEmoneyWaon"))
                 || "true".equals(data.get("payEmoneyRakutenEdy"))
                 || "true".equals(data.get("payEmoneyNanaco"))
-                || "true".equals(data.get("payEmoneyTransitIc"));
+                || "true".equals(data.get("payEmoneyTransitIc"))
+                || "true".equals(data.get("payEmoneyQuickPay"))
+                || "true".equals(data.get("payEmoneyApplePay"));
         if (!emoneyAny) {
             errors.add("電子マネー決済を1つ以上選択してください");
         }

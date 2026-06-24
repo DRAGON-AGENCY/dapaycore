@@ -82,6 +82,17 @@ public class MerchantApplicationService {
             return new MerchantApplicationResponse(false, null, null, "リクエストが不正です。");
         }
 
+        String email = request.getContactEmail();
+        if (email != null && !email.trim().isEmpty()) {
+            boolean emailExists = !merchantApplicationRepository
+                    .findByContactEmailAndDeleteFlagFalse(email.trim()).isEmpty();
+            if (emailExists) {
+                return new MerchantApplicationResponse(
+                        false, null, null,
+                        "このメールアドレスはすでに登録されています。");
+            }
+        }
+
         String memberCode = generateNextMemberCode();
         String tempPassword = generateTempPassword();
         LocalDateTime now = LocalDateTime.now();
@@ -178,6 +189,8 @@ public class MerchantApplicationService {
         app.setPayEmoneyRakutenEdy(req.isPayEmoneyRakutenEdy());
         app.setPayEmoneyNanaco(req.isPayEmoneyNanaco());
         app.setPayEmoneyTransitIc(req.isPayEmoneyTransitIc());
+        app.setPayEmoneyQuickPay(req.isPayEmoneyQuickPay());
+        app.setPayEmoneyApplePay(req.isPayEmoneyApplePay());
     }
 
     private void applyStep4(MerchantApplication app, MerchantApplicationRequest req) {

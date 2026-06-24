@@ -31,6 +31,9 @@ public class ContactInquiry {
     @Column(name = "inquiry_number")
     private String inquiryNumber;
 
+    @Column(name = "member_code")
+    private String memberCode;
+
     @Column(name = "category")
     private String category;
 
@@ -55,6 +58,14 @@ public class ContactInquiry {
 
     public void setInquiryNumber(String inquiryNumber) {
         this.inquiryNumber = inquiryNumber;
+    }
+
+    public String getMemberCode() {
+        return memberCode;
+    }
+
+    public void setMemberCode(String memberCode) {
+        this.memberCode = memberCode;
     }
 
     public String getCategory() {

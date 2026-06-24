@@ -105,13 +105,14 @@
         <span>マイポータル</span>
         <a class="logout-btn" href="login.html"><i class="ti ti-logout" aria-hidden="true"></i>ログアウト</a>
       </div>
+      <a class="menu-sub" data-src="merchant_inquiry.html"><i class="ti ti-file-search" aria-hidden="true"></i>申込内容照会</a>
       <a class="menu-sub" data-src="settlement_inquiry.html"><i class="ti ti-receipt" aria-hidden="true"></i>売上明細照会</a>
       <a class="menu-sub" data-src="transfer_list.html"><i class="ti ti-transfer" aria-hidden="true"></i>振込一覧</a>
       <a class="menu-sub" data-src="contact_inquiry.html"><i class="ti ti-message-question" aria-hidden="true"></i>お問い合わせ</a>
     </aside>
 
     <div class="main">
-      <iframe class="content-frame" id="contentFrame" src="content_placeholder.html" title="機能表示エリア"></iframe>
+      <iframe class="content-frame" id="contentFrame" src="merchant_inquiry.html" title="機能表示エリア"></iframe>
     </div>
 
   </div>
@@ -135,6 +136,12 @@
           closeMenu();
       });
   });
+
+  // ログイン直後に申込内容照会を選択状態にする
+  var defaultItem = document.querySelector('.menu-sub[data-src="merchant_inquiry.html"]');
+  if (defaultItem) {
+      defaultItem.classList.add('active');
+  }
 
   // mobile menu
   var sidebar = document.getElementById('sidebar');

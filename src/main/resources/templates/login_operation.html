@@ -156,6 +156,10 @@
   </main>
 
 <script>
+  if (window.self !== window.top) {
+    window.top.location.replace(window.location.href);
+  }
+
   const pw = document.getElementById('password');
   const toggle = document.getElementById('pwToggle');
   toggle.addEventListener('click', () => {

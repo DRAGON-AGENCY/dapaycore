@@ -168,6 +168,12 @@ public class MerchantApplication {
     @Column(name = "pay_emoney_transit_ic")
     private boolean payEmoneyTransitIc;
 
+    @Column(name = "pay_emoney_quick_pay")
+    private boolean payEmoneyQuickPay;
+
+    @Column(name = "pay_emoney_apple_pay")
+    private boolean payEmoneyApplePay;
+
     // STEP 4: 法人情報
     @Column(name = "corporate_number")
     private String corporateNumber;
@@ -954,6 +960,22 @@ public class MerchantApplication {
 
     public void setPayEmoneyTransitIc(boolean payEmoneyTransitIc) {
         this.payEmoneyTransitIc = payEmoneyTransitIc;
+    }
+
+    public boolean isPayEmoneyQuickPay() {
+        return payEmoneyQuickPay;
+    }
+
+    public void setPayEmoneyQuickPay(boolean payEmoneyQuickPay) {
+        this.payEmoneyQuickPay = payEmoneyQuickPay;
+    }
+
+    public boolean isPayEmoneyApplePay() {
+        return payEmoneyApplePay;
+    }
+
+    public void setPayEmoneyApplePay(boolean payEmoneyApplePay) {
+        this.payEmoneyApplePay = payEmoneyApplePay;
     }
 
     public String getCorporateNumber() {

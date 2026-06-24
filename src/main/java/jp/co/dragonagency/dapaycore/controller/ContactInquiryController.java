@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jakarta.servlet.http.HttpSession;
 import jp.co.dragonagency.dapaycore.dto.ContactInquiryRequest;
 import jp.co.dragonagency.dapaycore.dto.ContactInquiryResponse;
 import jp.co.dragonagency.dapaycore.service.ContactInquiryService;
@@ -25,8 +26,10 @@ public class ContactInquiryController {
 
     /**
      * お問い合わせを送信（新規登録）する。
+     * セッションから会員コードを取得して登録に紐付ける。
      *
      * @param request 画面から送信されたお問い合わせ内容
+     * @param session 現在の HTTP セッション
      * @return 処理結果
      */
     @PostMapping(
@@ -35,7 +38,9 @@ public class ContactInquiryController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ContactInquiryResponse submit(
-            @RequestBody ContactInquiryRequest request) {
-        return contactInquiryService.submitInquiry(request);
+            @RequestBody ContactInquiryRequest request,
+            HttpSession session) {
+        String memberCode = (String) session.getAttribute("merchantMemberCode");
+        return contactInquiryService.submitInquiry(request, memberCode);
     }
 }

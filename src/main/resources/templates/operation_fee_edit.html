@@ -348,11 +348,11 @@
         <li>既存レートの上書きはできません。新しい期間・レートを追加してください。</li>
         <li>適用開始日は未来日付で事前登録できます。</li>
         <li>適用終了日を空欄にすると「期限なし」として登録されます。</li>
-        <li>同じ会員・決済手段で期間が重複する登録はできません。</li>
+        <li>同じ会員で期間が重複する登録はできません。</li>
       </ul>
     </div>
 
-    <!-- 会員・決済手段カード -->
+    <!-- 対象設定カード -->
     <div class="card">
       <div class="card-title">対象設定</div>
 
@@ -367,42 +367,6 @@
         </div>
       </div>
 
-      <div class="field" style="margin-top: 16px;">
-        <label>決済手段 <span class="req">*</span></label>
-        <select id="payment-method">
-          <option value="">— 決済手段を選択 —</option>
-          <optgroup label="QRコード決済">
-            <option value="WeChat Pay">WeChat Pay</option>
-            <option value="PayPay">PayPay</option>
-            <option value="d払い">d払い</option>
-            <option value="au PAY">au PAY</option>
-            <option value="メルペイ">メルペイ</option>
-            <option value="楽天ペイ">楽天ペイ</option>
-            <option value="JKO Pay（街口支付）">JKO Pay（街口支付）</option>
-            <option value="PromptPay">PromptPay</option>
-            <option value="Alipay+">Alipay+</option>
-          </optgroup>
-          <optgroup label="クレジットカード">
-            <option value="JCB">JCB</option>
-            <option value="Discover">Discover</option>
-            <option value="Visa">Visa</option>
-            <option value="Mastercard">Mastercard</option>
-            <option value="Diners Club">Diners Club</option>
-            <option value="American Express">American Express</option>
-          </optgroup>
-          <optgroup label="電子マネー">
-            <option value="iD">iD</option>
-            <option value="WAON">WAON</option>
-            <option value="楽天Edy">楽天Edy</option>
-            <option value="nanaco">nanaco</option>
-            <option value="交通系IC（Suica等）">交通系IC（Suica等）</option>
-            <option value="OKICA">OKICA</option>
-          </optgroup>
-          <optgroup label="デビット・プリペイド">
-            <option value="悠遊カード（EasyCard）">悠遊カード（EasyCard）</option>
-          </optgroup>
-        </select>
-      </div>
     </div>
 
     <!-- 適用期間・手数料率カード -->
@@ -451,8 +415,7 @@
     <div class="dialog">
       <div class="dialog-title">削除の確認</div>
       <div class="dialog-body">
-        このレートを削除します。削除した内容は元に戻せません。<br>
-        よろしいですか？
+        このレートを削除します。削除した内容は元に戻せませんが、よろしいですか？
       </div>
       <div class="dialog-actions">
         <button class="btn btn-secondary" type="button" id="dialog-cancel">キャンセル</button>
@@ -506,13 +469,11 @@
 
     function validateForm() {
       var memberCode = document.getElementById('member-code').value.trim();
-      var paymentMethod = document.getElementById('payment-method').value;
       var startDate = document.getElementById('start-date').value;
       var feeRate = document.getElementById('fee-rate').value;
 
       var errors = [];
       if (!memberCode) { errors.push('会員コードを入力してください。'); }
-      if (!paymentMethod) { errors.push('決済手段を選択してください。'); }
       if (!startDate) { errors.push('適用開始日を入力してください。'); }
       if (!feeRate || isNaN(parseFloat(feeRate))) {
         errors.push('手数料率を入力してください。');
@@ -538,7 +499,6 @@
     function buildPayload() {
       return {
         memberCode: document.getElementById('member-code').value.trim(),
-        paymentMethod: document.getElementById('payment-method').value,
         startDate: document.getElementById('start-date').value,
         endDate: document.getElementById('end-date').value || null,
         feeRate: parseFloat(document.getElementById('fee-rate').value)
@@ -610,7 +570,6 @@
       .then(function (data) {
         document.getElementById('member-code').value = data.memberCode || '';
         document.getElementById('member-name').value = data.memberName || '';
-        document.getElementById('payment-method').value = data.paymentMethod || '';
         document.getElementById('start-date').value = data.startDate || '';
         document.getElementById('end-date').value = data.endDate || '';
         document.getElementById('fee-rate').value = data.feeRate != null ? data.feeRate : '';

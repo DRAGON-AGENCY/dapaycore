@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface MerchantApplicationRepository
         extends JpaRepository<MerchantApplication, String> {
 
-    Optional<MerchantApplication> findByContactEmailAndDeleteFlagFalse(String contactEmail);
+    List<MerchantApplication> findByContactEmailAndDeleteFlagFalse(String contactEmail);
 
     @Query("SELECT a FROM MerchantApplication a WHERE a.deleteFlag = false ORDER BY a.submittedAt DESC NULLS LAST")
     List<MerchantApplication> findAllOrderBySubmittedAtDesc();

@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS m_contact_inquiry (
 );
 
 ALTER TABLE m_contact_inquiry OWNER TO dapaycore;
+
+ALTER TABLE m_contact_inquiry
+    ADD COLUMN IF NOT EXISTS member_code VARCHAR(20);
