@@ -27,6 +27,8 @@ ALTER TABLE m_employee ADD COLUMN IF NOT EXISTS delete_flag BOOLEAN NOT NULL DEF
 -- 同時登録によるレースコンディションを防ぐため、アプリ側ではなく DB 側で採番する。
 CREATE SEQUENCE IF NOT EXISTS seq_employee_number;
 
+ALTER SEQUENCE seq_employee_number OWNER TO dapaycore;
+
 -- 既存データがある場合はシーケンスをその最大値で初期化する。
 -- 何度実行しても安全 (冪等)。
 DO $$

@@ -552,8 +552,9 @@
 
     // エラーメッセージの表示・非表示
     function showError(message) {
-      formError.textContent = message;
+      formError.textContent = message || 'サーバーエラーが発生しました。時間をおいて再度お試しください。';
       formError.style.display = 'block';
+      formError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function hideError() {
@@ -679,15 +680,15 @@
         body: JSON.stringify(payload)
       })
         .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          if (data.success) {
-            window.location.href = '/employee_list.html';
-            return;
-          }
-          showError(data.message);
-          submitButton.disabled = false;
+          var ok = response.ok;
+          return response.json().then(function (data) {
+            if (ok && data.success) {
+              window.location.href = '/employee_list.html';
+              return;
+            }
+            showError(data.message);
+            submitButton.disabled = false;
+          });
         })
         .catch(function () {
           showError('通信エラーが発生しました。時間をおいて再度お試しください。');
@@ -711,15 +712,15 @@
         body: JSON.stringify({ employeeNumber: employeeNumberInput.value })
       })
         .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          if (data.success) {
-            window.location.href = '/employee_list.html';
-            return;
-          }
-          showError(data.message);
-          deleteButton.disabled = false;
+          var ok = response.ok;
+          return response.json().then(function (data) {
+            if (ok && data.success) {
+              window.location.href = '/employee_list.html';
+              return;
+            }
+            showError(data.message);
+            deleteButton.disabled = false;
+          });
         })
         .catch(function () {
           showError('通信エラーが発生しました。時間をおいて再度お試しください。');

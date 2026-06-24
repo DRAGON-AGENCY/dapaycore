@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -97,5 +98,20 @@ public class EmployeeController {
         Object authorityCode =
                 session.getAttribute(SessionAttributeNames.AUTHORITY_CODE);
         return AUTHORITY_ADMINISTRATOR.equals(authorityCode);
+    }
+
+    /**
+     * このコントローラ内で捕捉されなかった例外をまとめて処理し、
+     * JSON 形式のエラーレスポンスを返す。
+     *
+     * @param ex 発生した例外
+     * @return エラーを示す EmployeeResponse
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public EmployeeResponse handleException(Exception ex) {
+        return new EmployeeResponse(
+                false,
+                "処理中にエラーが発生しました。時間をおいて再度お試しください。");
     }
 }
