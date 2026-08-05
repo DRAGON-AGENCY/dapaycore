@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -44,16 +45,19 @@ public class MerchantApplicationService {
     private final MerchantApplicationDocumentRepository documentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final DocumentStorageService documentStorageService;
 
     public MerchantApplicationService(
             MerchantApplicationRepository merchantApplicationRepository,
             MerchantApplicationDocumentRepository documentRepository,
             JdbcTemplate jdbcTemplate,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            DocumentStorageService documentStorageService) {
         this.merchantApplicationRepository = merchantApplicationRepository;
         this.documentRepository = documentRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
+        this.documentStorageService = documentStorageService;
     }
 
     /**
@@ -352,12 +356,10 @@ public class MerchantApplicationService {
     }
 
     /**
-     * アップロードされたファイルの受付情報を docs リストへ追加する。
+     * アップロードされたファイルをディスクへ保存し、受付情報を docs リストへ追加する。
      *
-     * <p>現在の実装はファイル名のみ記録する仮実装（file_path は空文字）。
-     * 実際のファイル保存は未実装（保存先未定）。
-     * 将来ディスク保存を追加する場合は、このメソッド内で行い、
-     * ディスク書き込みの成否はトランザクション外で個別に管理すること。
+     * <p>ディスク保存に失敗した場合は書類の受付自体は継続し、file_path を空文字のまま
+     * 記録する（申込全体の登録を書類保存の失敗で止めないため）。
      * DB 書き込みは saveDocumentsBatch() を経由し @Transactional スコープ内で完結する。
      */
     private void collectDocumentFile(
@@ -374,11 +376,20 @@ public class MerchantApplicationService {
         String fileName = (originalName != null && !originalName.isEmpty())
                 ? originalName : "(不明)";
 
+        String filePath;
+        try {
+            filePath = documentStorageService.store(memberCode, documentType, file);
+        } catch (IOException e) {
+            log.warn("書類ファイルの保存に失敗しました: memberCode={} documentType={} "
+                    + "fileName={}", memberCode, documentType, fileName, e);
+            filePath = "";
+        }
+
         MerchantApplicationDocument doc = new MerchantApplicationDocument();
         doc.setMemberCode(memberCode);
         doc.setDocumentType(documentType);
         doc.setFileName(fileName);
-        doc.setFilePath("");
+        doc.setFilePath(filePath);
         doc.setFileSize(file.getSize());
         doc.setUploadedAt(uploadedAt);
         docs.add(doc);
