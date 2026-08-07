@@ -58,6 +58,10 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/fee",
                         "/api/fee/**",
                         "/api/member/*/name",
+                        "/operation_transfer_fee_list.html",
+                        "/operation_transfer_fee_edit.html",
+                        "/api/transfer-fee",
+                        "/api/transfer-fee/**",
                         "/operation_transfer.html",
                         "/operation_contact_inquiry_list.html");
 

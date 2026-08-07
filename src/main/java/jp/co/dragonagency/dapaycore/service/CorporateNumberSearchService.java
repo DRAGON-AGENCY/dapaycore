@@ -1,11 +1,16 @@
 package jp.co.dragonagency.dapaycore.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.co.dragonagency.dapaycore.dto.CorporateNumberSearchResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -16,15 +21,13 @@ import java.time.Duration;
 @Service
 public class CorporateNumberSearchService {
 
-    // NTA API v4 のみ type=12（JSON）をサポート。
-    // 参考記事（https://qiita.com/y-okuda/items/0a372018cbf00d7313b7）は v1 URL だが
-    // JSON 取得には v4 エンドポイントを使用する。
+    // NTA API v4 は JSON 形式に対応していない。type=01/02 は CSV、type=12 が XML。
+    // レスポンスは XML（<corporations><corporation>...）で返るため DOM でパースする。
     private static final String NTA_BASE_URL
             = "https://api.houjin-bangou.nta.go.jp/4/num";
 
     private final String applicationId;
     private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
 
     public CorporateNumberSearchService(
             @Value("${nta.corp.api.id}") String applicationId) {
@@ -32,7 +35,6 @@ public class CorporateNumberSearchService {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
-        this.objectMapper = new ObjectMapper();
     }
 
     public CorporateNumberSearchResult search(String corporateNumber) throws Exception {
@@ -49,7 +51,7 @@ public class CorporateNumberSearchService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(15))
-                .header("Accept", "application/json")
+                .header("Accept", "application/xml")
                 .GET()
                 .build();
 
@@ -69,22 +71,50 @@ public class CorporateNumberSearchService {
                     + " body=" + response.body());
         }
 
-        JsonNode root = objectMapper.readTree(response.body());
-        int count = root.path("count").asInt(0);
+        Document doc = parseXml(response.body());
+
+        int count = Integer.parseInt(textOf(doc.getDocumentElement(), "count", "0"));
         if (count == 0) {
             return null;
         }
 
-        JsonNode corp = root.path("corporation").get(0);
+        NodeList corporations = doc.getElementsByTagName("corporation");
+        if (corporations.getLength() == 0) {
+            return null;
+        }
+        Element corp = (Element) corporations.item(0);
+
         CorporateNumberSearchResult result = new CorporateNumberSearchResult();
         result.setCorporateNumber(corporateNumber);
-        result.setName(corp.path("name").asText(null));
-        result.setFurigana(nullIfEmpty(corp.path("furigana").asText(null)));
-        result.setPostCode(nullIfEmpty(corp.path("postCode").asText(null)));
-        result.setPrefectureName(nullIfEmpty(corp.path("prefectureName").asText(null)));
-        result.setCityName(nullIfEmpty(corp.path("cityName").asText(null)));
-        result.setStreetNumber(nullIfEmpty(corp.path("streetNumber").asText(null)));
+        result.setName(nullIfEmpty(textOf(corp, "name", null)));
+        // NTA の法人番号API はフリガナ（読み仮名）情報を提供していないため常に null。
+        result.setFurigana(null);
+        result.setPostCode(nullIfEmpty(textOf(corp, "postCode", null)));
+        result.setPrefectureName(nullIfEmpty(textOf(corp, "prefectureName", null)));
+        result.setCityName(nullIfEmpty(textOf(corp, "cityName", null)));
+        result.setStreetNumber(nullIfEmpty(textOf(corp, "streetNumber", null)));
         return result;
+    }
+
+    private Document parseXml(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // XXE 対策: 外部エンティティ・DOCTYPE の解決を無効化する。
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new InputSource(new StringReader(xml)));
+    }
+
+    private String textOf(Element parent, String tagName, String defaultValue) {
+        NodeList nodes = parent.getElementsByTagName(tagName);
+        if (nodes.getLength() == 0) {
+            return defaultValue;
+        }
+        String text = nodes.item(0).getTextContent();
+        return text == null ? defaultValue : text;
     }
 
     private String nullIfEmpty(String value) {

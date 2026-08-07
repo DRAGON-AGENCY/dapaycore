@@ -3,6 +3,7 @@ package jp.co.dragonagency.dapaycore.controller;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jp.co.dragonagency.dapaycore.service.TransferFeeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +21,17 @@ public class PageController {
     private final MemberListService memberListService;
     private final MerchantApplicationInquiryService inquiryService;
     private final FeeRateService feeRateService;
+    private final TransferFeeService transferFeeService;
 
     public PageController(
             MemberListService memberListService,
             MerchantApplicationInquiryService inquiryService,
-            FeeRateService feeRateService) {
+            FeeRateService feeRateService,
+            TransferFeeService transferFeeService) {
         this.memberListService = memberListService;
         this.inquiryService = inquiryService;
         this.feeRateService = feeRateService;
+        this.transferFeeService = transferFeeService;
     }
 
     /**
@@ -184,6 +188,26 @@ public class PageController {
     @GetMapping("/operation_fee_edit.html")
     public String showOperationFeeEdit() {
         return "operation_fee_edit";
+    }
+
+    /**
+     * 振込手数料一覧画面を表示する。
+     * 運用管理ポータルの「振込手数料管理」から表示する。
+     * m_transfer_fee からデータを取得してモデルへ渡す。
+     */
+    @GetMapping("/operation_transfer_fee_list.html")
+    public String showOperationTransferFeeList(Model model) {
+        model.addAttribute("transferFees", transferFeeService.findAllForList());
+        return "operation_transfer_fee_list";
+    }
+
+    /**
+     * 振込手数料登録・変更画面を表示する。
+     * 運用管理ポータルの「振込手数料管理」または振込手数料一覧の行クリックから表示する。
+     */
+    @GetMapping("/operation_transfer_fee_edit.html")
+    public String showOperationTransferFeeEdit() {
+        return "operation_transfer_fee_edit";
     }
 
     /**

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<title>振込手数料管理 | 運用管理ポータル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+</noscript>
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-card: #ffffff;
+    --bg-form: #f3f7fc;
+    --bg-soft: #e9f1fb;
+    --bg-white: #ffffff;
+    --bg-hover: #f4f6fa;
+    --bg-readonly: #eef2f7;
+    --border-color: rgba(20, 45, 80, 0.10);
+    --border-input: rgba(20, 45, 80, 0.24);
+    --text-main: #1b2733;
+    --text-sub: #5a6675;
+    --text-label: #5a6675;
+    --text-muted: #93a0af;
+    --text-soft: #0c447c;
+    --accent: #0b5fd0;
+    --accent-light: #e9f1fb;
+    --accent-border: #b9d0ec;
+    --danger: #b33a3a;
+    --danger-light: #fdf4f4;
+    --danger-border: #e6c4c4;
+    --warn: #92400e;
+    --warn-light: #fdf3e0;
+    --warn-border: #f0d9a0;
+    --font-jp: "Inter", "Noto Sans JP", sans-serif;
+    --font-base: "Inter", "Noto Sans JP", sans-serif;
+    --font-mono: "SFMono-Regular", "Consolas", "Menlo", monospace;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 22px;
+    --container-max: 1760px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100vh; }
+
+  body {
+    font-family: var(--font-base);
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+    font-size: var(--fs-base);
+    font-feature-settings: "palt";
+  }
+
+  .container {
+    min-width: 1200px;
+    max-width: 1760px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: var(--bg-card);
+    border: none;
+    border-radius: 0;
+    padding: 10px 32px 32px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--text-main);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    letter-spacing: 0.01em;
+  }
+
+  .page-title .mode-badge {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-left: 8px;
+  }
+
+  .card {
+    background: var(--bg-form);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--text-label);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .field label .req {
+    color: #c64a4a;
+    margin-left: 4px;
+    font-size: 12px;
+  }
+
+  .field .hint {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .field input[type="text"],
+  .field input[type="number"] {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    background-color: var(--bg-white);
+    font-family: var(--font-jp);
+    font-size: var(--fs-base);
+    color: var(--text-main);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(27, 102, 179, 0.15);
+  }
+
+  .field input[readonly] {
+    background-color: var(--bg-readonly);
+    color: var(--text-sub);
+    cursor: default;
+    border-color: var(--border-color);
+  }
+
+  .field input[readonly]:focus {
+    box-shadow: none;
+    border-color: var(--border-color);
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* エラー */
+  .error-box {
+    background: var(--danger-light);
+    border: 1px solid var(--danger-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: var(--fs-xs);
+    color: var(--danger);
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .error-box.visible { display: block; }
+
+  /* 注意書き（登録・更新時） */
+  .notice-warn {
+    background: var(--warn-light);
+    border: 1px solid var(--warn-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: var(--fs-xs);
+    color: var(--warn);
+    line-height: 1.7;
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .notice-warn .icon { flex-shrink: 0; }
+
+  /* アクションボタン */
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: var(--fs-base);
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover { background-color: var(--text-soft); border-color: var(--text-soft); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+  .btn-secondary {
+    background-color: var(--bg-white);
+    border-color: var(--border-input);
+    color: var(--text-main);
+    font-weight: 500;
+  }
+
+  .btn-secondary:hover { background-color: var(--bg-hover); }
+
+  .btn-danger {
+    background-color: var(--danger-light);
+    border-color: var(--danger-border);
+    color: var(--danger);
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  .btn-danger:hover { background-color: #f5e0e0; }
+
+  /* 確認ダイアログ（削除）*/
+  .dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .dialog-overlay[hidden] { display: none !important; }
+
+  .dialog {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 32px 36px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(16, 40, 70, 0.18);
+  }
+
+  .dialog-title {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 10px;
+  }
+
+  .dialog-body {
+    font-size: var(--fs-sm);
+    color: var(--text-sub);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <h1 class="page-title">振込手数料管理<span class="mode-badge" id="mode-badge" hidden></span></h1>
+
+    <!-- エラー表示 -->
+    <div class="error-box" id="error-box" role="alert"></div>
+
+    <!-- 振込手数料情報カード -->
+    <div class="card">
+      <div class="card-title">振込手数料情報</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>銀行コード <span class="req">*</span></label>
+          <input type="text" id="bank-code" placeholder="例: 0310" maxlength="20" />
+          <span class="hint">数字4桁で入力してください（例: 0310）。既定値の行（DEFAULT）は変更できません。</span>
+        </div>
+        <div class="field">
+          <label>振込手数料(円) <span class="req">*</span></label>
+          <input type="number" id="transfer-fee" placeholder="例: 129" min="0" max="999999" step="1" />
+          <span class="hint">0以上999999以下の整数で入力してください</span>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top: 16px;">
+        <label>備考</label>
+        <input type="text" id="remarks" placeholder="例: GMOあおぞらネット銀行" maxlength="500" />
+      </div>
+    </div>
+
+    <!-- アクション -->
+    <div class="actions">
+      <button class="btn btn-secondary" type="button" id="back-btn">
+        戻る
+      </button>
+      <button class="btn btn-primary" type="button" id="save-btn">
+        登録
+      </button>
+      <button class="btn btn-danger" type="button" id="delete-btn" hidden>
+        削除
+      </button>
+    </div>
+
+    <!-- 登録・更新時の注意書き -->
+    <div class="notice-warn">
+      <span class="icon">⚠</span>
+      <span id="notice-text"></span>
+    </div>
+
+  </div>
+
+  <!-- 削除確認ダイアログ -->
+  <div class="dialog-overlay" id="delete-dialog" hidden>
+    <div class="dialog">
+      <div class="dialog-title">削除の確認</div>
+      <div class="dialog-body">
+        この振込手数料を削除します。削除した内容は元に戻せませんが、よろしいですか？
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" type="button" id="dialog-cancel">キャンセル</button>
+        <button class="btn btn-danger" type="button" id="dialog-confirm">削除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var mode = params.get('mode');
+    var bankCodeParam = params.get('bankCode');
+    var isNew = (mode === 'new' || !bankCodeParam);
+
+    var modeBadge = document.getElementById('mode-badge');
+    var saveBtn = document.getElementById('save-btn');
+    var deleteBtn = document.getElementById('delete-btn');
+    var backBtn = document.getElementById('back-btn');
+    var errorBox = document.getElementById('error-box');
+    var deleteDialog = document.getElementById('delete-dialog');
+    var bankCodeInput = document.getElementById('bank-code');
+    var noticeText = document.getElementById('notice-text');
+
+    var NOTICE_NEW =
+        'この振込手数料はその他統合振込CSV作成（stera terminal）の最終振込金額の算出に使用されます。' +
+        '振込先の実際の手数料と一致する銀行コード・金額を入力してください。';
+    var NOTICE_EDIT =
+        'この振込手数料はその他統合振込CSV作成（stera terminal）の最終振込金額の算出に使用されます。' +
+        '変更する場合は振込先の実際の手数料と一致しているか確認してください。';
+
+    if (isNew) {
+      modeBadge.textContent = '（登録モード）';
+      modeBadge.removeAttribute('hidden');
+      saveBtn.textContent = '登録';
+      noticeText.textContent = '登録時のご注意: ' + NOTICE_NEW;
+    } else {
+      modeBadge.setAttribute('hidden', '');
+      saveBtn.textContent = '更新';
+      noticeText.textContent = '更新時のご注意: ' + NOTICE_EDIT;
+      bankCodeInput.readOnly = true;
+      deleteBtn.removeAttribute('hidden');
+      loadRecord(bankCodeParam);
+    }
+
+    backBtn.addEventListener('click', function () {
+      window.location.href = '/operation_transfer_fee_list.html';
+    });
+
+    deleteBtn.addEventListener('click', function () {
+      deleteDialog.removeAttribute('hidden');
+    });
+
+    document.getElementById('dialog-cancel').addEventListener('click', function () {
+      deleteDialog.setAttribute('hidden', '');
+    });
+
+    document.getElementById('dialog-confirm').addEventListener('click', function () {
+      deleteDialog.setAttribute('hidden', '');
+      submitDelete();
+    });
+
+    saveBtn.addEventListener('click', function () {
+      if (!validateForm()) { return; }
+      submitSave();
+    });
+
+    function validateForm() {
+      var bankCode = bankCodeInput.value.trim();
+      var transferFee = document.getElementById('transfer-fee').value;
+
+      var errors = [];
+      if (!bankCode) {
+        errors.push('銀行コードを入力してください。');
+      } else if (!/^([0-9]{4}|DEFAULT)$/i.test(bankCode)) {
+        errors.push('銀行コードは「DEFAULT」または数字4桁で入力してください。');
+      }
+
+      if (transferFee === '' || isNaN(parseInt(transferFee, 10))) {
+        errors.push('振込手数料を入力してください。');
+      } else {
+        var feeValue = parseInt(transferFee, 10);
+        if (feeValue < 0 || feeValue > 999999) {
+          errors.push('振込手数料は0以上999999以下の整数で入力してください。');
+        }
+      }
+
+      if (errors.length > 0) {
+        errorBox.textContent = errors.join('\n');
+        errorBox.className = 'error-box visible';
+        errorBox.style.whiteSpace = 'pre-line';
+        return false;
+      }
+      errorBox.className = 'error-box';
+      return true;
+    }
+
+    function buildPayload() {
+      return {
+        bankCode: bankCodeInput.value.trim().toUpperCase(),
+        transferFee: parseInt(document.getElementById('transfer-fee').value, 10),
+        remarks: document.getElementById('remarks').value.trim() || null
+      };
+    }
+
+    function getCsrfToken() {
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      return meta ? meta.getAttribute('content') : '';
+    }
+
+    function submitSave() {
+      saveBtn.disabled = true;
+      saveBtn.textContent = '処理中...';
+
+      var url = isNew ? '/api/transfer-fee' : '/api/transfer-fee/' + encodeURIComponent(bankCodeParam);
+      var method = isNew ? 'POST' : 'PUT';
+
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCsrfToken()
+        },
+        body: JSON.stringify(buildPayload())
+      })
+      .then(function (res) {
+        if (!res.ok) { return res.json().then(function (b) { throw b; }); }
+        return res.json();
+      })
+      .then(function () {
+        window.location.href = '/operation_transfer_fee_list.html';
+      })
+      .catch(function (err) {
+        var msg = (err && err.message) ? err.message : '登録に失敗しました。内容を確認してください。';
+        errorBox.textContent = msg;
+        errorBox.className = 'error-box visible';
+        errorBox.style.whiteSpace = 'pre-line';
+        saveBtn.disabled = false;
+        saveBtn.textContent = isNew ? '登録' : '更新';
+      });
+    }
+
+    function submitDelete() {
+      var confirmBtn = document.getElementById('dialog-confirm');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = '処理中...';
+      fetch('/api/transfer-fee/' + encodeURIComponent(bankCodeParam), {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': getCsrfToken() }
+      })
+      .then(function (res) {
+        if (!res.ok) { return res.json().then(function (b) { throw b; }); }
+        window.location.href = '/operation_transfer_fee_list.html';
+      })
+      .catch(function (err) {
+        errorBox.textContent = (err && err.message) ? err.message : '削除に失敗しました。';
+        errorBox.className = 'error-box visible';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = '削除';
+      });
+    }
+
+    function loadRecord(bankCode) {
+      fetch('/api/transfer-fee/' + encodeURIComponent(bankCode))
+      .then(function (res) {
+        if (!res.ok) { throw new Error('データの取得に失敗しました。'); }
+        return res.json();
+      })
+      .then(function (data) {
+        bankCodeInput.value = data.bankCode || '';
+        document.getElementById('transfer-fee').value = data.transferFee != null ? data.transferFee : '';
+        document.getElementById('remarks').value = data.remarks || '';
+      })
+      .catch(function (err) {
+        errorBox.textContent = err.message;
+        errorBox.className = 'error-box visible';
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申込内容照会 | マイポータル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      media="print" onload="this.media='all'">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+      media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
+<style>
+  :root {
+    --bg-page:#eef2f7; --bg-surface:#ffffff; --bg-secondary:#f4f6fa;
+    --bg-soft:#e9f1fb; --bg-soft-2:#f3f7fc;
+    --text-primary:#1b2733; --text-secondary:#5a6675; --text-tertiary:#93a0af;
+    --text-soft:#0c447c; --text-ok:#1f8a6d;
+    --border:rgba(20,45,80,0.10); --border-strong:rgba(20,45,80,0.24);
+    --accent:#0b5fd0; --accent-strong:#0b3f86;
+    --ok:#2aa583; --ok-soft:#e3f4ee;
+    --warn:#d8694e; --warn-soft:#fdf0dd;
+    --danger:#c93737; --danger-soft:#fdf0f0;
+    --shadow-sm:0 1px 2px rgba(16,40,70,0.06); --shadow-md:0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm:7px; --radius-md:10px; --radius-lg:14px;
+    --fs-xs:14px; --fs-sm:15px; --fs-base:16px; --fs-md:18px; --fs-lg:22px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg-page);color:var(--text-primary);
+    font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .wrap{width:100%;min-width:1200px;max-width:1760px;margin:0 auto;padding:26px 28px 60px;}
+  .shell{background:var(--bg-surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);
+    overflow:hidden;min-height:640px;box-shadow:var(--shadow-md);}
+  .main{display:flex;flex-direction:column;min-height:640px;}
+
+  /* topbar */
+  .topbar{padding:16px 28px 0;}
+  .topbar .titlerow{display:flex;align-items:center;margin-bottom:16px;}
+  .topbar .titlerow .t{font-size:var(--fs-md);font-weight:700;color:var(--text-primary);
+    display:inline-flex;align-items:center;gap:7px;}
+  .topbar .titlerow .t i{font-size:var(--fs-lg);color:var(--accent);}
+
+  /* stepper */
+  .stepper{display:flex;align-items:flex-start;overflow-x:auto;padding:2px 0 16px;
+    border-bottom:0.5px solid var(--border);scrollbar-width:thin;}
+  .stepper .step{display:flex;flex-direction:column;align-items:center;gap:6px;
+    min-width:66px;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;}
+  .stepper .dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:12.5px;font-weight:700;flex:0 0 auto;transition:all .2s;}
+  .stepper .dot.done{background:var(--ok);color:#fff;}
+  .stepper .dot.active{background:var(--accent);color:#fff;box-shadow:0 0 0 4px rgba(61,141,221,.22);}
+  .stepper .dot.todo{background:var(--bg-secondary);border:0.5px solid var(--border-strong);color:var(--text-tertiary);}
+  .stepper .stxt{font-size:11px;color:var(--text-tertiary);text-align:center;line-height:1.3;white-space:nowrap;}
+  .stepper .step.is-done .stxt{color:var(--text-secondary);}
+  .stepper .step.is-active .stxt{color:var(--text-soft);font-weight:700;}
+  .stepper .bar{flex:1;height:2px;background:var(--border-strong);margin-top:14px;min-width:12px;border-radius:2px;}
+  .stepper .bar.done{background:var(--ok);}
+
+  /* panels */
+  .panel-area{flex:1;padding:22px 28px 18px;}
+  .panel{display:none;animation:fade .28s ease;}
+  .panel.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .step-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;}
+  .step-head .num{flex:0 0 auto;width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-strong));color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-md);font-weight:700;box-shadow:var(--shadow-sm);}
+  .step-head h2{font-size:var(--fs-lg);font-weight:700;margin:0 0 3px;color:var(--text-primary);}
+  .step-head .desc{font-size:var(--fs-sm);color:var(--text-secondary);margin:0;}
+
+  .card{border:0.5px solid var(--border);border-radius:var(--radius-md);
+    background:var(--bg-surface);box-shadow:var(--shadow-sm);margin-bottom:16px;overflow:hidden;}
+  .panel > .card:last-of-type{margin-bottom:0;}
+  .card-h{display:flex;align-items:center;gap:9px;padding:13px 16px;
+    background:var(--accent);border-bottom:0.5px solid transparent;
+    font-size:var(--fs-base);font-weight:700;color:#fff;}
+  .card-h i{font-size:var(--fs-md);color:#fff;}
+  .card-b{padding:16px;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .card-grid > .card{margin-bottom:0;}
+
+  /* kv list */
+  .kv{display:grid;grid-template-columns:minmax(160px,240px) 1fr;margin:0;
+    border:1px solid var(--border-strong);border-radius:var(--radius-sm);overflow:hidden;}
+  .kv dt{font-size:var(--fs-xs);color:var(--accent-strong);font-weight:600;padding:11px 14px;
+    background:var(--bg-soft);border-bottom:1px solid var(--border-strong);
+    border-right:1px solid var(--border-strong);display:flex;align-items:center;}
+  .kv dd{font-size:var(--fs-base);color:var(--text-primary);margin:0;padding:11px 14px;
+    border-bottom:1px solid var(--border-strong);display:flex;align-items:center;
+    flex-wrap:wrap;gap:6px;word-break:break-word;}
+  .kv dt:last-of-type,.kv dd:last-of-type{border-bottom:none;}
+  .kv-docs dd{justify-content:space-between;gap:10px;}
+
+  .status-ok{color:var(--text-ok);font-weight:600;}
+  .status-na{color:var(--text-tertiary);}
+
+  /* brand chips */
+  .brand-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  .brand-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;
+    border-radius:var(--radius-sm);font-size:14px;font-weight:500;
+    border:1px solid transparent;width:185px;box-sizing:border-box;}
+  .brand-chip.applied{background:#b8e8d4;color:#0e5438;border-color:rgba(14,84,56,.35);}
+  .brand-chip.none{background:#d4dae5;color:#4a5568;border-color:rgba(20,45,80,.28);}
+  .brand-chip i{font-size:15px;flex:0 0 auto;}
+
+  /* view: selected value chip */
+  .sel-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;
+    border-radius:var(--radius-sm);font-size:var(--fs-sm);font-weight:500;
+    background:#e3f4ee;border:1px solid rgba(14,84,56,.4);color:#0e5438;}
+  .sel-chip i{font-size:15px;flex:0 0 auto;}
+
+  /* download button */
+  .dl-btn{flex:0 0 auto;font-family:inherit;font-size:var(--fs-xs);font-weight:600;
+    color:var(--accent);background:var(--bg-soft);border:0.5px solid var(--border-strong);
+    border-radius:var(--radius-sm);padding:5px 11px;text-decoration:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:5px;transition:background .15s,color .15s;}
+  .dl-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .dl-btn i{font-size:var(--fs-sm);}
+
+  /* note */
+  .note{display:flex;align-items:flex-start;gap:9px;background:var(--bg-soft);
+    border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin-top:4px;}
+  .note i{font-size:var(--fs-lg);color:var(--accent);flex:0 0 auto;margin-top:1px;}
+  .note span{font-size:var(--fs-sm);color:var(--text-soft);line-height:1.6;}
+
+  /* actions */
+  .actions{position:sticky;bottom:0;display:flex;gap:12px;align-items:center;
+    padding:14px 28px;border-top:0.5px solid var(--border);background:var(--bg-surface);}
+  .actions .prog{font-size:var(--fs-xs);color:var(--text-tertiary);margin-right:auto;}
+  .btn{font-family:inherit;font-size:var(--fs-base);font-weight:500;padding:0 22px;height:46px;
+    border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;
+    gap:6px;border:1px solid transparent;transition:background .15s,opacity .15s;}
+  .btn i{font-size:var(--fs-md);}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-strong);}
+  .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-strong);}
+  .btn-ghost:hover{background:var(--bg-secondary);}
+
+  /* not-found */
+  .not-found{display:flex;align-items:center;justify-content:center;min-height:300px;}
+  .not-found p{font-size:var(--fs-base);color:var(--text-secondary);}
+
+  /* 審査ステータスバナー */
+  .status-banner{display:flex;align-items:center;gap:20px;padding:24px 28px;
+    border-radius:var(--radius-md);border:1px solid transparent;margin-bottom:16px;}
+  .status-banner .status-ico{font-size:48px;flex:0 0 auto;}
+  .status-banner .status-label{font-size:var(--fs-lg);font-weight:700;margin-bottom:4px;}
+  .status-banner .status-msg{font-size:var(--fs-sm);line-height:1.7;}
+  .st-unreviewed{background:#f4f6fa;border-color:var(--border-strong);color:var(--text-secondary);}
+  .st-unreviewed .status-ico{color:var(--text-tertiary);}
+  .st-reviewing{background:var(--bg-soft);border-color:rgba(11,95,208,.30);color:var(--text-soft);}
+  .st-reviewing .status-ico{color:var(--accent);}
+  .st-approved{background:var(--ok-soft);border-color:rgba(42,165,131,.40);color:#0e5438;}
+  .st-approved .status-ico{color:var(--ok);}
+  .st-rejected{background:var(--danger-soft);border-color:rgba(201,55,55,.30);color:var(--danger);}
+  .st-rejected .status-ico{color:var(--danger);}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <div class="shell" id="shell">
+    <div class="main">
+
+      <div class="topbar">
+        <div class="titlerow">
+          <span class="t"><i class="ti ti-file-search" aria-hidden="true"></i>申込内容照会</span>
+        </div>
+        <nav class="stepper" id="step-nav" aria-label="申込ステップ"></nav>
+      </div>
+
+      <!-- 申込情報なし -->
+      <div class="not-found" th:if="${merchantApp == null}">
+        <p>申込情報が見つかりませんでした。</p>
+      </div>
+
+      <!-- 申込内容 -->
+      <div th:if="${merchantApp != null}">
+
+        <div class="panel-area">
+
+          <!-- 1: 審査ステータス（新設）-->
+          <section class="panel" data-step="0">
+            <div class="step-head">
+              <span class="num">1</span>
+              <div><h2>審査ステータス</h2><p class="desc">お申込みの現在の審査状況です。</p></div>
+            </div>
+
+            <!-- ステータスバナー -->
+            <div th:if="${merchantApp.applicationStatus == 'UNREVIEWED'}"
+                 class="status-banner st-unreviewed">
+              <i class="ti ti-clock-hour-4 status-ico" aria-hidden="true"></i>
+              <div>
+                <div class="status-label">未審査</div>
+                <div class="status-msg">お申込みを受け付けました。審査開始までしばらくお待ちください。</div>
+              </div>
+            </div>
+            <div th:if="${merchantApp.applicationStatus == 'REVIEWING'}"
+                 class="status-banner st-reviewing">
+              <i class="ti ti-search status-ico" aria-hidden="true"></i>
+              <div>
+                <div class="status-label">審査中</div>
+                <div class="status-msg">現在、お申込み内容を審査しております。結果のご連絡までしばらくお待ちください。</div>
+              </div>
+            </div>
+            <div th:if="${merchantApp.applicationStatus == 'APPROVED'}"
+                 class="status-banner st-approved">
+              <i class="ti ti-circle-check status-ico" aria-hidden="true"></i>
+              <div>
+                <div class="status-label">承認済み</div>
+                <div class="status-msg">審査が完了し、お申込みが承認されました。担当者よりご連絡いたします。</div>
+              </div>
+            </div>
+            <div th:if="${merchantApp.applicationStatus == 'REJECTED'}"
+                 class="status-banner st-rejected">
+              <i class="ti ti-circle-x status-ico" aria-hidden="true"></i>
+              <div>
+                <div class="status-label">否認</div>
+                <div class="status-msg">審査の結果、ご希望に添えない場合がございました。詳細は担当者よりご連絡いたします。</div>
+              </div>
+            </div>
+
+            <!-- 申込基本情報 -->
+            <div class="card">
+              <div class="card-h"><i class="ti ti-info-circle"></i>申込情報</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>会員コード</dt>
+                  <dd th:text="${merchantApp.memberCode}"></dd>
+                  <dt>受付日時</dt>
+                  <dd th:text="${merchantApp.createdAt != null ? #temporals.format(merchantApp.createdAt, 'yyyy年M月d日 HH:mm') : '—'}"></dd>
+                  <dt>最終更新日時</dt>
+                  <dd th:text="${merchantApp.updatedAt != null ? #temporals.format(merchantApp.updatedAt, 'yyyy年M月d日 HH:mm') : '—'}"></dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2: 事前確認 -->
+          <section class="panel" data-step="1">
+            <div class="step-head">
+              <span class="num">2</span>
+              <div><h2>事前確認</h2><p class="desc">各規約への同意・確認の状況です。</p></div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-checklist"></i>① 決済サービスの加盟店規約・特約</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>StarPay決済サービス加盟店規約</dt>
+                    <dd><span th:class="${merchantApp.agreedStarpay ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedStarpay ? '確認済み' : '未確認'}"></span></dd>
+                    <dt>JCB加盟店規約・加盟店特約</dt>
+                    <dd><span th:class="${merchantApp.agreedJcb ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedJcb ? '確認済み' : '未確認'}"></span></dd>
+                    <dt>琉球銀行加盟店規約（Visa/Mastercard/銀聯）</dt>
+                    <dd><span th:class="${merchantApp.agreedRyuginVisaMcCu ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedRyuginVisaMcCu ? '確認済み' : '未確認'}"></span></dd>
+                    <dt>銀聯QRコード決済サービス利用加盟店規約</dt>
+                    <dd><span th:class="${merchantApp.agreedRyuginCuQr ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedRyuginCuQr ? '確認済み' : '未確認'}"></span></dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-file-certificate"></i>② 委任・利用規約</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>代理申請の委任への同意</dt>
+                    <dd><span th:class="${merchantApp.agreedAgencyDelegation ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedAgencyDelegation ? '同意済み' : '未同意'}"></span></dd>
+                    <dt>当社サービス利用規約</dt>
+                    <dd><span th:class="${merchantApp.agreedServiceTerms ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedServiceTerms ? '同意済み' : '未同意'}"></span></dd>
+                    <dt>当社プライバシーポリシー</dt>
+                    <dd><span th:class="${merchantApp.agreedPrivacyPolicy ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedPrivacyPolicy ? '同意済み' : '未同意'}"></span></dd>
+                    <dt>代表者・契約締結権限の確認</dt>
+                    <dd><span th:class="${merchantApp.agreedAuthorityConfirmed ? 'status-ok' : 'status-na'}" th:text="${merchantApp.agreedAuthorityConfirmed ? '確認済み' : '未確認'}"></span></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3: 取引形態 -->
+          <section class="panel" data-step="2">
+            <div class="step-head">
+              <span class="num">3</span>
+              <div><h2>取引形態</h2><p class="desc">特定商取引法に該当する取引形態です。</p></div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-gavel"></i>特定商取引法に該当する取引形態</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>該当する取引形態</dt>
+                    <dd>
+                      <span th:if="${merchantApp.txTypeVisitSales}">訪問販売　</span>
+                      <span th:if="${merchantApp.txTypeContinuousService}">継続的役務提供　</span>
+                      <span th:if="${merchantApp.txTypePhoneSolicitation}">電話勧誘販売　</span>
+                      <span th:if="${merchantApp.txTypePrepaidService}">前払式特定取引　</span>
+                      <span th:if="${merchantApp.txTypeBusinessInduction}">業務提供誘引販売　</span>
+                      <span th:if="${merchantApp.txTypeChainSales}">連鎖販売　</span>
+                      <span th:if="${merchantApp.txTypeNoneApplicable}">①〜⑥に該当しない</span>
+                      <span class="status-na" th:if="${!merchantApp.txTypeVisitSales and !merchantApp.txTypeContinuousService and !merchantApp.txTypePhoneSolicitation and !merchantApp.txTypePrepaidService and !merchantApp.txTypeBusinessInduction and !merchantApp.txTypeChainSales and !merchantApp.txTypeNoneApplicable}">（未回答）</span>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-building"></i>事業区分</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>法人区分</dt>
+                    <dd>
+                      <span class="sel-chip" th:if="${merchantApp.businessEntityType != null and !#strings.isEmpty(merchantApp.businessEntityType)}"><i class="ti ti-check"></i><span th:text="${merchantApp.businessEntityType}"></span></span>
+                      <span class="status-na" th:if="${merchantApp.businessEntityType == null or #strings.isEmpty(merchantApp.businessEntityType)}">（未回答）</span>
+                    </dd>
+                    <dt>販売形態</dt>
+                    <dd>
+                      <span class="sel-chip" th:if="${merchantApp.salesFormat != null and !#strings.isEmpty(merchantApp.salesFormat)}"><i class="ti ti-check"></i><span th:text="${merchantApp.salesFormat}"></span></span>
+                      <span class="status-na" th:if="${merchantApp.salesFormat == null or #strings.isEmpty(merchantApp.salesFormat)}">（未回答）</span>
+                    </dd>
+                    <dt>運営形態</dt>
+                    <dd>
+                      <span class="sel-chip" th:if="${merchantApp.operationFormat != null and !#strings.isEmpty(merchantApp.operationFormat)}"><i class="ti ti-check"></i><span th:text="${merchantApp.operationFormat}"></span></span>
+                      <span class="status-na" th:if="${merchantApp.operationFormat == null or #strings.isEmpty(merchantApp.operationFormat)}">（未回答）</span>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4: 決済種類 -->
+          <section class="panel" data-step="3">
+            <div class="step-head">
+              <span class="num">4</span>
+              <div><h2>決済種類</h2><p class="desc">利用を申し込んだ決済サービスです。</p></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-qrcode"></i>QRコード決済</div>
+              <div class="card-b">
+                <div class="brand-grid">
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrPaypay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrPaypay ? 'ti-circle-check' : 'ti-minus')}"></i>PayPay</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrDBarai ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrDBarai ? 'ti-circle-check' : 'ti-minus')}"></i>d払い</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrRakutenPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrRakutenPay ? 'ti-circle-check' : 'ti-minus')}"></i>楽天ペイ</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrAlipayPlus ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrAlipayPlus ? 'ti-circle-check' : 'ti-minus')}"></i>Alipay+</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrWechatPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrWechatPay ? 'ti-circle-check' : 'ti-minus')}"></i>WeChat Pay</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrAuPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrAuPay ? 'ti-circle-check' : 'ti-minus')}"></i>au PAY</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrMerpay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrMerpay ? 'ti-circle-check' : 'ti-minus')}"></i>メルペイ</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payQrJkoPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payQrJkoPay ? 'ti-circle-check' : 'ti-minus')}"></i>JKOPAY</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-credit-card"></i>クレジットカード</div>
+              <div class="card-b">
+                <div class="brand-grid">
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditJcb ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditJcb ? 'ti-circle-check' : 'ti-minus')}"></i>JCB</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditVisa ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditVisa ? 'ti-circle-check' : 'ti-minus')}"></i>Visa</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditMastercard ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditMastercard ? 'ti-circle-check' : 'ti-minus')}"></i>Mastercard</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditDiscover ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditDiscover ? 'ti-circle-check' : 'ti-minus')}"></i>Discover</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditDiners ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditDiners ? 'ti-circle-check' : 'ti-minus')}"></i>Diners Club</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payCreditAmex ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payCreditAmex ? 'ti-circle-check' : 'ti-minus')}"></i>American Express</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-device-mobile"></i>電子マネー</div>
+              <div class="card-b">
+                <div class="brand-grid">
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyId ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyId ? 'ti-circle-check' : 'ti-minus')}"></i>iD</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyWaon ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyWaon ? 'ti-circle-check' : 'ti-minus')}"></i>WAON</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyRakutenEdy ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyRakutenEdy ? 'ti-circle-check' : 'ti-minus')}"></i>楽天Edy</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyNanaco ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyNanaco ? 'ti-circle-check' : 'ti-minus')}"></i>nanaco</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyTransitIc ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyTransitIc ? 'ti-circle-check' : 'ti-minus')}"></i>交通系IC</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyQuickPay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyQuickPay ? 'ti-circle-check' : 'ti-minus')}"></i>QUICPay</span>
+                  <span th:class="${'brand-chip ' + (merchantApp.payEmoneyApplePay ? 'applied' : 'none')}"><i th:class="${'ti ' + (merchantApp.payEmoneyApplePay ? 'ti-circle-check' : 'ti-minus')}"></i>Apple Pay</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-cash"></i>クレジットのお支払方法</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>ボーナス払い<br><small style="font-weight:400;color:var(--text-tertiary);">JCB・AMEX・Diners</small></dt>
+                  <dd><span class="sel-chip" th:if="${merchantApp.payCreditBonus == 'する'}"><i class="ti ti-check"></i>する</span><span class="status-na" th:if="${merchantApp.payCreditBonus != 'する'}">しない</span></dd>
+                  <dt>2回払い<br><small style="font-weight:400;color:var(--text-tertiary);">JCB</small></dt>
+                  <dd><span class="sel-chip" th:if="${merchantApp.payCreditTwoTimes == 'する'}"><i class="ti ti-check"></i>する</span><span class="status-na" th:if="${merchantApp.payCreditTwoTimes != 'する'}">しない</span></dd>
+                  <dt>分割払い<br><small style="font-weight:400;color:var(--text-tertiary);">JCB・AMEX</small></dt>
+                  <dd><span class="sel-chip" th:if="${merchantApp.payCreditInstallment == 'する'}"><i class="ti ti-check"></i>する</span><span class="status-na" th:if="${merchantApp.payCreditInstallment != 'する'}">しない</span></dd>
+                  <dt>リボ払い<br><small style="font-weight:400;color:var(--text-tertiary);">JCB・Diners</small></dt>
+                  <dd><span class="sel-chip" th:if="${merchantApp.payCreditRevolving == 'する'}"><i class="ti ti-check"></i>する</span><span class="status-na" th:if="${merchantApp.payCreditRevolving != 'する'}">しない</span></dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5: 法人情報 -->
+          <section class="panel" data-step="4">
+            <div class="step-head">
+              <span class="num">5</span>
+              <div><h2>法人情報</h2><p class="desc">申込者・代表者の情報です。</p></div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-building-skyscraper"></i>申込者情報</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>法人番号</dt><dd th:text="${merchantApp.corporateNumber ?: '（未記入）'}"></dd>
+                    <dt>法人名</dt><dd th:text="${merchantApp.corporateName ?: '（未記入）'}"></dd>
+                    <dt>法人名（カナ）</dt><dd th:text="${merchantApp.corporateNameKana ?: '（未記入）'}"></dd>
+                    <dt>法人名（英語）</dt><dd th:text="${merchantApp.corporateNameEn ?: '（なし）'}"></dd>
+                    <dt>法人設立年月日</dt><dd th:text="${merchantApp.establishmentDate != null ? #temporals.format(merchantApp.establishmentDate, 'yyyy年M月d日') : '（未記入）'}"></dd>
+                    <dt>法人種別</dt><dd th:text="${merchantApp.corporateType ?: '（未記入）'}"></dd>
+                    <dt>ブランド名（屋号）</dt><dd th:text="${merchantApp.brandName ?: '（なし）'}"></dd>
+                    <dt>ブランド名（カナ）</dt><dd th:text="${merchantApp.brandNameKana ?: '（なし）'}"></dd>
+                    <dt>ブランド名（英語）</dt><dd th:text="${merchantApp.brandNameEn ?: '（なし）'}"></dd>
+                    <dt>会社URL</dt><dd th:text="${merchantApp.companyUrl ?: '（なし）'}"></dd>
+                    <dt>年商（万円）</dt><dd th:text="${merchantApp.annualRevenue != null ? #numbers.formatInteger(merchantApp.annualRevenue, 1, 'COMMA') : '（未記入）'}"></dd>
+                    <dt>資本金（万円）</dt><dd th:text="${merchantApp.capitalAmount != null ? #numbers.formatInteger(merchantApp.capitalAmount, 1, 'COMMA') : '（未記入）'}"></dd>
+                    <dt>従業員数（人）</dt><dd th:text="${merchantApp.employeeCount ?: '（未記入）'}"></dd>
+                    <dt>業種（カテゴリー）</dt><dd th:text="${merchantApp.industryCategory ?: '（未記入）'}"></dd>
+                    <dt>業種（詳細）</dt><dd th:text="${merchantApp.industryDetail ?: '（未記入）'}"></dd>
+                    <dt>事業内容及び取扱商材</dt><dd th:text="${merchantApp.businessDescription ?: '（未記入）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-map-pin"></i>本社住所</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>郵便番号</dt><dd th:text="${merchantApp.companyZipCode ?: '（未記入）'}"></dd>
+                    <dt>都道府県</dt><dd th:text="${merchantApp.companyPrefecture ?: '（未記入）'}"></dd>
+                    <dt>都道府県（カナ）</dt><dd th:text="${merchantApp.companyPrefectureKana ?: '（未記入）'}"></dd>
+                    <dt>市区町村</dt><dd th:text="${merchantApp.companyCity ?: '（未記入）'}"></dd>
+                    <dt>市区町村（カナ）</dt><dd th:text="${merchantApp.companyCityKana ?: '（未記入）'}"></dd>
+                    <dt>町域</dt><dd th:text="${merchantApp.companyTown ?: '（未記入）'}"></dd>
+                    <dt>町域（カナ）</dt><dd th:text="${merchantApp.companyTownKana ?: '（未記入）'}"></dd>
+                    <dt>番地</dt><dd th:text="${merchantApp.companyStreetNumber ?: '（未記入）'}"></dd>
+                    <dt>番地（カナ）</dt><dd th:text="${merchantApp.companyStreetNumberKana ?: '（未記入）'}"></dd>
+                    <dt>建物名</dt><dd th:text="${merchantApp.companyBuilding ?: '（なし）'}"></dd>
+                    <dt>建物名（カナ）</dt><dd th:text="${merchantApp.companyBuildingKana ?: '（なし）'}"></dd>
+                    <dt>本社電話番号</dt><dd th:text="${merchantApp.companyPhone ?: '（未記入）'}"></dd>
+                    <dt>本社FAX番号</dt><dd th:text="${merchantApp.companyFax ?: '（なし）'}"></dd>
+                    <dt>携帯電話番号</dt><dd th:text="${merchantApp.companyMobile ?: '（なし）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-user"></i>代表者様情報</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>姓</dt><dd th:text="${merchantApp.repLastName ?: '（未記入）'}"></dd>
+                    <dt>姓（カナ）</dt><dd th:text="${merchantApp.repLastNameKana ?: '（未記入）'}"></dd>
+                    <dt>姓（英語）</dt><dd th:text="${merchantApp.repLastNameEn ?: '（未記入）'}"></dd>
+                    <dt>名</dt><dd th:text="${merchantApp.repFirstName ?: '（未記入）'}"></dd>
+                    <dt>名（カナ）</dt><dd th:text="${merchantApp.repFirstNameKana ?: '（未記入）'}"></dd>
+                    <dt>名（英語）</dt><dd th:text="${merchantApp.repFirstNameEn ?: '（未記入）'}"></dd>
+                    <dt>生年月日</dt><dd th:text="${merchantApp.repBirthDate != null ? #temporals.format(merchantApp.repBirthDate, 'yyyy年M月d日') : '（未記入）'}"></dd>
+                    <dt>性別</dt>
+                    <dd>
+                      <span class="sel-chip" th:if="${merchantApp.repGender != null and !#strings.isEmpty(merchantApp.repGender)}"><i class="ti ti-check"></i><span th:text="${merchantApp.repGender}"></span></span>
+                      <span class="status-na" th:if="${merchantApp.repGender == null or #strings.isEmpty(merchantApp.repGender)}">（未記入）</span>
+                    </dd>
+                    <dt>自宅 郵便番号</dt><dd th:text="${merchantApp.repZipCode ?: '（未記入）'}"></dd>
+                    <dt>自宅 都道府県</dt><dd th:text="${merchantApp.repPrefecture ?: '（未記入）'}"></dd>
+                    <dt>自宅 都道府県（カナ）</dt><dd th:text="${merchantApp.repPrefectureKana ?: '（未記入）'}"></dd>
+                    <dt>自宅 市区町村</dt><dd th:text="${merchantApp.repCity ?: '（未記入）'}"></dd>
+                    <dt>自宅 市区町村（カナ）</dt><dd th:text="${merchantApp.repCityKana ?: '（未記入）'}"></dd>
+                    <dt>自宅 町域</dt><dd th:text="${merchantApp.repTown ?: '（未記入）'}"></dd>
+                    <dt>自宅 町域（カナ）</dt><dd th:text="${merchantApp.repTownKana ?: '（未記入）'}"></dd>
+                    <dt>自宅 番地</dt><dd th:text="${merchantApp.repStreetNumber ?: '（未記入）'}"></dd>
+                    <dt>自宅 番地（カナ）</dt><dd th:text="${merchantApp.repStreetNumberKana ?: '（未記入）'}"></dd>
+                    <dt>自宅 建物名</dt><dd th:text="${merchantApp.repBuilding ?: '（なし）'}"></dd>
+                    <dt>自宅電話番号</dt><dd th:text="${merchantApp.repPhone ?: '（未記入）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-headset"></i>担当者様情報</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>姓</dt><dd th:text="${merchantApp.contactLastName ?: '（未記入）'}"></dd>
+                    <dt>姓（カナ）</dt><dd th:text="${merchantApp.contactLastNameKana ?: '（未記入）'}"></dd>
+                    <dt>名</dt><dd th:text="${merchantApp.contactFirstName ?: '（未記入）'}"></dd>
+                    <dt>名（カナ）</dt><dd th:text="${merchantApp.contactFirstNameKana ?: '（未記入）'}"></dd>
+                    <dt>勤務先 郵便番号</dt><dd th:text="${merchantApp.contactZipCode ?: '（未記入）'}"></dd>
+                    <dt>勤務先 都道府県</dt><dd th:text="${merchantApp.contactPrefecture ?: '（未記入）'}"></dd>
+                    <dt>勤務先 都道府県（カナ）</dt><dd th:text="${merchantApp.contactPrefectureKana ?: '（未記入）'}"></dd>
+                    <dt>勤務先 市区町村</dt><dd th:text="${merchantApp.contactCity ?: '（未記入）'}"></dd>
+                    <dt>勤務先 市区町村（カナ）</dt><dd th:text="${merchantApp.contactCityKana ?: '（未記入）'}"></dd>
+                    <dt>勤務先 町域</dt><dd th:text="${merchantApp.contactTown ?: '（未記入）'}"></dd>
+                    <dt>勤務先 町域（カナ）</dt><dd th:text="${merchantApp.contactTownKana ?: '（未記入）'}"></dd>
+                    <dt>勤務先 番地</dt><dd th:text="${merchantApp.contactStreetNumber ?: '（未記入）'}"></dd>
+                    <dt>勤務先 番地（カナ）</dt><dd th:text="${merchantApp.contactStreetNumberKana ?: '（未記入）'}"></dd>
+                    <dt>勤務先 建物名</dt><dd th:text="${merchantApp.contactBuilding ?: '（なし）'}"></dd>
+                    <dt>勤務先 建物名（カナ）</dt><dd th:text="${merchantApp.contactBuildingKana ?: '（なし）'}"></dd>
+                    <dt>部署名</dt><dd th:text="${merchantApp.contactDepartment ?: '（なし）'}"></dd>
+                    <dt>メールアドレス</dt><dd th:text="${merchantApp.contactEmail ?: '（未記入）'}"></dd>
+                    <dt>担当者電話番号1</dt><dd th:text="${merchantApp.contactPhone1 ?: '（未記入）'}"></dd>
+                    <dt>担当者電話番号2</dt><dd th:text="${merchantApp.contactPhone2 ?: '（なし）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6: 口座情報 -->
+          <section class="panel" data-step="5">
+            <div class="step-head">
+              <span class="num">6</span>
+              <div><h2>口座情報</h2><p class="desc">売上金の入金先口座です。</p></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-building-bank"></i>入金先口座</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>金融機関コード</dt><dd th:text="${merchantApp.bankCode ?: '（未記入）'}"></dd>
+                  <dt>金融機関名</dt><dd th:text="${merchantApp.bankName ?: '（未記入）'}"></dd>
+                  <dt>支店コード</dt><dd th:text="${merchantApp.branchCode ?: '（未記入）'}"></dd>
+                  <dt>支店名</dt><dd th:text="${merchantApp.branchName ?: '（未記入）'}"></dd>
+                  <dt>預金種別</dt>
+                  <dd>
+                    <span class="sel-chip" th:if="${merchantApp.accountType != null and !#strings.isEmpty(merchantApp.accountType)}"><i class="ti ti-check"></i><span th:text="${merchantApp.accountType}"></span></span>
+                    <span class="status-na" th:if="${merchantApp.accountType == null or #strings.isEmpty(merchantApp.accountType)}">（未記入）</span>
+                  </dd>
+                  <dt>口座番号</dt><dd th:text="${merchantApp.accountNumber ?: '（未記入）'}"></dd>
+                  <dt>口座名義（カナ）</dt><dd th:text="${merchantApp.accountHolderKana ?: '（未記入）'}"></dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+          <!-- 7: 店舗情報 -->
+          <section class="panel" data-step="6">
+            <div class="step-head">
+              <span class="num">7</span>
+              <div><h2>店舗情報</h2><p class="desc">申込店舗の情報です。</p></div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-building-store"></i>店舗名</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>店舗名</dt><dd th:text="${merchantApp.storeName ?: '（未記入）'}"></dd>
+                    <dt>店舗名（カナ）</dt><dd th:text="${merchantApp.storeNameKana ?: '（未記入）'}"></dd>
+                    <dt>店舗名（英語）</dt><dd th:text="${merchantApp.storeNameEn ?: '（なし）'}"></dd>
+                    <dt>ブランド名（屋号）</dt><dd th:text="${merchantApp.storeBrandName ?: '（なし）'}"></dd>
+                    <dt>ブランド名（カナ）</dt><dd th:text="${merchantApp.storeBrandNameKana ?: '（なし）'}"></dd>
+                    <dt>ブランド名（英語）</dt><dd th:text="${merchantApp.storeBrandNameEn ?: '（なし）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-category"></i>業種・商材</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>店舗業種（カテゴリ）</dt><dd th:text="${merchantApp.storeIndustryCategory ?: '（未記入）'}"></dd>
+                    <dt>店舗業種（詳細）</dt><dd th:text="${merchantApp.storeIndustryDetail ?: '（未記入）'}"></dd>
+                    <dt>店舗商材の詳細</dt><dd th:text="${merchantApp.storeProductDescription ?: '（未記入）'}"></dd>
+                    <dt>店舗数</dt><dd th:text="${merchantApp.storeCount != null ? merchantApp.storeCount + ' 店舗' : '（未記入）'}"></dd>
+                    <dt>平均単価（円）</dt><dd th:text="${merchantApp.storeAveragePrice != null ? #numbers.formatInteger(merchantApp.storeAveragePrice, 1, 'COMMA') : '（未記入）'}"></dd>
+                    <dt>店舗口座</dt><dd th:text="${merchantApp.storeBankAccount ?: '（未記入）'}"></dd>
+                    <dt>レシート名</dt><dd th:text="${merchantApp.storeReceiptName ?: '（なし）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div class="card-grid">
+              <div class="card">
+                <div class="card-h"><i class="ti ti-clock-hour-4"></i>営業時間・定休日</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>第1営業時間</dt>
+                    <dd th:text="${merchantApp.businessHours1Start != null and merchantApp.businessHours1End != null ? #temporals.format(merchantApp.businessHours1Start, 'HH:mm') + ' 〜 ' + #temporals.format(merchantApp.businessHours1End, 'HH:mm') : '（なし）'}"></dd>
+                    <dt>第2営業時間</dt>
+                    <dd th:text="${merchantApp.businessHours2Start != null and merchantApp.businessHours2End != null ? #temporals.format(merchantApp.businessHours2Start, 'HH:mm') + ' 〜 ' + #temporals.format(merchantApp.businessHours2End, 'HH:mm') : '（なし）'}"></dd>
+                    <dt>定休日</dt>
+                    <dd>
+                      <span th:if="${merchantApp.closedMonday}">月　</span>
+                      <span th:if="${merchantApp.closedTuesday}">火　</span>
+                      <span th:if="${merchantApp.closedWednesday}">水　</span>
+                      <span th:if="${merchantApp.closedThursday}">木　</span>
+                      <span th:if="${merchantApp.closedFriday}">金　</span>
+                      <span th:if="${merchantApp.closedSaturday}">土　</span>
+                      <span th:if="${merchantApp.closedSunday}">日　</span>
+                      <span th:if="${merchantApp.closedHoliday}">祝　</span>
+                      <span th:if="${merchantApp.closedHolidayEve}">祝前</span>
+                      <span class="status-na" th:if="${!merchantApp.closedMonday and !merchantApp.closedTuesday and !merchantApp.closedWednesday and !merchantApp.closedThursday and !merchantApp.closedFriday and !merchantApp.closedSaturday and !merchantApp.closedSunday and !merchantApp.closedHoliday and !merchantApp.closedHolidayEve}">（なし）</span>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-h"><i class="ti ti-map-2"></i>地図掲載</div>
+                <div class="card-b">
+                  <dl class="kv">
+                    <dt>地図掲載希望</dt>
+                    <dd th:text="${merchantApp.mapDisplayDesired ? '希望する' : '希望しない'}"></dd>
+                    <dt>地図掲載希望日</dt>
+                    <dd th:text="${merchantApp.mapDisplayDesiredDate != null ? #temporals.format(merchantApp.mapDisplayDesiredDate, 'yyyy年M月d日') : '（なし）'}"></dd>
+                    <dt>緯度</dt><dd th:text="${merchantApp.storeLatitude ?: '（なし）'}"></dd>
+                    <dt>経度</dt><dd th:text="${merchantApp.storeLongitude ?: '（なし）'}"></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-map-pin"></i>店舗所在地・連絡先</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>郵便番号</dt><dd th:text="${merchantApp.shopZipCode ?: '（未記入）'}"></dd>
+                  <dt>都道府県</dt><dd th:text="${merchantApp.shopPrefecture ?: '（未記入）'}"></dd>
+                  <dt>都道府県（カナ）</dt><dd th:text="${merchantApp.shopPrefectureKana ?: '（未記入）'}"></dd>
+                  <dt>市区町村</dt><dd th:text="${merchantApp.shopCity ?: '（未記入）'}"></dd>
+                  <dt>市区町村（カナ）</dt><dd th:text="${merchantApp.shopCityKana ?: '（未記入）'}"></dd>
+                  <dt>町域</dt><dd th:text="${merchantApp.shopTown ?: '（未記入）'}"></dd>
+                  <dt>町域（カナ）</dt><dd th:text="${merchantApp.shopTownKana ?: '（未記入）'}"></dd>
+                  <dt>番地</dt><dd th:text="${merchantApp.shopStreetNumber ?: '（未記入）'}"></dd>
+                  <dt>番地（カナ）</dt><dd th:text="${merchantApp.shopStreetNumberKana ?: '（未記入）'}"></dd>
+                  <dt>建物名</dt><dd th:text="${merchantApp.shopBuilding ?: '（なし）'}"></dd>
+                  <dt>建物名（カナ）</dt><dd th:text="${merchantApp.shopBuildingKana ?: '（なし）'}"></dd>
+                  <dt>電話番号</dt><dd th:text="${merchantApp.shopPhone ?: '（未記入）'}"></dd>
+                  <dt>営業許可番号</dt><dd th:text="${merchantApp.shopBusinessPermitNumber ?: '（なし）'}"></dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-device-desktop"></i>端末情報</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>端末保持状況</dt>
+                  <dd>
+                    <span class="sel-chip" th:if="${merchantApp.terminalPossessionStatus != null and !#strings.isEmpty(merchantApp.terminalPossessionStatus)}"><i class="ti ti-check"></i><span th:text="${merchantApp.terminalPossessionStatus}"></span></span>
+                    <span class="status-na" th:if="${merchantApp.terminalPossessionStatus == null or #strings.isEmpty(merchantApp.terminalPossessionStatus)}">（未回答）</span>
+                  </dd>
+                  <dt>POS端末IC対応状況</dt>
+                  <dd>
+                    <span class="sel-chip" th:if="${merchantApp.terminalIcStatus != null and !#strings.isEmpty(merchantApp.terminalIcStatus)}"><i class="ti ti-check"></i><span th:text="${merchantApp.terminalIcStatus}"></span></span>
+                    <span class="status-na" th:if="${merchantApp.terminalIcStatus == null or #strings.isEmpty(merchantApp.terminalIcStatus)}">（未回答）</span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+          <!-- 8: 書類情報 -->
+          <section class="panel" data-step="7">
+            <div class="step-head">
+              <span class="num">8</span>
+              <div><h2>書類情報</h2><p class="desc">提出書類の受領状況です。</p></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-files"></i>提出状況</div>
+              <div class="card-b">
+                <dl class="kv kv-docs">
+                  <dt>営業許可関連書類（許可証）</dt>
+                  <dd th:if="${docMap != null and docMap['BUSINESS_PERMIT'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['BUSINESS_PERMIT'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['BUSINESS_PERMIT'] != null}" class="status-na">未提出</dd>
+                  <dt>本人確認書類（表面）</dt>
+                  <dd th:if="${docMap != null and docMap['ID_FRONT'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['ID_FRONT'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['ID_FRONT'] != null}" class="status-na">未提出</dd>
+                  <dt>本人確認書類（裏面）</dt>
+                  <dd th:if="${docMap != null and docMap['ID_BACK'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['ID_BACK'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['ID_BACK'] != null}" class="status-na">未提出</dd>
+                  <dt>開業届・店舗図面など</dt>
+                  <dd th:if="${docMap != null and docMap['OPENING_PLAN'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['OPENING_PLAN'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['OPENING_PLAN'] != null}" class="status-na">未提出</dd>
+                  <dt>販売予定の商材がわかる資料</dt>
+                  <dd th:if="${docMap != null and docMap['PRODUCT_MATERIAL'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['PRODUCT_MATERIAL'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['PRODUCT_MATERIAL'] != null}" class="status-na">未提出</dd>
+                  <dt>イベント会場図面など</dt>
+                  <dd th:if="${docMap != null and docMap['EVENT_VENUE'] != null}" class="status-ok">
+                    <span>提出済み</span>
+                    <a class="dl-btn" th:href="'/merchant/document/download?documentId=' + ${docMap['EVENT_VENUE'].documentId}" download><i class="ti ti-download"></i>ダウンロード</a>
+                  </dd>
+                  <dd th:unless="${docMap != null and docMap['EVENT_VENUE'] != null}" class="status-na">未提出</dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+          <!-- 9: 発送申込 -->
+          <section class="panel" data-step="8">
+            <div class="step-head">
+              <span class="num">9</span>
+              <div><h2>発送申込</h2><p class="desc">決済端末のお届け先・受取人です。</p></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><i class="ti ti-truck-delivery"></i>お届け先</div>
+              <div class="card-b">
+                <dl class="kv">
+                  <dt>端末台数</dt><dd th:text="${merchantApp.mposQuantity != null ? merchantApp.mposQuantity + ' 台' : '（未記入）'}"></dd>
+                  <dt>郵便番号</dt><dd th:text="${merchantApp.deliveryZipCode ?: '（未記入）'}"></dd>
+                  <dt>都道府県</dt><dd th:text="${merchantApp.deliveryPrefecture ?: '（未記入）'}"></dd>
+                  <dt>都道府県（カナ）</dt><dd th:text="${merchantApp.deliveryPrefectureKana ?: '（未記入）'}"></dd>
+                  <dt>市区町村</dt><dd th:text="${merchantApp.deliveryCity ?: '（未記入）'}"></dd>
+                  <dt>市区町村（カナ）</dt><dd th:text="${merchantApp.deliveryCityKana ?: '（未記入）'}"></dd>
+                  <dt>町域</dt><dd th:text="${merchantApp.deliveryTown ?: '（未記入）'}"></dd>
+                  <dt>町域（カナ）</dt><dd th:text="${merchantApp.deliveryTownKana ?: '（未記入）'}"></dd>
+                  <dt>番地</dt><dd th:text="${merchantApp.deliveryStreetNumber ?: '（未記入）'}"></dd>
+                  <dt>番地（カナ）</dt><dd th:text="${merchantApp.deliveryStreetNumberKana ?: '（未記入）'}"></dd>
+                  <dt>建物名</dt><dd th:text="${merchantApp.deliveryBuilding ?: '（なし）'}"></dd>
+                  <dt>建物名（カナ）</dt><dd th:text="${merchantApp.deliveryBuildingKana ?: '（なし）'}"></dd>
+                  <dt>電話番号</dt><dd th:text="${merchantApp.deliveryPhone ?: '（未記入）'}"></dd>
+                  <dt>受取人</dt><dd th:text="${merchantApp.deliveryReceiver ?: '（未記入）'}"></dd>
+                </dl>
+              </div>
+            </div>
+          </section>
+
+        </div><!-- /.panel-area -->
+
+        <!-- アクション（照会のみ：戻る/次へ） -->
+        <div class="actions">
+          <span class="prog" id="prog"></span>
+          <button type="button" class="btn btn-ghost" id="back" style="display:none">
+            <i class="ti ti-arrow-left"></i>戻る
+          </button>
+          <button type="button" class="btn btn-primary" id="next">
+            次へ進む<i class="ti ti-arrow-right"></i>
+          </button>
+        </div>
+
+      </div><!-- /th:if merchantApp != null -->
+
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var steps = ['審査ステータス','事前確認','取引形態','決済種類','法人情報','口座情報','店舗情報','書類情報','発送申込'];
+  var total = steps.length;
+  var current = 0;
+  var panels = [].slice.call(document.querySelectorAll('.panel'));
+  var backBtn = document.getElementById('back');
+  var nextBtn = document.getElementById('next');
+  var progEl  = document.getElementById('prog');
+
+  function buildStepper() {
+    var nav = document.getElementById('step-nav');
+    if (!nav) return;
+    nav.innerHTML = '';
+    steps.forEach(function (name, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'step';
+      if (i === current) btn.classList.add('is-active');
+      if (i < current) btn.classList.add('is-done');
+      var dot = document.createElement('span');
+      dot.className = 'dot ' + (i < current ? 'done' : i === current ? 'active' : 'todo');
+      dot.innerHTML = i < current ? '<i class="ti ti-check" style="font-size:14px"></i>' : (i + 1);
+      var txt = document.createElement('span');
+      txt.className = 'stxt'; txt.textContent = name;
+      btn.appendChild(dot); btn.appendChild(txt);
+      btn.addEventListener('click', function () { goTo(i); });
+      nav.appendChild(btn);
+      if (i < steps.length - 1) {
+        var bar = document.createElement('div');
+        bar.className = 'bar' + (i < current ? ' done' : '');
+        nav.appendChild(bar);
+      }
+    });
+  }
+
+  function render() {
+    panels.forEach(function (p) {
+      p.classList.toggle('show', Number(p.dataset.step) === current);
+    });
+    if (backBtn) backBtn.style.display = current === 0 ? 'none' : 'inline-flex';
+    if (nextBtn) nextBtn.style.display = current === total - 1 ? 'none' : 'inline-flex';
+    if (progEl) progEl.textContent = 'カテゴリ ' + (current + 1) + ' / ' + total + '：' + steps[current];
+    buildStepper();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goTo(i) {
+    if (i < 0 || i >= total) return;
+    current = i; render();
+  }
+
+  if (backBtn) backBtn.addEventListener('click', function () { goTo(current - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
+  render();
+})();
+</script>
+</body>
+</html>

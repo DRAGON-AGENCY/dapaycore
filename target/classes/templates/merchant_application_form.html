@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申込登録</title>
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f4f6fa;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --text-primary: #1b2733;
+    --text-secondary: #5a6675;
+    --text-tertiary: #93a0af;
+    --text-danger: #c0392b;
+    --text-soft: #0c447c;
+    --text-ok: #1f8a6d;
+    --border: rgba(20,45,80,0.10);
+    --border-strong: rgba(20,45,80,0.24);
+    --accent: #0b5fd0;
+    --accent-strong: #0c447c;
+    --accent-line: #3d8ddd;
+    --ok: #2aa583;
+    --ok-soft: #e3f4ee;
+    --warn-soft: #fdf0dd;
+    --warn-text: #8a5410;
+    --warn-line: #e0972a;
+    --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #0f141a;
+      --bg-surface: #19202a;
+      --bg-secondary: #1f2832;
+      --bg-soft: #14283f;
+      --bg-soft-2: #16202c;
+      --text-primary: #eef2f7;
+      --text-secondary: #aeb9c6;
+      --text-tertiary: #7a8694;
+      --text-danger: #ec8478;
+      --text-soft: #9cc6f2;
+      --text-ok: #5ccfac;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.22);
+      --accent: #3d8ddd;
+      --accent-strong: #0c447c;
+      --accent-line: #3d8ddd;
+      --ok: #36b78f;
+      --ok-soft: #16322a;
+      --warn-soft: #38290f;
+      --warn-text: #e8b765;
+      --warn-line: #e8b765;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg-page); color: var(--text-primary);
+    font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { min-width: 1200px; max-width: 1480px; margin: 0 auto; padding: 26px 18px 60px; }
+  .shell { background: var(--bg-surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: stretch; min-height: 640px; box-shadow: var(--shadow-md); }
+
+  /* ---------- sidebar ---------- */
+  .sidebar { flex: 0 0 280px; background: linear-gradient(180deg,#0c2440 0%,#0a1f38 100%); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar .brand { display: flex; align-items: center; gap: 9px; padding: 6px 10px 18px; }
+  .sidebar .brand .logo { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+  .sidebar .brand span { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: .02em; }
+  .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 15px; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .menu-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .menu-item i { font-size: 20px; }
+  .menu-group { font-size: 12.5px; font-weight: 700; color: #6f8db0; letter-spacing: 0.06em; padding: 15px 10px 6px; display: flex; align-items: center; gap: 8px; }
+  .menu-group i { font-size: 15px; }
+  .menu-group:first-of-type { padding-top: 4px; }
+  .menu-sub { display: flex; align-items: center; gap: 9px; padding: 9px 14px 9px 18px; border-radius: var(--radius-sm); color: #aac4e4; font-size: 14px; line-height: 1.4; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s, color .15s; }
+  .menu-sub:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .menu-sub.active { background: var(--accent); color: #fff; font-weight: 500; box-shadow: var(--shadow-sm); }
+  .menu-sub i { font-size: 18px; flex: 0 0 auto; }
+  .menu-spacer { flex: 1; }
+  .menu-divider { height: 0.5px; background: rgba(255,255,255,0.14); margin: 8px 4px; }
+
+  /* ---------- main ---------- */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { padding: 16px 28px 0; }
+  .topbar .titlerow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .topbar .titlerow .t { font-size: 15px; font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; }
+  .topbar .titlerow .s { font-size: 12px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px; }
+  .topbar .titlerow .s i { font-size: 14px; color: var(--ok); }
+  .menu-toggle { display: none; }
+
+  /* ---------- stepper ---------- */
+  .stepper { display: flex; align-items: flex-start; overflow-x: auto; padding: 2px 0 16px; border-bottom: 0.5px solid var(--border); scrollbar-width: thin; }
+  .stepper .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 66px; cursor: default; background: none; border: none; font-family: inherit; padding: 0; }
+  .stepper .step:disabled { opacity: 1; }
+  .stepper .dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; flex: 0 0 auto; transition: all .2s; }
+  .stepper .dot.done { background: var(--ok); color: #fff; }
+  .stepper .dot.active { background: var(--accent); color: #fff; box-shadow: 0 0 0 4px rgba(61,141,221,0.22); }
+  .stepper .dot.todo { background: var(--bg-secondary); border: 0.5px solid var(--border-strong); color: var(--text-tertiary); }
+  .stepper .stxt { font-size: 11px; color: var(--text-tertiary); text-align: center; line-height: 1.3; white-space: nowrap; }
+  .stepper .step.is-done .stxt { color: var(--text-secondary); }
+  .stepper .step.is-active .stxt { color: var(--text-soft); font-weight: 700; }
+  .stepper .bar { flex: 1; height: 2px; background: var(--border-strong); margin-top: 14px; min-width: 12px; border-radius: 2px; }
+  .stepper .bar.done { background: var(--ok); }
+
+  /* ---------- panels ---------- */
+  .panel-area { flex: 1; padding: 22px 28px 18px; }
+  .panel { display: none; animation: fade .28s ease; }
+  .panel.show { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .step-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .step-head .num { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg,var(--accent),var(--accent-strong)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; box-shadow: var(--shadow-sm); }
+  .step-head .htext { flex: 1; min-width: 0; }
+  .step-head h2 { font-size: 19px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); letter-spacing: .01em; }
+  .step-head .desc { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .step-head .legend { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; padding-top: 4px; }
+  .step-head .legend .req { color: var(--text-danger); }
+
+  /* card grouping */
+  .card { border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-surface); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; }
+  .card-h { display: flex; align-items: center; gap: 9px; padding: 13px 16px; background: var(--accent); border-bottom: 0.5px solid transparent; font-size: var(--fs-base); font-weight: 700; color: #ffffff; }
+  .card-h i { font-size: 17px; color: #ffffff; }
+  .card-h .badge { margin-left: auto; font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.85); }
+  .card-b { padding: 16px; }
+
+  /* 2-col card grid */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .card-grid > .card { margin-bottom: 0; }
+
+  /* 発送申込：注文商品 */
+  .order-item { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; padding: 4px 0 20px; }
+  .order-prod { display: flex; gap: 20px; align-items: flex-start; }
+  .order-prod .pimg { flex: 0 0 auto; width: 96px; height: 96px; border-radius: 12px; background: linear-gradient(145deg, #e4edf8 0%, #d4e2f3 100%); border: 1px solid rgba(20,45,80,.12); display: flex; align-items: center; justify-content: center; padding: 10px; }
+  .order-prod .pimg svg { width: 100%; height: 100%; }
+  .order-prod .pinfo { padding-top: 2px; }
+  .order-prod .pname { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
+  .order-prod .pdesc { font-size: var(--fs-xs); color: var(--text-tertiary); margin: 0 0 12px; line-height: 1.5; }
+  .unit-price { display: inline-flex; align-items: baseline; gap: 3px; background: #e9f1fb; border-radius: 6px; padding: 5px 10px; }
+  .unit-price .up-label { font-size: 12px; color: var(--text-secondary); margin-right: 2px; }
+  .unit-price .up-val { font-size: var(--fs-lg); font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+  .unit-price .up-yen { font-size: var(--fs-sm); font-weight: 600; color: var(--accent-strong); }
+  .qty-area { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .qty-area .qty-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; color: var(--text-secondary); }
+  .qty-stepper { display: flex; align-items: center; border: 1.5px solid rgba(20,45,80,.20); border-radius: 40px; overflow: hidden; background: #fff; box-shadow: 0 1px 4px rgba(20,45,80,.08); }
+  .qty-stepper button { width: 48px; height: 48px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; transition: background .15s, color .15s; flex-shrink: 0; }
+  .qty-stepper button:hover { background: #e9f1fb; color: var(--accent); }
+  .qty-stepper button:active { background: #d5e3f4; }
+  .qty-stepper input[type="number"] { width: 58px; height: 48px; text-align: center; border: none; border-left: 1px solid rgba(20,45,80,.14); border-right: 1px solid rgba(20,45,80,.14); border-radius: 0; font-size: 22px; font-weight: 700; color: var(--text-primary); background: transparent; -moz-appearance: textfield; }
+  .qty-stepper input[type="number"]::-webkit-inner-spin-button,
+  .qty-stepper input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .qty-stepper input[type="number"]:focus { outline: none; }
+  .qty-area .qty-unit { font-size: 13px; color: var(--text-tertiary); }
+  .order-total-bar { background: #e9f1fb; border: 1px solid rgba(27,102,179,.18); border-radius: 10px; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .order-total-bar .calc-expr { font-size: var(--fs-xs); color: var(--text-secondary); }
+  .order-total-right { display: flex; align-items: baseline; gap: 8px; }
+  .order-total-right .total-label { font-size: var(--fs-sm); font-weight: 600; color: #0c447c; padding-right: 10px; border-right: 1.5px solid rgba(12,68,124,.20); margin-right: 2px; }
+  .order-total-right .total-amount { font-size: 30px; font-weight: 700; color: #0c447c; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .order-total-right .total-yen { font-size: var(--fs-md); font-weight: 700; color: #0c447c; }
+
+  .field { margin-bottom: 15px; }
+  .field:last-child { margin-bottom: 0; }
+  .field > label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+  .field .help { font-size: 11.5px; font-weight: 400; color: var(--text-tertiary); margin-left: 2px; }
+  .req { color: var(--text-danger); font-size: 12px; }
+  /* 必須マーク：ラベルの「*」を赤い小バッジで表示する */
+  span.req { display: inline-flex; align-items: center; vertical-align: middle; font-size: 0; }
+  span.req::before { content: "※"; font-size: 13px; font-weight: 700; color: #cc0000; }
+  .grid2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+  .grid2 .field { margin-bottom: 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .grid3 .field { margin-bottom: 0; }
+  @media (max-width: 720px) { .grid3 { grid-template-columns: 1fr; } }
+  .grid-shop-info { display: grid; grid-template-columns: 1fr 1fr 1fr 140px 160px; gap: 14px; align-items: end; }
+  .grid-shop-info .field { margin-bottom: 0; }
+  .sub-h { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); padding-bottom: 7px; margin: 20px 0 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 7px; }
+  .sub-h:first-child { margin-top: 0; }
+  .sub-h i { font-size: 15px; color: var(--accent); }
+  .sub-h .hint { font-weight: 400; font-size: 11.5px; color: var(--text-tertiary); }
+  .copy-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  input[readonly], input.autofill { background: var(--bg-secondary); color: var(--text-tertiary); cursor: not-allowed; }
+  .kana-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; align-items: end; }
+  @media (max-width: 720px) { .kana-pair { grid-template-columns: 1fr; } }
+
+  input[type="text"], input[type="tel"], input[type="email"], input[type="number"], input[type="date"], select {
+    width: 100%; font-family: inherit; font-size: 14px; color: var(--text-primary);
+    padding: 9px 12px; height: 42px; background: var(--bg-surface);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm); outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input::placeholder { color: var(--text-tertiary); }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61,141,221,0.16); }
+  .input-icon { position: relative; }
+  .input-icon > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 17px; color: var(--text-tertiary); pointer-events: none; }
+  .input-icon > input { padding-left: 38px; }
+  .input-row { display: flex; gap: 8px; }
+
+  /* selectable cards (payment brands / checkbox grid) */
+  .opt-sub { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 4px 0 10px; justify-content: space-between; }
+  .opt-sub i { font-size: 16px; color: var(--accent); }
+  .opt-sub:not(:first-child) { margin-top: 18px; }
+  .opt-sub .sub-label { display: flex; align-items: center; gap: 7px; }
+  .all-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-all { font-family: inherit; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border-mid, rgba(20,45,80,0.20)); background: #fff; color: var(--accent); cursor: pointer; transition: background .12s, color .12s; }
+  .btn-all:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .opt-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
+  /* クレジットお支払方法 */
+  .pay-methods { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .pay-method-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pay-method-item { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); transition: background .15s, border-color .15s; }
+  .pay-method-item.pm-fixed { background: #e9f1fb; border-color: rgba(27,102,179,0.22); }
+  .pay-method-item.item-active { background: var(--bg-soft); border-color: rgba(27,102,179,0.22); }
+  .pay-method-label { flex: 1; min-width: 0; }
+  .pay-method-label .pm-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .pay-method-label .pm-brand { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+  .pm-fixed-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 14px; background: #dff0e0; color: #2e7d32; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .pm-fixed-note { font-size: 12px; color: var(--text-tertiary); flex: 1; min-width: 0; }
+  .pay-method-item .seg { margin: 0; flex-wrap: nowrap; }
+  @media (max-width: 560px) { .opt-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  #txGrid { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 720px) { #txGrid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { #txGrid { grid-template-columns: 1fr; } }
+  .opt { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; font-size: 13.5px; color: var(--text-primary); background: var(--bg-surface); transition: border-color .15s, background .15s, box-shadow .15s; user-select: none; }
+  .opt:hover { border-color: var(--accent-line); background: var(--bg-soft-2); }
+  .opt input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; }
+  .opt.checked { background: var(--bg-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); font-weight: 500; }
+  .opt .bico { font-size: 19px; color: var(--text-tertiary); flex: 0 0 auto; }
+  .opt:hover .bico { color: var(--accent-line); }
+  .opt.checked .bico { color: var(--accent); }
+
+  /* segmented control */
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+  .seg .opt { padding: 9px 18px; }
+  /* segmented grid（枠を均等幅に揃える） */
+  .seg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .seg-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .seg-grid .opt { padding: 11px 13px; }
+  @media (max-width: 560px) { .seg-grid, .seg-grid.cols-2 { grid-template-columns: repeat(2, 1fr); } }
+
+  /* file drop */
+  .drop { display: flex; align-items: center; gap: 13px; padding: 14px 16px; border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; transition: border-color .15s, background .15s; margin-bottom: 11px; background: var(--bg-surface); }
+  .drop:last-child { margin-bottom: 0; }
+  .drop:hover { border-color: var(--accent); background: var(--bg-soft-2); }
+  .drop.filled { border-style: solid; border-color: var(--ok); background: var(--ok-soft); }
+  .drop .dico { width: 40px; height: 40px; border-radius: 9px; background: var(--bg-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; transition: background .15s, color .15s; }
+  .drop.filled .dico { background: var(--ok); color: #fff; }
+  .drop .dico i { font-size: 20px; }
+  .drop .meta { flex: 1; min-width: 0; }
+  .drop .meta .t { font-size: 13.5px; font-weight: 500; color: var(--text-primary); }
+  .drop .meta .s { font-size: 12px; color: var(--text-tertiary); }
+  .drop .fname { font-size: 12px; color: var(--accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+  .drop.filled .fname { color: var(--text-ok); font-weight: 500; }
+  .drop input[type="file"] { display: none; }
+
+  /* 本人確認書類の例 */
+  .idsample-intro { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 12px; }
+  .idsample-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  @media (max-width: 720px) { .idsample-grid { grid-template-columns: 1fr; } }
+  .idsample { display: flex; flex-direction: column; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-surface); }
+  .idsample > h4 { margin: 0; padding: 9px 12px; font-size: 13px; font-weight: 700; color: var(--text-soft); background: var(--bg-soft-2); border-bottom: 0.5px solid var(--border); }
+  .idsample .imgs { display: flex; gap: 10px; padding: 12px; flex-wrap: wrap; }
+  .idsample figure { flex: 1; min-width: 120px; margin: 0; text-align: center; }
+  .idsample figure img { width: 100%; height: auto; border: 0.5px solid var(--border); border-radius: 4px; background: #fff; }
+  .idsample figure svg { width: 100%; height: auto; display: block; }
+  .idsample figure .noimg { display: none; padding: 22px 8px; border: 1px dashed var(--border-strong); border-radius: 4px; color: var(--text-tertiary); font-size: 12px; background: var(--bg-secondary); }
+  .idsample figcaption { font-size: 11px; color: var(--text-tertiary); margin-top: 5px; }
+  .idsample ul { margin: 0; padding: 2px 14px 14px 30px; }
+  .idsample li { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 3px 0; }
+  .idsample-credit { font-size: 11px; color: var(--text-tertiary); line-height: 1.6; margin-top: 12px; }
+
+  /* note / banner */
+  .note { display: flex; align-items: flex-start; gap: 9px; background: var(--bg-soft); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; margin-top: 4px; }
+  .note i { font-size: 18px; color: var(--accent); flex: 0 0 auto; margin-top: 1px; }
+  .note span { font-size: 12.5px; color: var(--text-soft); line-height: 1.6; }
+  .note.warn { background: var(--warn-soft); border: 1px solid var(--warn-line); border-left: 5px solid var(--warn-line); padding: 14px 16px; box-shadow: 0 2px 10px rgba(224,151,42,0.18); }
+  .note.warn i { color: var(--warn-line); font-size: 24px; margin-top: 0; }
+  .note.warn span { color: var(--warn-text); }
+  .note .guide { font-size: 12.5px; line-height: 1.7; color: var(--text-soft); }
+  .note.warn .guide { color: var(--warn-text); }
+  .note .guide .gtitle { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; letter-spacing: .02em; margin-bottom: 8px; padding: 3px 12px; border-radius: 999px; background: var(--warn-line); color: #fff; }
+  .note.warn .guide .gtitle { color: #fff; }
+  .note .guide .ghead { display: block; font-weight: 700; margin: 12px 0 3px; }
+  .note .guide p { margin: 0; }
+  .note .guide ul { margin: 4px 0 0; padding-left: 20px; }
+  .note .guide li { margin: 2px 0; }
+  .note .guide .small { font-size: 11.5px; opacity: 0.9; }
+  .note .guide table { border-collapse: collapse; margin-top: 6px; }
+  .note .guide th, .note .guide td { border: 1px solid currentColor; padding: 5px 9px; text-align: left; font-weight: 400; vertical-align: top; }
+  .note .guide th { font-weight: 700; white-space: nowrap; }
+  .banner { display: flex; align-items: flex-start; gap: 10px; border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.6; }
+  .banner.warn { background: var(--warn-soft); color: var(--warn-text); }
+  .banner.info { background: var(--bg-soft); color: var(--text-soft); }
+  .banner i { font-size: 19px; flex: 0 0 auto; margin-top: 1px; }
+
+  /* agreement rows */
+  .a-row { display: flex; align-items: center; gap: 13px; padding: 13px 16px; cursor: default; }
+  .a-row + .a-row { border-top: 0.5px solid var(--border); }
+  .a-row.tinted { background: var(--bg-soft); }
+  .a-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; cursor: pointer; }
+  .a-row .abody { flex: 1; min-width: 0; }
+  .a-row .nameline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .a-row .aname { font-size: 13.5px; font-weight: 500; }
+  .a-row .asub { display: block; font-size: 12px; color: var(--text-tertiary); margin-top: 3px; }
+  .a-row.tinted .aname, .a-row.tinted .asub { color: var(--text-soft); }
+  .a-row .astatus { font-size: 11px; color: var(--text-tertiary); background: var(--bg-soft-2); padding: 2px 9px; border-radius: 999px; white-space: nowrap; font-weight: 500; transition: background .15s, color .15s; }
+  .a-row input[type="checkbox"]:checked ~ .astatus { color: var(--text-ok); background: var(--ok-soft); }
+  .a-link { font-size: 12px; color: var(--accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; text-decoration: none; }
+  .a-link:hover { text-decoration: underline; }
+  .a-link i { font-size: 14px; }
+  .a-row-err { font-size: 12px; color: var(--text-danger); padding: 5px 16px 8px 52px; animation: fadeInOut 3s forwards; }
+  @keyframes fadeInOut { 0% { opacity: 0; } 10% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+  .a-link.highlight { color: var(--text-danger); animation: shake .4s; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .icon-spin { display: inline-block; animation: spin .8s linear infinite; }
+  .tag { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+  .tag-net { background: #E1F5EE; color: #04342C; }
+  .tag-jcb { background: #E6F1FB; color: #042C53; }
+  .tag-ryu { background: #FAECE7; color: #4A1B0C; }
+  .attest { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--bg-soft); border: 1px solid var(--accent-line); border-radius: var(--radius-sm); cursor: pointer; margin-top: 4px; }
+  .attest input { width: 19px; height: 19px; accent-color: var(--accent); margin-top: 1px; flex: 0 0 auto; }
+  .attest span { font-size: 13.5px; font-weight: 500; line-height: 1.6; color: var(--text-soft); }
+
+  /* footer actions (sticky) */
+  .actions { position: sticky; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 14px 28px; border-top: 0.5px solid var(--border); background: var(--bg-surface); }
+  .actions .prog { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
+  .actions .step1-err { display: none; font-size: 15px; font-weight: 700; color: #c0392b; align-items: center; gap: 5px; }
+  .actions .step1-err.visible { display: inline-flex; }
+  .field-err { display: none; font-size: 14px; font-weight: 700; color: var(--text-danger); margin-top: 6px; align-items: center; gap: 4px; }
+  .field-err.visible { display: flex; }
+  .field-err i { font-size: 16px; }
+  input.input-err, select.input-err { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.15) !important; }
+  .input-suffix { align-self: center; color: var(--text-secondary); font-size: 14px; font-weight: 600; white-space: nowrap; padding-left: 4px; }
+  .time-range { display: flex; align-items: flex-end; gap: 12px; }
+  .time-range .time-block { display: flex; flex-direction: column; gap: 4px; }
+  .time-range .time-lbl { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-align: center; }
+  .time-range input[type="time"] { width: 130px; }
+  .time-range .time-sep { padding-bottom: 10px; color: var(--text-tertiary); font-size: 15px; }
+  .btn { font-family: inherit; font-size: 14px; font-weight: 500; padding: 0 20px; height: 42px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: background .15s, opacity .15s, transform .05s; }
+  .btn:active { transform: scale(0.98); }
+  .btn i { font-size: 17px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-ghost:hover { background: var(--bg-secondary); }
+  .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-sm { height: 42px; padding: 0 14px; white-space: nowrap; }
+
+  /* 最終確認: カテゴリ別の確認リスト */
+  .review-edit { margin-left: auto; height: 32px; padding: 0 14px; font-size: 12.5px; color: #fff; border-color: rgba(255,255,255,0.55); }
+  .review-edit:hover { color: #fff; background: rgba(255,255,255,0.16); }
+  .review-edit i { font-size: 15px; color: #fff; }
+  .rv-list { display: grid; grid-template-columns: minmax(160px, 240px) 1fr; margin: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+  .rv-list dt { font-size: 12.5px; color: var(--text-secondary); font-weight: 600; padding: 11px 14px; background: var(--bg-soft-2); border-bottom: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); display: flex; align-items: center; }
+  .rv-list dd { font-size: 13.5px; color: var(--text-primary); margin: 0; padding: 11px 14px; border-bottom: 1px solid var(--border-strong); display: flex; align-items: center; word-break: break-word; }
+  .rv-list dt:nth-last-of-type(1), .rv-list dd:nth-last-of-type(1) { border-bottom: none; }
+  .rv-list dd.rv-na { color: var(--text-tertiary); }
+  .rv-empty { font-size: 13px; color: var(--text-tertiary); margin: 0; }
+  @media (max-width: 560px) {
+    .rv-list { grid-template-columns: 1fr; }
+    .rv-list dt { border-bottom: none; padding-bottom: 3px; }
+    .rv-list dd { padding-top: 3px; }
+  }
+
+  /* 口座情報：左右2カラム */
+  .acc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; align-items: start; }
+  .acc-col-right { border-left: 0.5px solid var(--border); padding-left: 32px; }
+  .acc-glabel { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.05em; margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
+  .acc-glabel i { font-size: 15px; color: var(--accent); }
+  .acc-code-grid { display: grid; grid-template-columns: 110px 1fr; gap: 10px; }
+  .acc-preview-wrap { position: sticky; top: 80px; }
+  .acc-pb { background: linear-gradient(140deg, #0e3060 0%, #0a1e40 100%); border-radius: 12px; padding: 20px 18px; color: #fff; box-shadow: 0 6px 20px rgba(10,30,64,0.28); }
+  .acc-pb .apb-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.12); border: 0.5px solid rgba(255,255,255,0.22); border-radius: 999px; padding: 3px 10px 3px 8px; font-size: 10.5px; color: rgba(255,255,255,0.7); letter-spacing: 0.06em; margin-bottom: 16px; }
+  .acc-pb .apb-chip i { font-size: 13px; }
+  .acc-pb .apb-bank { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; min-height: 1.4em; }
+  .acc-pb .apb-branch { font-size: 12.5px; color: rgba(255,255,255,0.58); margin-bottom: 16px; min-height: 1.4em; }
+  .acc-pb .apb-divider { height: 0.5px; background: rgba(255,255,255,0.16); margin: 0 0 14px; }
+  .acc-pb .apb-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .acc-pb .apb-row:last-child { margin-bottom: 0; }
+  .acc-pb .apb-lbl { font-size: 11px; color: rgba(255,255,255,0.48); white-space: nowrap; min-width: 56px; }
+  .acc-pb .apb-val { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
+  .acc-pb .apb-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.88); }
+  .acc-pb-note { font-size: 11px; color: var(--text-tertiary); margin: 8px 0 0; text-align: center; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0; }
+    .shell { border-radius: 0; border: none; min-height: 100vh; flex-direction: column; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 30; width: 240px; flex: none; transform: translateX(-100%); transition: transform .2s; }
+    .sidebar.open { transform: translateX(0); }
+    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 20; }
+    .menu-overlay.show { display: block; }
+    .menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary); cursor: pointer; margin-right: 10px; }
+    .topbar, .panel-area, .actions { padding-left: 16px; padding-right: 16px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .step-head .legend { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h2 class="sr-only">キャッシュレス決済 加盟店申込の9ステップ入力フォーム。事前確認、取引形態、決済種類、法人情報、口座情報、店舗情報、書類情報、発送申込、最終確認の順に進みます。</h2>
+  <form class="shell" id="wizard" novalidate>
+
+    <div class="main">
+
+      <div class="topbar">
+        <div class="titlerow">
+          <span class="t">
+            申込登録
+          </span>
+          <a class="btn btn-ghost btn-sm" href="login.html">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i>戻る
+          </a>
+        </div>
+        <nav class="stepper" id="stepper" aria-label="入力ステップ"></nav>
+      </div>
+
+      <div class="panel-area">
+
+        <!-- STEP 1: 事前確認 -->
+        <section class="panel" data-step="0">
+          <div class="step-head">
+            <span class="num">1</span>
+            <div class="htext">
+              <h2>事前確認</h2>
+            </div>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>「規約を確認」をクリックすると各社の公式ページ（外部リンク）で規約が開き、確認済みに自動でチェックが入ります。チェックは「同意済みであることの確認」です。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-file-text" aria-hidden="true"></i>① 決済サービスの加盟店規約・特約</div>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-starpay">
+              <span class="abody"><span class="nameline"><span class="aname">StarPay決済サービス加盟店規約（共通・第2特約）</span><span class="tag tag-net">NETSTARS</span>
+                <a class="a-link agreement-link" href="https://www.netstars.co.jp/starpay_common_termsofuse/" target="_blank" data-for="chk-starpay"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">確認済み</span>
+            </label>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-jcb">
+              <span class="abody"><span class="nameline"><span class="aname">JCB加盟店規約・加盟店特約</span><span class="tag tag-jcb">JCB</span>
+                <a class="a-link agreement-link" href="https://www.jcb.co.jp/merchant/regulation/index.html" target="_blank" data-for="chk-jcb"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">確認済み</span>
+            </label>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-ryu1">
+              <span class="abody"><span class="nameline"><span class="aname">琉球銀行加盟店規約（Visa / Mastercard / 銀聯）</span><span class="tag tag-ryu">りゅうぎん</span>
+                <a class="a-link agreement-link" href="https://www.ryugin.co.jp/kiteikiyaku/kameitenkanren/" target="_blank" data-for="chk-ryu1"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">確認済み</span>
+            </label>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-ryu2">
+              <span class="abody"><span class="nameline"><span class="aname">銀聯QRコード決済サービス利用加盟店規約</span><span class="tag tag-ryu">りゅうぎん</span>
+                <a class="a-link agreement-link" href="https://www.ryugin.co.jp/kiteikiyaku/kameitenkanren/" target="_blank" data-for="chk-ryu2"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">確認済み</span>
+            </label>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-writing-sign" aria-hidden="true"></i>② 当社（代理申請者）への委任・利用規約</div>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-iin1">
+              <span class="abody"><span class="nameline"><span class="aname">代理申請の委任（委任契約）への同意</span>
+                <a class="a-link agreement-link" href="/terms/agency-delegation.html" target="_blank" data-for="chk-iin1"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span><span class="asub">別途締結の契約書により合意済み</span></span>
+              <span class="astatus">同意済み</span>
+            </label>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-iin2">
+              <span class="abody"><span class="nameline"><span class="aname">当社サービス利用規約</span>
+                <a class="a-link agreement-link" href="/terms/service.html" target="_blank" data-for="chk-iin2"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">同意済み</span>
+            </label>
+            <label class="a-row">
+              <input type="checkbox" class="req" id="chk-iin3">
+              <span class="abody"><span class="nameline"><span class="aname">当社プライバシーポリシー（取得情報の各社提供）</span>
+                <a class="a-link agreement-link" href="/terms/privacy-policy.html" target="_blank" data-for="chk-iin3"><i class="ti ti-external-link"></i>規約を確認</a>
+              </span></span>
+              <span class="astatus">同意済み</span>
+            </label>
+          </div>
+
+          <label class="attest">
+            <input type="checkbox" class="req">
+            <span>私は本加盟店の代表者または契約締結の権限を有する者であり、上記の各規約に同意済みであることを確認します</span>
+          </label>
+        </section>
+
+        <!-- STEP 2: 取引形態 -->
+        <section class="panel" data-step="1">
+          <div class="step-head">
+            <span class="num">2</span>
+            <div class="htext">
+              <h2>取引形態</h2>
+              <p class="desc">特定商取引法に該当する取引形態を確認し、事業区分をご入力ください。</p>
+            </div>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="card-grid">
+          <div class="card">
+            <div class="card-h"><i class="ti ti-gavel" aria-hidden="true"></i>特定商取引法に該当する取引形態 <span class="req">*</span></div>
+            <div class="card-b">
+              <div class="opt-grid" id="txGrid">
+                <label class="opt"><input type="checkbox">①訪問販売</label>
+                <label class="opt"><input type="checkbox">②特定継続的役務提供</label>
+                <label class="opt"><input type="checkbox">③電話勧誘販売</label>
+                <label class="opt"><input type="checkbox">④前払い式サービスの取引</label>
+                <label class="opt"><input type="checkbox">⑤業務提供誘引販売</label>
+                <label class="opt"><input type="checkbox">⑥連鎖販売</label>
+              </div>
+              <label class="opt" id="txNoneWrap" style="margin-top:10px;"><input type="checkbox" id="txNone">①〜⑥に該当する取引形態ではない</label>
+              <p class="field-err" id="err-tx-type"><i class="ti ti-alert-circle"></i>取引形態を1つ以上選択してください。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-building" aria-hidden="true"></i>事業区分</div>
+            <div class="card-b">
+              <div class="field">
+                <label>法人区分 <span class="req">*</span></label>
+                <div class="seg-grid cols-2" data-single>
+                  <label class="opt"><input type="radio" name="bizkind">法人</label>
+                  <label class="opt"><input type="radio" name="bizkind">個人事業主</label>
+                </div>
+                <p class="field-err" id="err-bizkind"><i class="ti ti-alert-circle"></i>法人区分を選択してください。</p>
+              </div>
+              <div class="field">
+                <label>販売形態 <span class="req">*</span></label>
+                <div class="seg-grid cols-2" data-single>
+                  <label class="opt"><input type="radio" name="saleform">固定店舗</label>
+                  <label class="opt"><input type="radio" name="saleform">移動販売</label>
+                </div>
+                <p class="field-err" id="err-saleform"><i class="ti ti-alert-circle"></i>販売形態を選択してください。</p>
+              </div>
+              <div class="field">
+                <label>運営形態 <span class="req">*</span></label>
+                <div class="seg-grid" data-single>
+                  <label class="opt"><input type="radio" name="opform">個店</label>
+                  <label class="opt"><input type="radio" name="opform">商業施設</label>
+                  <label class="opt"><input type="radio" name="opform">フランチャイズ</label>
+                  <label class="opt"><input type="radio" name="opform">該当しない</label>
+                </div>
+                <p class="field-err" id="err-opform"><i class="ti ti-alert-circle"></i>運営形態を選択してください。</p>
+              </div>
+            </div>
+          </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: 決済種類 -->
+        <section class="panel" data-step="2">
+          <div class="step-head">
+            <span class="num">3</span>
+            <div class="htext">
+              <h2>決済種類</h2>
+              <p class="desc">お申込みになる決済ブランドを選択してください。複数選択できます。</p>
+            </div>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>クレジットカード・電子マネーのご利用を希望されるお客様は、「発行申込」ページで「mPOS」のご購入が必要です。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-b">
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-qrcode" aria-hidden="true"></i>QRコード決済</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('qrGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('qrGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="qrGrid">
+                <label class="opt"><input type="checkbox"><i class="ti ti-brand-wechat bico" aria-hidden="true"></i>WeChat Pay</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>PayPay</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>d払い</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>au PAY</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>メルペイ</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>楽天ペイ</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>Alipay+</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-qrcode bico" aria-hidden="true"></i>JKOPAY</label>
+              </div>
+              <p class="field-err" id="err-qr"><i class="ti ti-alert-circle"></i>QRコード決済を1つ以上選択してください。</p>
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットカード</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('creditGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('creditGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="creditGrid">
+                <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>JCB</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>Discover</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-brand-visa bico" aria-hidden="true"></i>Visa</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-brand-mastercard bico" aria-hidden="true"></i>Mastercard</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>Diners Club</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-credit-card bico" aria-hidden="true"></i>American Express</label>
+              </div>
+              <p class="field-err" id="err-credit"><i class="ti ti-alert-circle"></i>クレジットカードを1つ以上選択してください。</p>
+              <div class="opt-sub"><span class="sub-label"><i class="ti ti-credit-card" aria-hidden="true"></i>クレジットのお支払方法</span></div>
+              <div class="note" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>ご指定がない場合は、JCBにて設定します。</span></div>
+              <div class="pay-methods">
+                <!-- 1回払い（固定） -->
+                <div class="pay-method-item pm-fixed">
+                  <div class="pay-method-label">
+                    <div class="pm-name">1回払い</div>
+                    <div class="pm-brand">JCB・AMEX・Diners・Discover</div>
+                  </div>
+                  <span class="pm-fixed-badge"><i class="ti ti-check" aria-hidden="true"></i>する（固定）</span>
+                  <span class="pm-fixed-note">クレジット以外は、1回払いのみのお取り扱いとなります。</span>
+                </div>
+                <!-- ボーナス払い・2回払い -->
+                <div class="pay-method-pair">
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">ボーナス払い</div>
+                      <div class="pm-brand">JCB・AMEX・Diners</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payBonus">する</label>
+                      <label class="opt checked"><input type="radio" name="payBonus" checked>しない</label>
+                    </div>
+                  </div>
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">2回払い</div>
+                      <div class="pm-brand">JCB</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="pay2kai">する</label>
+                      <label class="opt checked"><input type="radio" name="pay2kai" checked>しない</label>
+                    </div>
+                  </div>
+                </div>
+                <!-- 分割払い・リボ払い -->
+                <div class="pay-method-pair">
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">分割払い</div>
+                      <div class="pm-brand">JCB・AMEX</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payBunkatsu">する</label>
+                      <label class="opt checked"><input type="radio" name="payBunkatsu" checked>しない</label>
+                    </div>
+                  </div>
+                  <div class="pay-method-item">
+                    <div class="pay-method-label">
+                      <div class="pm-name">リボ払い</div>
+                      <div class="pm-brand">JCB・Diners</div>
+                    </div>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="payRevo">する</label>
+                      <label class="opt checked"><input type="radio" name="payRevo" checked>しない</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="opt-sub">
+                <span class="sub-label"><i class="ti ti-device-mobile" aria-hidden="true"></i>電子マネー</span>
+                <span class="all-btns">
+                  <button type="button" class="btn-all" onclick="selectAllGrid('emoneyGrid')">全選択</button>
+                  <button type="button" class="btn-all" onclick="clearAllGrid('emoneyGrid')">全解除</button>
+                </span>
+              </div>
+              <div class="opt-grid" id="emoneyGrid">
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>iD</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>WAON</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>楽天Edy</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>nanaco</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-train bico" aria-hidden="true"></i>交通系IC（Suica 等）</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-device-mobile bico" aria-hidden="true"></i>QUICPay</label>
+                <label class="opt"><input type="checkbox"><i class="ti ti-brand-apple bico" aria-hidden="true"></i>Apple Pay</label>
+              </div>
+              <p class="field-err" id="err-emoney"><i class="ti ti-alert-circle"></i>電子マネーを1つ以上選択してください。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: 法人情報 -->
+        <section class="panel" data-step="3">
+          <div class="step-head">
+            <span class="num">4</span>
+            <div class="htext">
+              <h2>法人情報</h2>
+              <p class="desc">申込者・代表者・担当者の情報をご入力ください。登記内容・本人確認書類のとおりに入力してください。</p>
+            </div>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>入力内容は登記簿・本人確認書類と一致している必要があります。相違があると審査に時間がかかります。</p>
+            </div>
+          </div>
+
+          <!-- 申込者情報 -->
+          <div class="card">
+            <div class="card-h"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>申込者情報</div>
+            <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ｶﾌﾞｼｷｶﾞｲｼｬ）</span></div>
+              <div class="field">
+                <label>法人番号 <span class="req">*</span></label>
+                <div class="input-row">
+                  <input type="text" id="houjinNumber" placeholder="例）1234567890123" maxlength="13" style="max-width:200px;">
+                  <button type="button" class="btn btn-ghost btn-sm" id="houjinLookup"><i class="ti ti-search"></i>確認</button>
+                </div>
+              </div>
+              <div class="grid3">
+                <div class="field"><label>法人名 <span class="req">*</span></label><input type="text" id="companyName" placeholder="株式会社〇〇"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="companyNameKana" placeholder="ｶﾌﾞｼｷｶﾞｲｼｬ 〇〇"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="companyNameEn" placeholder="〇〇 Co."></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>法人設立年月日 <span class="req">*</span></label><input type="date" id="corporateEstDate"></div>
+                <div class="field"><label>法人種別 <span class="help">任意</span></label>
+                  <select id="corporateType"><option>選択してください</option><option>株式会社</option><option>合同会社</option><option>有限会社</option><option>合名会社</option><option>合資会社</option><option>一般社団法人</option><option>その他</option></select>
+                </div>
+              </div>
+              <div class="grid3" style="margin-top:14px;">
+                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input type="text" id="brandName" placeholder="〇〇"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="brandNameKana" placeholder="〇〇"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="brandNameEn" placeholder="〇〇"></div>
+              </div>
+              <div class="field" style="margin-top:14px;"><label>会社URL <span class="help">任意</span></label><div class="input-icon"><i class="ti ti-world"></i><input type="text" id="companyUrl" placeholder="https://example.co.jp"></div></div>
+              <div class="grid3" style="margin-top:14px;">
+                <div class="field"><label>年商（単位：万円） <span class="req">*</span></label><input type="number" id="annualSales" placeholder="例）10000"></div>
+                <div class="field"><label>資本金（単位：万円） <span class="help">任意</span></label><input type="number" id="capitalAmount" placeholder="例）1000"></div>
+                <div class="field"><label>従業員数（単位：人） <span class="help">任意</span></label><input type="number" id="employeeCount" placeholder="40"></div>
+              </div>
+
+              <div class="sub-h"><i class="ti ti-category" aria-hidden="true"></i>業種情報</div>
+              <div class="grid2">
+                <div class="field"><label>業種（カテゴリー） <span class="req">*</span></label>
+                  <select id="industryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
+                </div>
+                <div class="field"><label>業種（詳細） <span class="req">*</span></label>
+                  <select id="industryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
+                </div>
+              </div>
+              <div class="field" style="margin-top:14px;"><label>事業内容及び取扱商材 <span class="req">*</span></label><input type="text" id="businessContent" placeholder="例）〇〇の製造・販売、〇〇サービスの提供"></div>
+
+              <div class="sub-h"><i class="ti ti-map-pin" aria-hidden="true"></i>個人事業主住所／本社住所 <span class="hint">個人事業主の場合は本人確認書類記載の住所をご入力ください</span></div>
+              <div class="addr" data-addr="company">
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="5-23-17"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="5-23-17"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                </div>
+                <div class="grid3" style="margin-top:14px;">
+                  <div class="field"><label>本社電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0312345678"></div></div>
+                  <div class="field"><label>本社FAX番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-printer"></i><input type="tel" data-f="fax" placeholder="0312345679"></div></div>
+                  <div class="field"><label>携帯電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" data-f="mobile" placeholder="09012345678"></div></div>
+                </div>
+              </div>
+              <p class="field-err" id="err-step4-corp"><i class="ti ti-alert-circle"></i>申込者情報に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step4-corp-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
+            </div>
+          </div>
+
+          <div class="card-grid">
+          <!-- 代表者情報 -->
+          <div class="card">
+            <div class="card-h"><i class="ti ti-user" aria-hidden="true"></i>代表者様情報</div>
+            <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ﾔﾏﾀﾞ ﾀﾛｳ）</span></div>
+              <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前 <span class="hint">旧字体は常用漢字に置き換えてご入力ください</span></div>
+              <div class="grid3">
+                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="repLastName" placeholder="山田"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="repLastNameKana" placeholder="ﾔﾏﾀﾞ"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repLastNameEn" placeholder="YAMADA"></div>
+              </div>
+              <div class="grid3" style="margin-top:14px;">
+                <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="repFirstName" placeholder="太郎"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="repFirstNameKana" placeholder="ﾀﾛｳ"></div>
+                <div class="field"><label>英語表記 <span class="req">*</span></label><input type="text" id="repFirstNameEn" placeholder="TARO"></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>生年月日 <span class="req">*</span></label><input type="date" id="repBirthDate"></div>
+                <div class="field"><label>性別 <span class="req">*</span></label>
+                  <div class="seg" data-single>
+                    <label class="opt"><input type="radio" name="repsex">男</label>
+                    <label class="opt"><input type="radio" name="repsex">女</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sub-h"><i class="ti ti-home" aria-hidden="true"></i>代表者自宅住所</div>
+              <div class="copy-row">
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="company" data-to="rep"><i class="ti ti-copy"></i>本社住所と同じ</button>
+              </div>
+              <div class="addr" data-addr="rep">
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
+                </div>
+                <div class="field" style="margin-top:14px;"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇マンション 101"></div>
+                <div class="field" style="margin-top:14px;"><label>自宅電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" data-f="tel" placeholder="0123456789"></div></div>
+              </div>
+              <p class="field-err" id="err-step4-rep"><i class="ti ti-alert-circle"></i>代表者様情報に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step4-rep-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
+            </div>
+          </div>
+
+          <!-- 担当者情報 -->
+          <div class="card">
+            <div class="card-h"><i class="ti ti-headset" aria-hidden="true"></i>担当者様情報 <span class="badge">お申込内容・審査等でご連絡することがあります</span></div>
+            <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：ﾔﾏﾀﾞ ﾊﾅｺ）</span></div>
+              <div class="sub-h"><i class="ti ti-id-badge" aria-hidden="true"></i>お名前</div>
+              <div class="grid2">
+                <div class="field"><label>姓 <span class="req">*</span></label><input type="text" id="contactLastName" placeholder="山田"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="contactLastNameKana" placeholder="ﾔﾏﾀﾞ"></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>名 <span class="req">*</span></label><input type="text" id="contactFirstName" placeholder="花子"></div>
+                <div class="field"><label>カタカナ（半角） <span class="req">*</span></label><input type="text" id="contactFirstNameKana" placeholder="ﾊﾅｺ"></div>
+              </div>
+
+              <div class="sub-h"><i class="ti ti-building-community" aria-hidden="true"></i>勤務先住所 <span class="hint">日中いらっしゃる住所をご入力ください</span></div>
+              <div class="copy-row">
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="company" data-to="contact"><i class="ti ti-copy"></i>本社住所と同じ</button>
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="rep" data-to="contact"><i class="ti ti-copy"></i>代表者住所と同じ</button>
+              </div>
+              <div class="addr" data-addr="contact">
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input type="text" data-f="banchi" placeholder="5-23-17"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="5-23-17"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                </div>
+                <div class="field" style="margin-top:14px;"><label>部署名 <span class="req">*</span> <span class="help">ない場合は「なし」と記入</span></label><input type="text" id="contactDept" placeholder="例）〇〇部"></div>
+                <div class="field" style="margin-top:14px;"><label>メールアドレス <span class="req">*</span></label><div class="input-icon"><i class="ti ti-at"></i><input type="email" id="contactEmail" placeholder="mail@example.co.jp"></div></div>
+                <div class="note warn" style="margin-top:8px;"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span>メールアドレスを誤って入力すると、新規登録完了メール（仮パスワードを含む）が届きません。正確にご入力ください。</span></div>
+              </div>
+
+              <div class="sub-h"><i class="ti ti-phone" aria-hidden="true"></i>担当者電話番号</div>
+              <div class="field"><label>担当者電話番号1 <span class="req">*</span> <span class="help">固定電話がある場合は固定電話を記入</span></label><div class="input-icon"><i class="ti ti-phone"></i><input type="tel" id="contactTel1" placeholder="0312345678"></div></div>
+              <div class="field" style="margin-top:14px;"><label>担当者電話番号2 <span class="help">携帯電話番号を記入</span></label><div class="input-icon"><i class="ti ti-device-mobile"></i><input type="tel" id="contactTel2" placeholder="09012345678"></div></div>
+              <p class="field-err" id="err-step4-contact"><i class="ti ti-alert-circle"></i>担当者様情報に未入力の必須項目があります。</p>
+            </div>
+          </div>
+          </div>
+
+        </section>
+
+        <!-- STEP 5: 口座情報 -->
+        <section class="panel" data-step="4">
+          <div class="step-head">
+            <span class="num">5</span>
+            <div class="htext">
+              <h2>口座情報</h2>
+              <p class="desc">売上金の入金先口座をご入力ください。法人名義の口座が原則です。</p>
+            </div>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <p>口座名義は通帳の表記どおり（カナ・記号含む）にご入力ください。相違があると入金できません。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-building-bank" aria-hidden="true"></i>入金先口座</div>
+            <div class="card-b">
+              <div class="acc-layout">
+                <!-- 左：金融機関・支店 -->
+                <div>
+                  <div class="acc-glabel"><i class="ti ti-building-bank" aria-hidden="true"></i>金融機関</div>
+                  <div class="acc-code-grid" style="margin-bottom:18px;">
+                    <div class="field"><label>金融機関コード <span class="req">*</span></label><input id="acc-bkcode" type="text" placeholder="例）0005" maxlength="4"></div>
+                    <div class="field"><label>金融機関名 <span class="req">*</span></label><div class="input-row"><input id="acc-bkname" type="text" placeholder="例）三菱UFJ"><span class="input-suffix">銀行</span></div></div>
+                  </div>
+                  <div class="acc-glabel"><i class="ti ti-map-pin" aria-hidden="true"></i>支店</div>
+                  <div class="acc-code-grid">
+                    <div class="field"><label>支店コード <span class="req">*</span></label><input id="acc-brcode" type="text" placeholder="例）150" maxlength="3"></div>
+                    <div class="field"><label>支店名 <span class="req">*</span></label><div class="input-row"><input id="acc-brname" type="text" placeholder="例）渋谷"><span class="input-suffix">支店</span></div></div>
+                  </div>
+                </div>
+                <!-- 右：口座詳細 -->
+                <div class="acc-col-right">
+                  <div class="acc-glabel"><i class="ti ti-wallet" aria-hidden="true"></i>口座詳細</div>
+                  <div class="field">
+                    <label>預金種別 <span class="req">*</span></label>
+                    <div class="seg" data-single>
+                      <label class="opt"><input type="radio" name="acctype" id="acc-type-futs">普通</label>
+                      <label class="opt"><input type="radio" name="acctype" id="acc-type-toza">当座</label>
+                    </div>
+                  </div>
+                  <div class="field" style="margin-top:14px;"><label>口座番号 <span class="req">*</span></label><input id="acc-num" type="text" placeholder="7桁（例）1234567" maxlength="7"></div>
+                  <div class="note" style="margin:12px 0 4px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>口座名義は半角カタカナで入力してください。（例：ｶ) ｶﾌﾞｼｷｶﾞｲｼｬ）</span></div>
+                  <div class="field" style="margin-top:4px;"><label>口座名義（カナ） <span class="req">*</span></label><input id="acc-kana" type="text" placeholder="ｶ) 〇〇 ﾀﾛｳ"></div>
+                </div>
+              </div>
+              <p class="field-err" id="err-step5-acc"><i class="ti ti-alert-circle"></i>入金先口座に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step5-acc-fmt"><i class="ti ti-alert-circle"></i>口座名義（カナ）は半角カタカナで入力してください。</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- STEP 6: 店舗情報 -->
+        <section class="panel" data-step="5">
+          <div class="step-head">
+            <span class="num">6</span>
+            <div class="htext">
+              <h2>店舗情報</h2>
+              <p class="desc">決済を導入する店舗ごとの情報をご入力ください。</p>
+            </div>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">ご記入時の注意事項</span>
+              <span class="ghead">■ 記入対象について</span>
+              <p>QRコード決済をご利用の店舗を、すべてご記入ください。</p>
+              <p>イベントやポップアップショップでご利用の場合は、本社住所をご入力ください。</p>
+              <span class="ghead">■ 入力ルール</span>
+              <table>
+                <tr><th>項目</th><th>ルール</th></tr>
+                <tr><td>店舗名</td><td>全角32文字以内／記号は使用できません</td></tr>
+                <tr><td>店舗名カナ</td><td>半角カタカナのみ</td></tr>
+              </table>
+              <span class="ghead">■ 店舗名・屋号名の確認について</span>
+              <p>「店舗名」「屋号名」は、ご提出・ご入力いただいたURLや店舗写真等で確認できるものをご入力ください。</p>
+              <span class="ghead">■ 店舗情報のURLがない場合</span>
+              <p>以下の2点をご提出ください。</p>
+              <ul>
+                <li>店舗外観（店舗名・屋号名が分かるもの）</li>
+                <li>商品・商材が分かるもの（陳列場所、メニュー表など）</li>
+              </ul>
+              <p class="small">※上記がご用意できない場合は、「書類情報」ページの詳細をご確認ください。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-building-store" aria-hidden="true"></i>店舗名・ブランド名</div>
+            <div class="card-b">
+              <div class="note" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>カタカナ（半角）欄は半角カタカナで入力してください。（例：〇〇 ﾃﾝ）</span></div>
+              <div class="grid3">
+                <div class="field"><label>店舗名 <span class="req">*</span></label><input id="shopName" type="text" placeholder="例）〇〇店"></div>
+                <div class="field"><label>店舗名（半角カナ） <span class="req">*</span></label><input id="shopNameKana" type="text" placeholder="例）〇〇 ﾃﾝ"></div>
+                <div class="field"><label>店舗名（英語表記） <span class="req">*</span></label><input id="shopNameEn" type="text" placeholder="例）〇〇 Store"></div>
+              </div>
+              <div class="grid3" style="margin-top:14px;">
+                <div class="field"><label>ブランド名（屋号） <span class="req">*</span></label><input id="shopBrandName" type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号）（半角カナ） <span class="req">*</span></label><input id="shopBrandNameKana" type="text" placeholder="例）〇〇"></div>
+                <div class="field"><label>ブランド名（屋号）（英語表記） <span class="req">*</span></label><input id="shopBrandNameEn" type="text" placeholder="例）〇〇"></div>
+              </div>
+              <p class="field-err" id="err-step6-name"><i class="ti ti-alert-circle"></i>店舗名・ブランド名に未入力の必須項目があります。</p>
+              <p class="field-err" id="err-step6-name-fmt"><i class="ti ti-alert-circle"></i>カタカナ欄は半角カタカナ、英語表記欄は英字・数字のみで入力してください。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-category" aria-hidden="true"></i>店舗業種・商材</div>
+            <div class="card-b">
+              <div class="grid-shop-info">
+                <div class="field"><label>店舗業種（カテゴリ） <span class="req">*</span></label>
+                  <select id="shopIndustryCategory"><option value="">選択してください</option><option>通信・情報・メディア</option><option>飲食</option><option>小売</option><option>サービス</option><option>宿泊</option><option>製造</option><option>建設</option></select>
+                </div>
+                <div class="field"><label>店舗業種（詳細） <span class="req">*</span></label>
+                  <select id="shopIndustryDetail"><option value="">選択してください</option><option>情報サービス</option><option>ソフトウェア開発</option><option>広告・メディア</option><option>その他</option></select>
+                </div>
+                <div class="field"><label>店舗商材の詳細 <span class="req">*</span></label><input id="shopMerchandise" type="text" placeholder="例）〇〇の販売・提供内容"></div>
+                <div class="field">
+                  <label>店舗数 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="shopCount" type="number" min="1" value="1" inputmode="numeric" placeholder="1">
+                    <span class="input-suffix">店舗</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>平均単価 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="shopAvgPrice" type="number" min="1" placeholder="5,000">
+                    <span class="input-suffix">円</span>
+                  </div>
+                </div>
+              </div>
+              <p class="field-err" id="err-step6-info"><i class="ti ti-alert-circle"></i>店舗業種・商材に未入力の必須項目があります。</p>
+            </div>
+          </div>
+          <div class="card-grid">
+          <div class="card">
+            <div class="card-h"><i class="ti ti-building-bank" aria-hidden="true"></i>口座・レシート</div>
+            <div class="card-b">
+              <div class="note" style="margin-bottom:14px;"><i class="ti ti-info-circle" aria-hidden="true"></i><span>口座情報で登録した入金先口座が表示されます。店舗ごとに別口座を指定する場合は変更してください。</span></div>
+              <div class="grid2">
+                <div class="field"><label>店舗口座 <span class="req">*</span></label><input id="shopAccount" type="text" placeholder="例）〇〇銀行 〇〇支店 普通 1234567 カ）〇〇"></div>
+                <div class="field"><label>レシート名 <span class="req">*</span></label><input id="shopReceiptName" type="text" placeholder="例）〇〇 STORE"></div>
+              </div>
+              <p class="field-err" id="err-step6-account"><i class="ti ti-alert-circle"></i>口座・レシート情報に未入力の必須項目があります。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-map-2" aria-hidden="true"></i>地図掲載</div>
+            <div class="card-b">
+              <div class="grid2">
+                <div class="field"><label>地図掲載希望可否 <span class="req">*</span></label>
+                  <select id="mapWish"><option>希望しない</option><option>希望する</option></select>
+                </div>
+                <div class="field"><label>地図掲載希望日 <span class="help">任意</span></label><input type="date"></div>
+              </div>
+              <div class="grid2" style="margin-top:14px;">
+                <div class="field"><label>緯度 <span class="help">任意</span></label><input type="text" id="storeLatitude" placeholder="例）35.681236"></div>
+                <div class="field"><label>経度 <span class="help">任意</span></label><input type="text" id="storeLongitude" placeholder="例）139.767125"></div>
+              </div>
+            </div>
+          </div>
+
+          </div>
+          <div class="card-grid">
+          <div class="card">
+            <div class="card-h"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>営業時間・定休日</div>
+            <div class="card-b">
+              <div class="grid2">
+                <div class="field"><label>第1営業時間 <span class="help">任意</span></label>
+                  <div class="time-range">
+                    <div class="time-block"><span class="time-lbl">開始</span><input type="time" id="businessHours1Start"></div>
+                    <span class="time-sep">〜</span>
+                    <div class="time-block"><span class="time-lbl">終了</span><input type="time" id="businessHours1End"></div>
+                  </div>
+                </div>
+                <div class="field"><label>第2営業時間 <span class="help">任意</span></label>
+                  <div class="time-range">
+                    <div class="time-block"><span class="time-lbl">開始</span><input type="time" id="businessHours2Start"></div>
+                    <span class="time-sep">〜</span>
+                    <div class="time-block"><span class="time-lbl">終了</span><input type="time" id="businessHours2End"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="field" style="margin-top:14px;">
+                <label>定休日 <span class="help">任意</span></label>
+                <div class="opt-grid" style="grid-template-columns:repeat(auto-fill,minmax(96px,1fr));">
+                  <label class="opt"><input type="checkbox" id="closedMonday">月</label>
+                  <label class="opt"><input type="checkbox" id="closedTuesday">火</label>
+                  <label class="opt"><input type="checkbox" id="closedWednesday">水</label>
+                  <label class="opt"><input type="checkbox" id="closedThursday">木</label>
+                  <label class="opt"><input type="checkbox" id="closedFriday">金</label>
+                  <label class="opt"><input type="checkbox" id="closedSaturday">土</label>
+                  <label class="opt"><input type="checkbox" id="closedSunday">日</label>
+                  <label class="opt"><input type="checkbox" id="closedHoliday">祝日</label>
+                  <label class="opt"><input type="checkbox" id="closedHolidayEve">祝前日</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-photo" aria-hidden="true"></i>店舗の外観・内観写真</div>
+            <div class="card-b">
+              <label class="drop">
+                <span class="dico"><i class="ti ti-photo"></i></span>
+                <span class="meta"><span class="t">店舗の外観・内観写真</span><span class="s">ファイル形式：JPEG・PNG・JPG／ファイルサイズ：2MB以内</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>アップロード</span>
+                <input type="file" accept=".jpg,.jpeg,.png" multiple>
+              </label>
+            </div>
+          </div>
+
+          </div>
+          <div class="card">
+            <div class="card-h"><i class="ti ti-map-pin" aria-hidden="true"></i>店舗所在地・連絡先</div>
+            <div class="card-b">
+              <div class="addr" data-addr="shop">
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="shopZip" type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
+                </div>
+                <div class="copy-row" style="margin-top:14px;">
+                  <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="company" data-to="shop"><i class="ti ti-copy"></i>本社住所と同じ</button>
+                </div>
+                <div class="kana-pair">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select id="shopPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>都道府県（半角カナ） <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input id="shopCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>市区町村（全角カナ） <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input id="shopTown" type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>町域（全角カナ） <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input id="shopBanchi" type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>番地（全角カナ） <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
+                  <div class="field"><label>建物名及び部屋番号（全角カナ） <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                </div>
+                <div class="grid2" style="margin-top:14px;">
+                  <div class="field"><label>電話番号 <span class="req">*</span></label><div class="input-icon"><i class="ti ti-phone"></i><input id="shopTel" type="tel" data-f="tel" placeholder="0312345678"></div></div>
+                  <div class="field"><label>営業許可番号 <span class="help">任意</span></label><input type="text" id="shopBusinessPermitNumber" placeholder="許可業種の場合に入力"></div>
+                </div>
+              </div>
+              <p class="field-err" id="err-step6-addr"><i class="ti ti-alert-circle"></i>店舗所在地・連絡先に未入力の必須項目があります。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-device-desktop" aria-hidden="true"></i>端末情報</div>
+            <div class="card-b">
+              <div class="grid2">
+                <div class="field">
+                  <label>POS端末IC対応状況 <span class="help">任意</span></label>
+                  <div class="seg" data-single>
+                    <label class="opt"><input type="radio" name="terminalIc">IC対応済み</label>
+                    <label class="opt"><input type="radio" name="terminalIc">IC非対応</label>
+                    <label class="opt"><input type="radio" name="terminalIc">IC対応予定あり</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>端末保持状況 <span class="req">*</span></label>
+                  <div class="seg" data-single>
+                    <label class="opt"><input type="radio" name="terminalStatus">保持中</label>
+                    <label class="opt"><input type="radio" name="terminalStatus">保持していない</label>
+                    <label class="opt"><input type="radio" name="terminalStatus">非保持化予定</label>
+                  </div>
+                </div>
+              </div>
+              <p class="field-err" id="err-step6-terminal"><i class="ti ti-alert-circle"></i>端末保持状況を選択してください。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: 書類情報 -->
+        <section class="panel" data-step="6">
+          <div class="step-head">
+            <span class="num">7</span>
+            <div class="htext">
+              <h2>書類情報</h2>
+              <p class="desc">審査に必要な書類をアップロードしてください（PDF・JPEG・PNG）。</p>
+            </div>
+          </div>
+
+          <div class="note warn" style="margin-bottom:14px;">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            <div class="guide">
+              <span class="gtitle">必要書類のご確認</span>
+              <p>各利用決済サービスの申請にあたり、下記の資料のご提出が必要となります。</p>
+
+              <span class="ghead">① 法人・個人事業主共通</span>
+              <p>一覧をご確認のうえ、該当する場合は、営業許可関連書類、本人確認書類のスキャンデータもしくは写真を、JPEG・PDF など画像データでアップロードしてください。</p>
+              <p class="small">※一覧に記載のない許可証につきましても、審査により追加でご提出をお願いする場合がございます。あらかじめご了承ください。</p>
+
+              <span class="ghead">② 個人事業主対象</span>
+              <p>本人確認書類のご提出をお願いします。なお、ご提出いただく資料は現住所が記載された有効期限内のものを、表面・裏面の両方とも JPEG・PDF など画像データでアップロードしてください。</p>
+
+              <span class="ghead">③ 開店前のお申込みで許可書等がご準備できない場合</span>
+              <p>以下のものをご提出ください。ご提出がございませんと、審査を進められない可能性がございます。</p>
+              <ul>
+                <li>ご利用予定の店舗の店舗名・屋号・住所のわかる開業届、店舗図面・設計書（いずれかの書類で可）＋店舗で販売予定の商材の分かる資料（メニュー表など）</li>
+              </ul>
+              <p class="small">※審査の進捗によって、別途、記載のもの以外の資料を追加でご提出いただく可能性がございます。</p>
+
+              <span class="ghead">④ イベント出店でご利用の際、開催前で WEB に情報がない場合</span>
+              <ul>
+                <li>屋号名・法人名などがどの場所に設営するか図示・記載されたイベント会場図面（いずれかの書類で可）、または詳細がわかる資料</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-b">
+              <label class="drop">
+                <span class="dico"><i class="ti ti-certificate"></i></span>
+                <span class="meta"><span class="t">営業許可関連書類（許可証）</span><span class="s">① 該当する場合・JPEG／PDF</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="fileBusinessPermit" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-id"></i></span>
+                <span class="meta"><span class="t">本人確認書類（表面） <span class="req">*</span></span><span class="s">　①② 有効期限内・現住所記載のもの</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="idDocFront" type="file" accept=".pdf,.jpg,.jpeg,.png">
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-id"></i></span>
+                <span class="meta"><span class="t">本人確認書類（裏面）</span><span class="s">② 個人事業主は表裏の両方をご提出</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="idDocBack" type="file" accept=".pdf,.jpg,.jpeg,.png">
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-file-text"></i></span>
+                <span class="meta"><span class="t">開業届・店舗図面・設計書 など</span><span class="s">　③ 開店前で許可証が準備できない場合（いずれか）</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="fileOpeningPlan" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-clipboard-list"></i></span>
+                <span class="meta"><span class="t">販売予定の商材がわかる資料</span><span class="s">　③ メニュー表など</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="fileProductMaterial" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              </label>
+              <label class="drop">
+                <span class="dico"><i class="ti ti-map"></i></span>
+                <span class="meta"><span class="t">イベント会場図面 など</span><span class="s">　④ イベント出店・開催前で WEB 情報がない場合</span></span>
+                <span class="fname"><i class="ti ti-upload"></i>ファイルを選択</span>
+                <input id="fileEventVenue" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              </label>
+              <p class="field-err" id="err-step7-doc"><i class="ti ti-alert-circle"></i>本人確認書類（表面）をアップロードしてください。</p>
+            </div>
+          </div>
+
+          <div class="card idsample-card">
+            <div class="card-h"><i class="ti ti-photo" aria-hidden="true"></i>本人確認書類の例</div>
+            <div class="card-b">
+              <p class="idsample-intro">有効期限内・現住所が記載されたものをご用意ください。記載事項の全体が鮮明に写るように撮影・スキャンしてください。</p>
+              <div class="idsample-grid">
+
+                <div class="idsample">
+                  <h4>運転免許証</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="運転免許証（表面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="14" font-weight="700" fill="#0c447c">運転免許証</text>
+                        <rect x="232" y="52" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="86" r="16" fill="#b7c2d0"/>
+                        <path d="M244 136a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="63" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名</text>
+                        <rect x="20" y="68" width="150" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="93" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="98" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="111" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="135" font-family="sans-serif" font-size="9" fill="#8a97a6">生年月日</text>
+                        <rect x="62" y="127" width="95" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="154" width="284" height="16" rx="3" fill="#fbe9c7"/>
+                        <text x="27" y="166" font-family="sans-serif" font-size="9" fill="#9a7b2a">有効期限</text>
+                      </svg>
+                      <figcaption>表面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>有効期限・公安委員会名・公印が確認できるよう全体を撮影してください。</li>
+                    <li>裏面に記載（変更履歴など）がある場合は、裏面も提出が必要です。</li>
+                  </ul>
+                </div>
+
+                <div class="idsample">
+                  <h4>在留カード</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="在留カードのイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v24H3z" fill="#e9f1fb"/>
+                        <text x="16" y="23" font-family="sans-serif" font-size="13" font-weight="700" fill="#0c447c">在留カード</text>
+                        <text x="16" y="34" font-family="sans-serif" font-size="7" fill="#5a7aa0">RESIDENCE CARD</text>
+                        <rect x="232" y="54" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="88" r="16" fill="#b7c2d0"/>
+                        <path d="M244 138a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="64" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名 / NAME</text>
+                        <rect x="20" y="69" width="160" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="92" font-family="sans-serif" font-size="9" fill="#8a97a6">国籍・地域</text>
+                        <rect x="20" y="97" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="118" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="123" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="146" font-family="sans-serif" font-size="9" fill="#8a97a6">在留資格</text>
+                        <rect x="62" y="138" width="110" height="9" rx="3" fill="#d7dde6"/>
+                        <g><rect x="20" y="158" width="30" height="22" rx="3" fill="#d9b24a"/><rect x="24" y="162" width="22" height="14" rx="2" fill="none" stroke="#b8923a"/><line x1="35" y1="158" x2="35" y2="180" stroke="#b8923a"/><line x1="20" y1="169" x2="50" y2="169" stroke="#b8923a"/></g>
+                      </svg>
+                      <figcaption>表面・裏面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>有効期限内のものをご提出ください。</li>
+                    <li>住所等の記載がある裏面も、表面とあわせて提出が必要です。</li>
+                  </ul>
+                </div>
+
+                <div class="idsample">
+                  <h4>マイナンバーカード</h4>
+                  <div class="imgs">
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="マイナンバーカード（表面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="12" font-weight="700" fill="#0c447c">マイナンバーカード</text>
+                        <rect x="232" y="52" width="72" height="92" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <circle cx="268" cy="86" r="16" fill="#b7c2d0"/>
+                        <path d="M244 136a24 24 0 0 1 48 0z" fill="#b7c2d0"/>
+                        <text x="20" y="63" font-family="sans-serif" font-size="9" fill="#8a97a6">氏名</text>
+                        <rect x="20" y="68" width="150" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="93" font-family="sans-serif" font-size="9" fill="#8a97a6">住所</text>
+                        <rect x="20" y="98" width="195" height="9" rx="3" fill="#d7dde6"/>
+                        <rect x="20" y="111" width="120" height="9" rx="3" fill="#d7dde6"/>
+                        <text x="20" y="135" font-family="sans-serif" font-size="9" fill="#8a97a6">生年月日</text>
+                        <rect x="62" y="127" width="95" height="9" rx="3" fill="#d7dde6"/>
+                        <g><rect x="20" y="152" width="30" height="22" rx="3" fill="#d9b24a"/><rect x="24" y="156" width="22" height="14" rx="2" fill="none" stroke="#b8923a"/><line x1="35" y1="152" x2="35" y2="174" stroke="#b8923a"/><line x1="20" y1="163" x2="50" y2="163" stroke="#b8923a"/></g>
+                      </svg>
+                      <figcaption>表面</figcaption>
+                    </figure>
+                    <figure>
+                      <svg viewBox="0 0 320 200" role="img" aria-label="マイナンバーカード（裏面）のイラスト見本">
+                        <rect x="3" y="3" width="314" height="194" rx="12" fill="#ffffff" stroke="#cfd6e0" stroke-width="2"/>
+                        <path d="M3 15a12 12 0 0 1 12-12h290a12 12 0 0 1 12 12v22H3z" fill="#e9f1fb"/>
+                        <text x="16" y="26" font-family="sans-serif" font-size="11" font-weight="700" fill="#0c447c">マイナンバーカード（裏面）</text>
+                        <text x="20" y="66" font-family="sans-serif" font-size="9" fill="#8a97a6">個人番号</text>
+                        <rect x="20" y="72" width="184" height="26" rx="4" fill="#eef2f7" stroke="#cfd6e0"/>
+                        <text x="30" y="91" font-family="sans-serif" font-size="15" letter-spacing="4" fill="#aeb9c6">●●●● ●●●● ●●●●</text>
+                        <text x="20" y="120" font-family="sans-serif" font-size="8" fill="#c0392b">提出時は個人番号を隠してください</text>
+                        <g transform="translate(236,96)">
+                          <rect width="64" height="64" fill="#ffffff" stroke="#cfd6e0"/>
+                          <rect x="6" y="6" width="16" height="16" fill="#1b2733"/><rect x="10" y="10" width="8" height="8" fill="#ffffff"/><rect x="12" y="12" width="4" height="4" fill="#1b2733"/>
+                          <rect x="42" y="6" width="16" height="16" fill="#1b2733"/><rect x="46" y="10" width="8" height="8" fill="#ffffff"/><rect x="48" y="12" width="4" height="4" fill="#1b2733"/>
+                          <rect x="6" y="42" width="16" height="16" fill="#1b2733"/><rect x="10" y="46" width="8" height="8" fill="#ffffff"/><rect x="12" y="48" width="4" height="4" fill="#1b2733"/>
+                          <rect x="28" y="8" width="4" height="4" fill="#1b2733"/><rect x="34" y="14" width="4" height="4" fill="#1b2733"/><rect x="28" y="28" width="4" height="4" fill="#1b2733"/><rect x="40" y="34" width="4" height="4" fill="#1b2733"/><rect x="48" y="40" width="4" height="4" fill="#1b2733"/><rect x="30" y="46" width="4" height="4" fill="#1b2733"/><rect x="40" y="52" width="4" height="4" fill="#1b2733"/><rect x="52" y="50" width="4" height="4" fill="#1b2733"/>
+                        </g>
+                      </svg>
+                      <figcaption>裏面</figcaption>
+                    </figure>
+                  </div>
+                  <ul>
+                    <li>顔写真・氏名・住所・生年月日が記載された表面をご提出ください。</li>
+                    <li>裏面の個人番号（マイナンバー）が写らないようご注意ください（提出不要）。</li>
+                  </ul>
+                </div>
+
+              </div>
+              <p class="idsample-credit">※イラストは記載位置を示す見本です。実物の券面とは異なります。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 8: 発送申込 -->
+        <section class="panel" data-step="7">
+          <div class="step-head">
+            <span class="num">8</span>
+            <div class="htext">
+              <h2>発送申込</h2>
+              <p class="desc">決済端末のお届け先・受取人をご入力ください。</p>
+            </div>
+            <span class="legend"><span class="req">*</span> は必須項目です</span>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-device-mobile" aria-hidden="true"></i>ご注文内容</div>
+            <div class="card-b">
+              <div class="order-item">
+                <div class="order-prod">
+                  <div class="pimg" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="26" y="6" width="48" height="80" rx="8" fill="#0c447c"/>
+                      <rect x="31" y="13" width="38" height="46" rx="3" fill="#eaf2fb"/>
+                      <rect x="35" y="18" width="30" height="6" rx="2" fill="#9cc6f2"/>
+                      <rect x="35" y="28" width="20" height="4" rx="2" fill="#c2d8f0"/>
+                      <circle cx="37" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="50" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="63" cy="68" r="4" fill="#9cc6f2"/>
+                      <circle cx="37" cy="78" r="4" fill="#9cc6f2"/>
+                      <circle cx="50" cy="78" r="4" fill="#9cc6f2"/>
+                      <circle cx="63" cy="78" r="4" fill="#9cc6f2"/>
+                      <rect x="40" y="90" width="20" height="6" rx="3" fill="#1b66b3"/>
+                    </svg>
+                  </div>
+                  <div class="pinfo">
+                    <p class="pname">mPOS 決済端末</p>
+                    <p class="pdesc">キャッシュレス決済対応のモバイル決済端末（1台あたり）</p>
+                    <div class="unit-price">
+                      <span class="up-label">単価</span>
+                      <span class="up-val" id="unitPrice" data-price="15400">15,400</span><span class="up-yen">円</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="qty-area">
+                  <span class="qty-label">数 量</span>
+                  <div class="qty-stepper">
+                    <button type="button" id="qtyMinus" aria-label="数量を減らす"><i class="ti ti-minus" aria-hidden="true"></i></button>
+                    <input type="number" id="qty" data-f="qty" value="1" min="1" max="99" inputmode="numeric">
+                    <button type="button" id="qtyPlus" aria-label="数量を増やす"><i class="ti ti-plus" aria-hidden="true"></i></button>
+                  </div>
+                  <span class="qty-unit">台</span>
+                </div>
+              </div>
+              <div class="order-total-bar">
+                <span class="calc-expr" id="calcText">15,400円 × 1台</span>
+                <div class="order-total-right">
+                  <span class="total-label">合 計</span>
+                  <span class="total-amount"><span id="totalAmount">15,400</span></span>
+                  <span class="total-yen">円</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><i class="ti ti-truck-delivery" aria-hidden="true"></i>お届け先</div>
+            <div class="card-b">
+              <div class="copy-row" style="margin-bottom:14px;">
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="company" data-to="delivery"><i class="ti ti-copy"></i>本社住所と同じ</button>
+                <button type="button" class="btn btn-ghost btn-sm addr-copy" data-from="rep" data-to="delivery"><i class="ti ti-copy"></i>代表者住所と同じ</button>
+              </div>
+              <div class="addr" data-addr="delivery">
+                <div class="sub-h"><i class="ti ti-map-pin"></i>住所</div>
+                <div class="field">
+                  <label>郵便番号 <span class="req">*</span></label>
+                  <div class="input-row">
+                    <input id="deliveryZip" type="text" data-f="zip" placeholder="1000001" style="max-width:180px;">
+                    <button type="button" class="btn btn-ghost btn-sm addr-auto"><i class="ti ti-map-pin"></i>住所自動入力</button>
+                  </div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>都道府県 <span class="req">*</span></label>
+                    <select id="deliveryPref" data-f="pref"><option value="">選択してください</option><option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option></select>
+                  </div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="prefk" class="autofill" placeholder="自動入力" readonly></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>市区町村 <span class="req">*</span></label><input id="deliveryCity" type="text" data-f="city" placeholder="例）〇〇市〇〇区"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="cityk" placeholder="例）〇〇シ〇〇ク"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>町域 <span class="req">*</span></label><input id="deliveryTown" type="text" data-f="town" placeholder="例）〇〇町"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="townk" placeholder="例）〇〇チョウ"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>番地 <span class="req">*</span></label><input id="deliveryBanchi" type="text" data-f="banchi" placeholder="例）1-2-3"></div>
+                  <div class="field"><label>カタカナ <span class="req">*</span></label><input type="text" data-f="banchik" placeholder="例）1-2-3"></div>
+                </div>
+                <div class="kana-pair" style="margin-top:14px;">
+                  <div class="field"><label>建物名及び部屋番号 <span class="help">任意</span></label><input type="text" data-f="bldg" placeholder="例）〇〇ビル 3F"></div>
+                  <div class="field"><label>カタカナ <span class="help">任意</span></label><input type="text" data-f="bldgk" placeholder="例）〇〇ビル3カイ"></div>
+                </div>
+
+                <div class="sub-h"><i class="ti ti-phone"></i>電話番号</div>
+                <div class="field">
+                  <label>電話番号 <span class="req">*</span></label>
+                  <div class="input-icon" style="max-width:280px;"><i class="ti ti-phone"></i><input id="deliveryTel" type="tel" data-f="tel" placeholder="0312345678"></div>
+                </div>
+
+                <div class="sub-h"><i class="ti ti-user"></i>受取人</div>
+                <div class="field">
+                  <label>受取人 <span class="req">*</span></label>
+                  <input id="deliveryReceiver" type="text" data-f="receiver" placeholder="例）〇〇 〇〇" style="max-width:280px;">
+                </div>
+              </div>
+              <p class="field-err" id="err-step8-delivery"><i class="ti ti-alert-circle"></i>お届け先に未入力の必須項目があります。</p>
+            </div>
+          </div>
+
+          <div class="note"><i class="ti ti-circle-check" aria-hidden="true"></i><span>「最終確認」を押すと、入力内容の確認画面へ進みます。</span></div>
+        </section>
+
+        <!-- STEP 9: 最終確認 -->
+        <section class="panel" data-step="8">
+          <div class="step-head">
+            <span class="num">9</span>
+            <div class="htext">
+              <h2>最終確認</h2>
+              <p class="desc">入力・選択した内容をカテゴリごとに確認できます。修正する場合は各カテゴリの「修正」を押してください。</p>
+            </div>
+          </div>
+
+          <div id="reviewArea"></div>
+
+          <div class="note"><i class="ti ti-circle-check" aria-hidden="true"></i><span>「登録する」を押すと申請内容が確定し、審査・発送手続きが開始されます。</span></div>
+          <p class="field-err" id="err-submit" style="margin-top:16px;"><i class="ti ti-alert-circle"></i><span id="err-submit-msg"></span></p>
+        </section>
+
+      </div>
+
+      <div class="actions">
+        <span class="prog" id="prog"></span>
+        <span class="step1-err" id="step1Err" role="alert">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>すべての規約を「規約を確認」で確認してからお進みください。
+        </span>
+        <button type="button" class="btn btn-ghost" id="back"><i class="ti ti-arrow-left"></i>前ページへ</button>
+        <button type="submit" class="btn btn-primary" id="next">次へ進む<i class="ti ti-arrow-right"></i></button>
+      </div>
+
+    </div>
+  </form>
+
+  <!-- 登録確認モーダル -->
+  <div id="modalConfirm" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.55);z-index:9000;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:36px 40px;max-width:440px;width:90%;box-shadow:0 24px 60px rgba(12,34,64,0.22);text-align:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:#e9f1fb;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <i class="ti ti-help" style="font-size:26px;color:#1b66b3;"></i>
+      </div>
+      <h3 style="margin:0 0 10px;font-size:18px;color:#1b2733;">申込内容を登録しますか？</h3>
+      <p style="margin:0 0 28px;font-size:14px;color:#5a6675;line-height:1.7;">入力内容をご確認のうえ、登録してください。</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button type="button" id="modalConfirmCancel" style="font-family:inherit;font-size:14px;font-weight:600;padding:11px 28px;border-radius:8px;border:1px solid rgba(20,45,80,0.20);background:#fff;color:#5a6675;cursor:pointer;">キャンセル</button>
+        <button type="button" id="modalConfirmOk" style="font-family:inherit;font-size:14px;font-weight:700;padding:11px 28px;border-radius:8px;border:none;background:#1b66b3;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(27,102,179,0.30);">登録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登録完了モーダル -->
+  <div id="modalComplete" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.55);z-index:9000;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:36px 40px;max-width:480px;width:90%;box-shadow:0 24px 60px rgba(12,34,64,0.22);">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:#e6f4ea;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;">
+          <i class="ti ti-circle-check" style="font-size:30px;color:#2e7d32;"></i>
+        </div>
+        <h3 style="margin:0 0 6px;font-size:20px;color:#1b2733;">申込が完了しました</h3>
+        <p style="margin:0;font-size:13px;color:#5a6675;">ご申込ありがとうございます。審査・発送手続きを開始します。</p>
+      </div>
+      <div style="background:#f3f7fc;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#5a6675;font-weight:500;">会員コード</span>
+          <span id="completeMemberCode" style="font-size:16px;font-weight:700;color:#0c447c;letter-spacing:.05em;"></span>
+        </div>
+      </div>
+      <div style="background:#fdf3e3;border:1px solid #ecd9b4;border-radius:10px;padding:14px 16px;margin-bottom:24px;display:flex;gap:10px;">
+        <i class="ti ti-mail" style="font-size:18px;color:#8a5410;margin-top:1px;flex-shrink:0;"></i>
+        <p style="margin:0;font-size:13px;color:#8a5410;line-height:1.7;">会員コード・仮パスワード・パスワード設定用URLを登録のメールアドレスへ送信しました。メールをご確認のうえ、パスワードを設定してください。数分経ってもメールが届かない場合は、迷惑メールフォルダをご確認いただくか、お問い合わせください。</p>
+      </div>
+      <button type="button" id="modalCompleteClose" style="width:100%;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;border:none;background:#1b66b3;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(27,102,179,0.30);">閉じる</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  // 事前確認の a-row ラベルは手動クリックによるチェック切替を禁止する
+  // （agreement-link は stopPropagation 済みのため、このハンドラは link クリック時には呼ばれない）
+  document.querySelectorAll('.a-row').forEach(function (label) {
+    label.addEventListener('click', function (e) {
+      e.preventDefault();
+    });
+    // チェックボックスを直接クリックした場合はエラーメッセージを表示する
+    var checkbox = label.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.checked) {
+          showAgreementError(label);
+        }
+      });
+    }
+  });
+
+  function showAgreementError(row) {
+    document.querySelectorAll('.a-row-err').forEach(function (el) { el.remove(); });
+    var err = document.createElement('p');
+    err.className = 'a-row-err';
+    err.textContent = '「規約を確認」をクリックして規約をご確認ください。';
+    row.insertAdjacentElement('afterend', err);
+    var link = row.querySelector('.agreement-link');
+    if (link) {
+      link.classList.remove('highlight');
+      void link.offsetWidth;
+      link.classList.add('highlight');
+      link.addEventListener('animationend', function () {
+        link.classList.remove('highlight');
+      }, { once: true });
+    }
+    setTimeout(function () { err.remove(); }, 3_000);
+  }
+
+  // 規約リンクをクリックしたとき、ラベルのトグルを止めてチェックのみを付ける
+  document.querySelectorAll('.agreement-link').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var checkbox = document.getElementById(link.dataset.for);
+      if (checkbox) {
+        checkbox.checked = true;
+      }
+      // href が "#" のままのときはページ内ジャンプを防ぐ
+      if (link.getAttribute('href') === '#') {
+        e.preventDefault();
+      }
+    });
+  });
+
+  const steps = ["事前確認", "取引形態", "決済種類", "法人情報", "口座情報", "店舗情報", "書類情報", "発送申込", "最終確認"];
+  const total = steps.length;
+  let current = 0;
+  // 最終確認画面の「修正」から各ステップへ移動したかどうか。
+  // true のときに「戻る」を押すと最終確認画面へ戻す。
+  let cameFromReview = false;
+
+  const stepperEl = document.getElementById('stepper');
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const backBtn = document.getElementById('back');
+  const nextBtn = document.getElementById('next');
+  const progEl = document.getElementById('prog');
+  const step1ErrEl = document.getElementById('step1Err');
+  const reviewArea = document.getElementById('reviewArea');
+
+  function buildStepper() {
+    stepperEl.innerHTML = '';
+    steps.forEach((name, i) => {
+      const step = document.createElement('button');
+      step.type = 'button';
+      step.className = 'step';
+      if (i === current) step.classList.add('is-active');
+      if (i < current) step.classList.add('is-done');
+
+      const dot = document.createElement('span');
+      dot.className = 'dot ' + (i < current ? 'done' : i === current ? 'active' : 'todo');
+      dot.innerHTML = i < current ? '<i class="ti ti-check" style="font-size:15px;"></i>' : (i + 1);
+
+      const txt = document.createElement('span');
+      txt.className = 'stxt';
+      txt.textContent = name;
+
+      step.appendChild(dot);
+      step.appendChild(txt);
+      // ステッパーのページ名クリックによる遷移は廃止（表示のみ）。
+      // 遷移は「次へ進む」「戻る」、最終確認の「修正」からのみ行う。
+      step.disabled = true;
+      stepperEl.appendChild(step);
+
+      if (i < steps.length - 1) {
+        const bar = document.createElement('div');
+        bar.className = 'bar' + (i < current ? ' done' : '');
+        stepperEl.appendChild(bar);
+      }
+    });
+  }
+
+  function render() {
+    panels.forEach(p => p.classList.toggle('show', Number(p.dataset.step) === current));
+    // 事前確認(先頭)では通常「戻る」を非表示にする。ただし最終確認の
+    // 「修正」から来た場合は表示し、押下で最終確認画面へ戻れるようにする
+    if (current === 0 && !cameFromReview) {
+      backBtn.style.display = 'none';
+    } else {
+      backBtn.style.display = '';
+      backBtn.disabled = false;
+    }
+    if (current === total - 1) {
+      nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+    } else if (current === total - 2) {
+      // 発送申込 の次は最終確認画面へ進む
+      nextBtn.innerHTML = '最終確認<i class="ti ti-arrow-right"></i>';
+    } else {
+      nextBtn.innerHTML = '次へ進む<i class="ti ti-arrow-right"></i>';
+    }
+    // 店舗情報ステップ表示時に、法人情報から店舗名・ブランド名を自動入力する
+    if (current === 5) {
+      var prefillMap = [
+        ['shopName',          'companyName'],
+        ['shopNameKana',      'companyNameKana'],
+        ['shopNameEn',        'companyNameEn'],
+        ['shopBrandName',     'brandName'],
+        ['shopBrandNameKana', 'brandNameKana'],
+        ['shopBrandNameEn',   'brandNameEn']
+      ];
+      prefillMap.forEach(function(pair) {
+        var dest = document.getElementById(pair[0]);
+        var src  = document.getElementById(pair[1]);
+        if (dest && src && dest.value.trim() === '') {
+          dest.value = src.value;
+        }
+      });
+
+      // 口座情報から店舗口座を自動入力する
+      var shopAcc = document.getElementById('shopAccount');
+      if (shopAcc && shopAcc.value.trim() === '') {
+        var bkname = document.getElementById('acc-bkname').value.trim();
+        var brname = document.getElementById('acc-brname').value.trim();
+        var acctypeEl = document.querySelector('input[name="acctype"]:checked');
+        var acctype = acctypeEl ? acctypeEl.parentElement.textContent.trim() : '';
+        var accnum = document.getElementById('acc-num').value.trim();
+        var acckana = document.getElementById('acc-kana').value.trim();
+        if (bkname || brname || accnum) {
+          var bknameDisp = bkname ? bkname + '銀行' : '';
+          var brnameDisp = brname ? brname + '支店' : '';
+          shopAcc.value = [bknameDisp, brnameDisp, acctype, accnum, acckana]
+              .filter(function(v) { return v !== ''; }).join(' ');
+        }
+      }
+    }
+    // 最終確認ステップを表示する直前に、入力内容の確認リストを組み立てる
+    if (current === total - 1) buildReview();
+    progEl.textContent = 'ステップ ' + (current + 1) + ' / ' + total + '：' + steps[current];
+    step1ErrEl.classList.remove('visible');
+    buildStepper();
+    document.querySelector('.panel-area').scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goTo(i) {
+    if (i < 0 || i >= total) return;
+    current = i;
+    render();
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (cameFromReview) {
+      // 最終確認の「修正」から来た場合は、最終確認画面へ戻す
+      cameFromReview = false;
+      goTo(total - 1);
+    } else {
+      goTo(current - 1);
+    }
+  });
+
+  // ---- 最終確認: 各カテゴリ (ステップ) の入力・選択内容を収集する ----
+
+  // 項目ラベルを取得する。必須マーク(span.req)を「※」に、任意(span.help)は除去する
+  function reviewLabelText(field) {
+    const label = field.querySelector(':scope > label');
+    if (!label) return '';
+    const clone = label.cloneNode(true);
+    clone.querySelectorAll('span.req').forEach(el => { el.textContent = '※'; el.style.fontSize = ''; });
+    clone.querySelectorAll('span.help').forEach(el => el.remove());
+    return clone.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // 単一入力欄 (テキスト・選択など) の値を取得する。該当しなければ null
+  function reviewFieldValue(field) {
+    const select = field.querySelector('select');
+    if (select) {
+      const opt = select.options[select.selectedIndex];
+      return opt ? opt.text.trim() : '';
+    }
+    const input = field.querySelector(
+        'input[type="text"], input[type="tel"], input[type="email"],'
+        + ' input[type="number"], input[type="date"]');
+    if (input) {
+      var v = input.value.trim();
+      var suffix = field.querySelector('.input-suffix');
+      return suffix && v ? v + suffix.textContent.trim() : v;
+    }
+    const textarea = field.querySelector('textarea');
+    if (textarea) return textarea.value.trim();
+    return null;
+  }
+
+  // 1 つのパネル (カテゴリ) から確認用の「ラベル: 値」の一覧を作る。
+  // showAllItems が true のカテゴリ (事前確認・取引形態・決済種類) では、
+  // チェック・選択されていない項目も「未選択／未確認」として表示する。
+  function collectPanelValues(panel, showAllItems) {
+    const rows = [];
+    // 単一入力項目 (テキスト・選択)。未入力は「未入力」として表示する
+    panel.querySelectorAll('.field').forEach(field => {
+      const value = reviewFieldValue(field);
+      if (value === null) return;
+      rows.push({
+        label: reviewLabelText(field),
+        value: value === '' ? '未入力' : value,
+        na: value === ''
+      });
+    });
+
+    if (showAllItems) {
+      // 選択肢 (チェックボックス・ラジオ) を未選択も含めて全件表示
+      panel.querySelectorAll('.opt').forEach(opt => {
+        const input = opt.querySelector(
+            'input[type="checkbox"], input[type="radio"]');
+        if (!input) return;
+        rows.push({
+          label: opt.textContent.replace(/\s+/g, ' ').trim(),
+          value: input.checked ? '選択' : '未選択',
+          na: !input.checked
+        });
+      });
+      // 同意・確認 (規約等) を未確認も含めて全件表示。各項目は必須扱い
+      panel.querySelectorAll('.a-row').forEach(row => {
+        const input = row.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        const name = row.querySelector('.aname');
+        rows.push({
+          label: name ? name.textContent.trim() : '確認事項',
+          value: input.checked ? '確認済み' : '未確認',
+          na: !input.checked
+        });
+      });
+      panel.querySelectorAll('.attest').forEach(att => {
+        const input = att.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        rows.push({
+          label: '権限者による確認',
+          value: input.checked ? '確認済み' : '未確認',
+          na: !input.checked
+        });
+      });
+    } else {
+      // その他のカテゴリ：チェックされた項目のみ集約して表示
+      const selectedOptions = [];
+      panel.querySelectorAll('.opt input:checked').forEach(input => {
+        const opt = input.closest('.opt');
+        if (opt) {
+          selectedOptions.push(opt.textContent.replace(/\s+/g, ' ').trim());
+        }
+      });
+      if (selectedOptions.length) {
+        rows.push({ label: '選択項目', value: selectedOptions.join('、') });
+      }
+      const agreed = [];
+      panel.querySelectorAll(
+          '.a-row input[type="checkbox"]:checked, .attest input:checked'
+      ).forEach(input => {
+        const row = input.closest('.a-row');
+        const name = row ? row.querySelector('.aname') : null;
+        agreed.push(name ? name.textContent.trim() : '確認済み');
+      });
+      if (agreed.length) {
+        rows.push({ label: '同意・確認', value: agreed.join('、') });
+      }
+    }
+
+    // 添付ファイル (共通)
+    panel.querySelectorAll('.drop').forEach(drop => {
+      const fileInput = drop.querySelector('input[type="file"]');
+      const title = drop.querySelector('.meta .t');
+      const label = title ? title.textContent.trim() : '書類';
+      let value = '未選択';
+      if (fileInput && fileInput.files && fileInput.files.length) {
+        value = fileInput.files.length > 1
+            ? fileInput.files.length + ' 件選択' : fileInput.files[0].name;
+      }
+      rows.push({ label: label, value: value, na: value === '未選択' });
+    });
+    return rows;
+  }
+
+  // 最終確認パネルへ、カテゴリ別カード (修正ボタン付き) を組み立てる
+  function buildReview() {
+    if (!reviewArea) return;
+    reviewArea.innerHTML = '';
+    // 最終確認 (最後のステップ) 自身は除外して、各カテゴリを並べる
+    for (let i = 0; i < total - 1; i++) {
+      const panel = panels.find(p => Number(p.dataset.step) === i);
+      if (!panel) continue;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const head = document.createElement('div');
+      head.className = 'card-h';
+      head.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i>'
+          + '<span>' + (i + 1) + '. ' + steps[i] + '</span>';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'btn btn-ghost btn-sm review-edit';
+      editBtn.innerHTML = '<i class="ti ti-edit"></i>修正';
+      // 修正後に「戻る」で最終確認画面へ戻れるようにフラグを立てる
+      editBtn.addEventListener('click', () => { cameFromReview = true; goTo(i); });
+      head.appendChild(editBtn);
+
+      const body = document.createElement('div');
+      body.className = 'card-b';
+      // 事前確認(0)・取引形態(1)・決済種類(2) は未設定項目も表示する
+      const rows = collectPanelValues(panel, i <= 2);
+      if (!rows.length) {
+        body.innerHTML = '<p class="rv-empty">入力・選択された項目はありません。</p>';
+      } else {
+        const dl = document.createElement('dl');
+        dl.className = 'rv-list';
+        rows.forEach(r => {
+          const dt = document.createElement('dt');
+          dt.textContent = r.label || '—';
+          const dd = document.createElement('dd');
+          dd.textContent = r.value;
+          if (r.na) dd.classList.add('rv-na');
+          dl.appendChild(dt);
+          dl.appendChild(dd);
+        });
+        body.appendChild(dl);
+      }
+
+      card.appendChild(head);
+      card.appendChild(body);
+      reviewArea.appendChild(card);
+    }
+  }
+
+  // 取引形態：「①〜⑥に該当しない」と①〜⑥の排他
+  const txNone = document.getElementById('txNone');
+  const txGrid = document.getElementById('txGrid');
+  if (txNone && txGrid) {
+    const txBoxes = txGrid.querySelectorAll('input[type="checkbox"]');
+    txNone.addEventListener('change', function () {
+      txBoxes.forEach(b => {
+        if (this.checked) { b.checked = false; b.closest('.opt').classList.remove('checked'); }
+        b.disabled = this.checked;
+        b.closest('.opt').style.opacity = this.checked ? '0.5' : '1';
+      });
+    });
+    txBoxes.forEach(b => b.addEventListener('change', function () {
+      if (this.checked) { txNone.checked = false; txNone.closest('.opt').classList.remove('checked'); }
+    }));
+  }
+
+  // バリデーション用ヘルパー関数
+  function hasValue(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim() !== '';
+  }
+
+  function isSelected(id) {
+    var el = document.getElementById(id);
+    return el && el.value !== '' && el.value !== null;
+  }
+
+  var HANKAKU_KANA_RE = /^[ｦ-ﾟ ()]+$/;
+  var ALPHA_EN_RE = /^[A-Za-z0-9 .,\-&'\/\(\)]+$/;
+
+  function isHankakuKana(id) {
+    var el = document.getElementById(id);
+    if (!el) return true;
+    var v = el.value.trim();
+    return v === '' || HANKAKU_KANA_RE.test(v);
+  }
+
+  function isAlphaEn(id) {
+    var el = document.getElementById(id);
+    if (!el) return true;
+    var v = el.value.trim();
+    return v === '' || ALPHA_EN_RE.test(v);
+  }
+
+  function markInputErr(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('input-err');
+  }
+
+  function clearInputErr(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('input-err');
+  }
+
+  function markAddrErr(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return;
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    if (el) el.classList.add('input-err');
+  }
+
+  function clearAddrErr(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return;
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    if (el) el.classList.remove('input-err');
+  }
+
+  function chkReqField(id, errObj) {
+    if (!hasValue(id)) { markInputErr(id); errObj.v = true; } else { clearInputErr(id); }
+  }
+
+  function chkSelField(id, errObj) {
+    if (!isSelected(id)) { markInputErr(id); errObj.v = true; } else { clearInputErr(id); }
+  }
+
+  function chkAddrField(addrName, fieldName, errObj) {
+    if (af(addrName, fieldName) === '') { markAddrErr(addrName, fieldName); errObj.v = true; } else { clearAddrErr(addrName, fieldName); }
+  }
+
+  function focusFirstErr(panel) {
+    var el = (panel || document).querySelector('input.input-err, select.input-err, textarea.input-err');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() { el.focus(); }, 300);
+      return;
+    }
+    var errMsg = (panel || document).querySelector('.field-err.visible');
+    if (errMsg) {
+      errMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function checkKanaFields(ids, hasErrObj) {
+    var fmt = false;
+    ids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.value.trim();
+      if (v !== '' && !HANKAKU_KANA_RE.test(v)) {
+        markInputErr(id); fmt = true; hasErrObj.v = true;
+      } else if (v !== '') {
+        clearInputErr(id);
+      }
+    });
+    return fmt;
+  }
+
+  function checkEnFields(ids, hasErrObj) {
+    var fmt = false;
+    ids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.value.trim();
+      if (v !== '' && !ALPHA_EN_RE.test(v)) {
+        markInputErr(id); fmt = true; hasErrObj.v = true;
+      } else if (v !== '') {
+        clearInputErr(id);
+      }
+    });
+    return fmt;
+  }
+
+  function selectAllGrid(gridId) {
+    document.querySelectorAll('#' + gridId + ' input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = true;
+      cb.closest('.opt').classList.add('checked');
+    });
+  }
+
+  function clearAllGrid(gridId) {
+    document.querySelectorAll('#' + gridId + ' input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = false;
+      cb.closest('.opt').classList.remove('checked');
+    });
+  }
+
+  // データ収集用ヘルパー関数
+  function gf(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function af(addrName, fieldName) {
+    var addr = document.querySelector('.addr[data-addr="' + addrName + '"]');
+    if (!addr) return '';
+    var el = addr.querySelector('[data-f="' + fieldName + '"]');
+    return el ? el.value.trim() : '';
+  }
+
+  function gridChk(gridId, idx) {
+    var grid = document.getElementById(gridId);
+    if (!grid) return false;
+    var inputs = grid.querySelectorAll('input[type="checkbox"]');
+    return inputs[idx] ? inputs[idx].checked : false;
+  }
+
+  function radioVal(name) {
+    var checked = document.querySelector('input[name="' + name + '"]:checked');
+    if (!checked) return '';
+    var opt = checked.closest('.opt');
+    return opt ? opt.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+
+  // submit / next
+  document.getElementById('wizard').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (current < total - 1) {
+      // 事前確認（STEP 1）はすべての規約チェックボックスが確認済みでないと進めない
+      if (current === 0) {
+        var unchecked = panels[0].querySelectorAll(
+            'input[type="checkbox"].req:not(:checked)');
+        if (unchecked.length > 0) {
+          step1ErrEl.classList.add('visible');
+          return;
+        }
+      }
+      // STEP 2: 取引形態のバリデーション
+      if (current === 1) {
+        var step2HasError = false;
+
+        var txChecked = document.querySelector('#txGrid input:checked, #txNone:checked');
+        var errTx = document.getElementById('err-tx-type');
+        if (!txChecked) {
+          errTx.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errTx.classList.remove('visible');
+        }
+
+        var bizkind = document.querySelector('input[name="bizkind"]:checked');
+        var errBizkind = document.getElementById('err-bizkind');
+        if (!bizkind) {
+          errBizkind.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errBizkind.classList.remove('visible');
+        }
+
+        var saleform = document.querySelector('input[name="saleform"]:checked');
+        var errSaleform = document.getElementById('err-saleform');
+        if (!saleform) {
+          errSaleform.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errSaleform.classList.remove('visible');
+        }
+
+        var opform = document.querySelector('input[name="opform"]:checked');
+        var errOpform = document.getElementById('err-opform');
+        if (!opform) {
+          errOpform.classList.add('visible');
+          step2HasError = true;
+        } else {
+          errOpform.classList.remove('visible');
+        }
+
+        if (step2HasError) { focusFirstErr(panels[1]); return; }
+      }
+
+      // STEP 3: 決済種類のバリデーション
+      if (current === 2) {
+        var step3HasError = false;
+
+        var errQr = document.getElementById('err-qr');
+        if (!document.querySelector('#qrGrid input:checked')) {
+          errQr.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errQr.classList.remove('visible');
+        }
+
+        var errCredit = document.getElementById('err-credit');
+        if (!document.querySelector('#creditGrid input:checked')) {
+          errCredit.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errCredit.classList.remove('visible');
+        }
+
+        var errEmoney = document.getElementById('err-emoney');
+        if (!document.querySelector('#emoneyGrid input:checked')) {
+          errEmoney.classList.add('visible');
+          step3HasError = true;
+        } else {
+          errEmoney.classList.remove('visible');
+        }
+
+        if (step3HasError) { focusFirstErr(panels[2]); return; }
+      }
+
+      // STEP 4: 法人情報のバリデーション
+      if (current === 3) {
+        var step4HasError = false;
+        var s4err = { v: false };
+
+        // --- 申込者情報 ---
+        var errCorp = document.getElementById('err-step4-corp');
+        var errCorpFmt = document.getElementById('err-step4-corp-fmt');
+        var s4corp = { v: false };
+        ['houjinNumber','companyName','companyNameKana','companyNameEn','corporateEstDate',
+         'brandName','brandNameKana','brandNameEn','annualSales','businessContent'
+        ].forEach(function(id) { chkReqField(id, s4corp); });
+        chkSelField('industryCategory', s4corp);
+        chkSelField('industryDetail', s4corp);
+        ['zip','pref','city','cityk','town','townk','banchi','banchik','tel','fax','mobile'].forEach(function(f) { chkAddrField('company', f, s4corp); });
+        if (s4corp.v) { errCorp.classList.add('visible'); step4HasError = true; } else { errCorp.classList.remove('visible'); }
+        s4err.v = false;
+        var corpKanaFmt = checkKanaFields(['companyNameKana', 'brandNameKana'], s4err);
+        var corpEnFmt = checkEnFields(['companyNameEn', 'brandNameEn'], s4err);
+        if (s4err.v) { errCorpFmt.classList.add('visible'); step4HasError = true; } else { errCorpFmt.classList.remove('visible'); }
+
+        // --- 代表者情報 ---
+        var errRep = document.getElementById('err-step4-rep');
+        var errRepFmt = document.getElementById('err-step4-rep-fmt');
+        var s4rep = { v: false };
+        ['repLastName','repLastNameKana','repLastNameEn','repFirstName',
+         'repFirstNameKana','repFirstNameEn','repBirthDate'
+        ].forEach(function(id) { chkReqField(id, s4rep); });
+        if (!document.querySelector('input[name="repsex"]:checked')) { s4rep.v = true; }
+        ['zip','pref','city','cityk','town','townk','banchi','banchik','tel'].forEach(function(f) { chkAddrField('rep', f, s4rep); });
+        if (s4rep.v) { errRep.classList.add('visible'); step4HasError = true; } else { errRep.classList.remove('visible'); }
+        s4err.v = false;
+        checkKanaFields(['repLastNameKana', 'repFirstNameKana'], s4err);
+        checkEnFields(['repLastNameEn', 'repFirstNameEn'], s4err);
+        if (s4err.v) { errRepFmt.classList.add('visible'); step4HasError = true; } else { errRepFmt.classList.remove('visible'); }
+
+        // --- 担当者情報 ---
+        var errContact = document.getElementById('err-step4-contact');
+        var s4cont = { v: false };
+        ['contactLastName','contactLastNameKana','contactFirstName','contactFirstNameKana',
+         'contactDept','contactEmail','contactTel1'
+        ].forEach(function(id) { chkReqField(id, s4cont); });
+        ['zip','pref','city','cityk','town','townk','banchi','banchik'].forEach(function(f) { chkAddrField('contact', f, s4cont); });
+        if (s4cont.v) { errContact.classList.add('visible'); step4HasError = true; } else { errContact.classList.remove('visible'); }
+        s4err.v = false;
+        checkKanaFields(['contactLastNameKana', 'contactFirstNameKana'], s4err);
+        if (s4err.v) step4HasError = true;
+
+        if (step4HasError) { focusFirstErr(panels[3]); return; }
+      }
+
+      // STEP 5: 口座情報のバリデーション
+      if (current === 4) {
+        var step5HasError = false;
+
+        var errAcc = document.getElementById('err-step5-acc');
+        var errAccFmt = document.getElementById('err-step5-acc-fmt');
+        var s5acc = { v: false };
+        ['acc-bkcode','acc-bkname','acc-brcode','acc-brname','acc-num','acc-kana'
+        ].forEach(function(id) { chkReqField(id, s5acc); });
+        if (!document.querySelector('input[name="acctype"]:checked')) { s5acc.v = true; }
+        if (s5acc.v) { errAcc.classList.add('visible'); step5HasError = true; } else { errAcc.classList.remove('visible'); }
+        var s5err = { v: false };
+        checkKanaFields(['acc-kana'], s5err);
+        if (s5err.v) { errAccFmt.classList.add('visible'); step5HasError = true; } else { errAccFmt.classList.remove('visible'); }
+
+        if (step5HasError) { focusFirstErr(panels[4]); return; }
+      }
+
+      // STEP 6: 店舗情報のバリデーション
+      if (current === 5) {
+        var step6HasError = false;
+
+        // --- 店舗名・ブランド名 ---
+        var errStep6Name = document.getElementById('err-step6-name');
+        var errStep6NameFmt = document.getElementById('err-step6-name-fmt');
+        var s6name = { v: false };
+        ['shopName','shopNameKana','shopNameEn','shopBrandName','shopBrandNameKana','shopBrandNameEn'
+        ].forEach(function(id) { chkReqField(id, s6name); });
+        if (s6name.v) { errStep6Name.classList.add('visible'); step6HasError = true; } else { errStep6Name.classList.remove('visible'); }
+        var s6nameFmt = { v: false };
+        checkKanaFields(['shopNameKana', 'shopBrandNameKana'], s6nameFmt);
+        checkEnFields(['shopNameEn', 'shopBrandNameEn'], s6nameFmt);
+        if (s6nameFmt.v) { errStep6NameFmt.classList.add('visible'); step6HasError = true; } else { errStep6NameFmt.classList.remove('visible'); }
+
+        // --- 店舗業種・商材 ---
+        var errStep6Info = document.getElementById('err-step6-info');
+        var s6info = { v: false };
+        chkReqField('shopMerchandise', s6info);
+        chkSelField('shopIndustryCategory', s6info);
+        chkSelField('shopIndustryDetail', s6info);
+        (function() { var n = parseInt(document.getElementById('shopCount').value, 10); if (isNaN(n) || n < 1) { markInputErr('shopCount'); s6info.v = true; } else { clearInputErr('shopCount'); } })();
+        (function() { var n = parseInt(document.getElementById('shopAvgPrice').value, 10); if (isNaN(n) || n < 1) { markInputErr('shopAvgPrice'); s6info.v = true; } else { clearInputErr('shopAvgPrice'); } })();
+        if (s6info.v) { errStep6Info.classList.add('visible'); step6HasError = true; } else { errStep6Info.classList.remove('visible'); }
+
+        // --- 口座・レシート ---
+        var errStep6Account = document.getElementById('err-step6-account');
+        var s6acc = { v: false };
+        chkReqField('shopAccount', s6acc);
+        chkReqField('shopReceiptName', s6acc);
+        if (s6acc.v) { errStep6Account.classList.add('visible'); step6HasError = true; } else { errStep6Account.classList.remove('visible'); }
+
+        // --- 店舗所在地 ---
+        var errStep6Addr = document.getElementById('err-step6-addr');
+        var s6addr = { v: false };
+        ['shopZip','shopCity','shopTown','shopBanchi','shopTel'].forEach(function(id) { chkReqField(id, s6addr); });
+        chkSelField('shopPref', s6addr);
+        ['cityk','townk','banchik'].forEach(function(f) { chkAddrField('shop', f, s6addr); });
+        if (s6addr.v) { errStep6Addr.classList.add('visible'); step6HasError = true; } else { errStep6Addr.classList.remove('visible'); }
+
+        // --- 端末保持状況 ---
+        var errStep6Terminal = document.getElementById('err-step6-terminal');
+        if (!document.querySelector('input[name="terminalStatus"]:checked')) {
+          errStep6Terminal.classList.add('visible');
+          step6HasError = true;
+        } else {
+          errStep6Terminal.classList.remove('visible');
+        }
+
+        if (step6HasError) { focusFirstErr(panels[5]); return; }
+      }
+
+      // STEP 7: 書類情報のバリデーション
+      if (current === 6) {
+        var step7HasError = false;
+
+        var errStep7Doc = document.getElementById('err-step7-doc');
+        var idDocFront = document.getElementById('idDocFront');
+        if (!idDocFront || !idDocFront.files || idDocFront.files.length === 0) {
+          errStep7Doc.classList.add('visible');
+          step7HasError = true;
+        } else {
+          errStep7Doc.classList.remove('visible');
+        }
+
+        if (step7HasError) { focusFirstErr(panels[6]); return; }
+      }
+
+      // STEP 8: 発送申込のバリデーション
+      if (current === 7) {
+        var step8HasError = false;
+
+        var errStep8Delivery = document.getElementById('err-step8-delivery');
+        var s8dlv = { v: false };
+        ['deliveryZip','deliveryCity','deliveryTown','deliveryBanchi','deliveryTel','deliveryReceiver'
+        ].forEach(function(id) { chkReqField(id, s8dlv); });
+        chkSelField('deliveryPref', s8dlv);
+        ['cityk','townk','banchik'].forEach(function(f) { chkAddrField('delivery', f, s8dlv); });
+        if (s8dlv.v) { errStep8Delivery.classList.add('visible'); step8HasError = true; } else { errStep8Delivery.classList.remove('visible'); }
+
+        if (step8HasError) { focusFirstErr(panels[7]); return; }
+      }
+
+      // 通常の前進操作のため、最終確認からの修正フラグは解除する
+      cameFromReview = false;
+      goTo(current + 1);
+    } else {
+      // 全ステップの入力値を収集して登録 API へ送信する
+      var payload = {
+        agreedStarpay: !!(document.getElementById('chk-starpay') && document.getElementById('chk-starpay').checked),
+        agreedJcb: !!(document.getElementById('chk-jcb') && document.getElementById('chk-jcb').checked),
+        agreedRyuginVisaMcCu: !!(document.getElementById('chk-ryu1') && document.getElementById('chk-ryu1').checked),
+        agreedRyuginCuQr: !!(document.getElementById('chk-ryu2') && document.getElementById('chk-ryu2').checked),
+        agreedAgencyDelegation: !!(document.getElementById('chk-iin1') && document.getElementById('chk-iin1').checked),
+        agreedServiceTerms: !!(document.getElementById('chk-iin2') && document.getElementById('chk-iin2').checked),
+        agreedPrivacyPolicy: !!(document.getElementById('chk-iin3') && document.getElementById('chk-iin3').checked),
+        agreedAuthorityConfirmed: !!(document.querySelector('.attest input[type="checkbox"]') && document.querySelector('.attest input[type="checkbox"]').checked),
+        txTypeVisitSales: gridChk('txGrid', 0),
+        txTypeContinuousService: gridChk('txGrid', 1),
+        txTypePhoneSolicitation: gridChk('txGrid', 2),
+        txTypePrepaidService: gridChk('txGrid', 3),
+        txTypeBusinessInduction: gridChk('txGrid', 4),
+        txTypeChainSales: gridChk('txGrid', 5),
+        txTypeNoneApplicable: !!(document.getElementById('txNone') && document.getElementById('txNone').checked),
+        businessEntityType: radioVal('bizkind'),
+        salesFormat: radioVal('saleform'),
+        operationFormat: radioVal('opform'),
+        payQrWechatPay: gridChk('qrGrid', 0),
+        payQrPaypay: gridChk('qrGrid', 1),
+        payQrDBarai: gridChk('qrGrid', 2),
+        payQrAuPay: gridChk('qrGrid', 3),
+        payQrMerpay: gridChk('qrGrid', 4),
+        payQrRakutenPay: gridChk('qrGrid', 5),
+        payQrAlipayPlus: gridChk('qrGrid', 6),
+        payQrJkoPay: gridChk('qrGrid', 7),
+        payCreditJcb: gridChk('creditGrid', 0),
+        payCreditDiscover: gridChk('creditGrid', 1),
+        payCreditVisa: gridChk('creditGrid', 2),
+        payCreditMastercard: gridChk('creditGrid', 3),
+        payCreditDiners: gridChk('creditGrid', 4),
+        payCreditAmex: gridChk('creditGrid', 5),
+        payCreditBonus: radioVal('payBonus'),
+        payCreditTwoTimes: radioVal('pay2kai'),
+        payCreditInstallment: radioVal('payBunkatsu'),
+        payCreditRevolving: radioVal('payRevo'),
+        payEmoneyId: gridChk('emoneyGrid', 0),
+        payEmoneyWaon: gridChk('emoneyGrid', 1),
+        payEmoneyRakutenEdy: gridChk('emoneyGrid', 2),
+        payEmoneyNanaco: gridChk('emoneyGrid', 3),
+        payEmoneyTransitIc: gridChk('emoneyGrid', 4),
+        payEmoneyQuickPay: gridChk('emoneyGrid', 5),
+        payEmoneyApplePay: gridChk('emoneyGrid', 6),
+        corporateNumber: gf('houjinNumber'),
+        corporateName: gf('companyName'),
+        corporateNameKana: gf('companyNameKana'),
+        corporateNameEn: gf('companyNameEn'),
+        establishmentDate: gf('corporateEstDate'),
+        brandName: gf('brandName'),
+        brandNameKana: gf('brandNameKana'),
+        brandNameEn: gf('brandNameEn'),
+        annualRevenue: gf('annualSales'),
+        corporateType: gf('corporateType'),
+        companyUrl: gf('companyUrl'),
+        capitalAmount: gf('capitalAmount'),
+        employeeCount: gf('employeeCount'),
+        industryCategory: gf('industryCategory'),
+        industryDetail: gf('industryDetail'),
+        businessDescription: gf('businessContent'),
+        companyZipCode: af('company', 'zip'),
+        companyPrefecture: af('company', 'pref'),
+        companyPrefectureKana: af('company', 'prefk'),
+        companyCity: af('company', 'city'),
+        companyCityKana: af('company', 'cityk'),
+        companyTown: af('company', 'town'),
+        companyTownKana: af('company', 'townk'),
+        companyStreetNumber: af('company', 'banchi'),
+        companyStreetNumberKana: af('company', 'banchik'),
+        companyBuilding: af('company', 'bldg'),
+        companyBuildingKana: af('company', 'bldgk'),
+        companyPhone: af('company', 'tel'),
+        companyFax: af('company', 'fax'),
+        companyMobile: af('company', 'mobile'),
+        repLastName: gf('repLastName'),
+        repLastNameKana: gf('repLastNameKana'),
+        repLastNameEn: gf('repLastNameEn'),
+        repFirstName: gf('repFirstName'),
+        repFirstNameKana: gf('repFirstNameKana'),
+        repFirstNameEn: gf('repFirstNameEn'),
+        repBirthDate: gf('repBirthDate'),
+        repGender: radioVal('repsex'),
+        repZipCode: af('rep', 'zip'),
+        repPrefecture: af('rep', 'pref'),
+        repPrefectureKana: af('rep', 'prefk'),
+        repCity: af('rep', 'city'),
+        repCityKana: af('rep', 'cityk'),
+        repTown: af('rep', 'town'),
+        repTownKana: af('rep', 'townk'),
+        repStreetNumber: af('rep', 'banchi'),
+        repStreetNumberKana: af('rep', 'banchik'),
+        repBuilding: af('rep', 'bldg'),
+        repPhone: af('rep', 'tel'),
+        contactLastName: gf('contactLastName'),
+        contactLastNameKana: gf('contactLastNameKana'),
+        contactFirstName: gf('contactFirstName'),
+        contactFirstNameKana: gf('contactFirstNameKana'),
+        contactZipCode: af('contact', 'zip'),
+        contactPrefecture: af('contact', 'pref'),
+        contactPrefectureKana: af('contact', 'prefk'),
+        contactCity: af('contact', 'city'),
+        contactCityKana: af('contact', 'cityk'),
+        contactTown: af('contact', 'town'),
+        contactTownKana: af('contact', 'townk'),
+        contactStreetNumber: af('contact', 'banchi'),
+        contactStreetNumberKana: af('contact', 'banchik'),
+        contactBuilding: af('contact', 'bldg'),
+        contactBuildingKana: af('contact', 'bldgk'),
+        contactDepartment: gf('contactDept'),
+        contactEmail: gf('contactEmail'),
+        contactPhone1: gf('contactTel1'),
+        contactPhone2: gf('contactTel2'),
+        bankCode: gf('acc-bkcode'),
+        bankName: gf('acc-bkname') ? gf('acc-bkname') + '銀行' : '',
+        branchCode: gf('acc-brcode'),
+        branchName: gf('acc-brname') ? gf('acc-brname') + '支店' : '',
+        accountType: radioVal('acctype'),
+        accountNumber: gf('acc-num'),
+        accountHolderKana: gf('acc-kana'),
+        storeName: gf('shopName'),
+        storeNameKana: gf('shopNameKana'),
+        storeNameEn: gf('shopNameEn'),
+        storeBrandName: gf('shopBrandName'),
+        storeBrandNameKana: gf('shopBrandNameKana'),
+        storeBrandNameEn: gf('shopBrandNameEn'),
+        storeIndustryCategory: gf('shopIndustryCategory'),
+        storeIndustryDetail: gf('shopIndustryDetail'),
+        storeProductDescription: gf('shopMerchandise'),
+        storeCount: gf('shopCount'),
+        storeAveragePrice: gf('shopAvgPrice'),
+        storeBankAccount: gf('shopAccount'),
+        storeReceiptName: gf('shopReceiptName'),
+        shopZipCode: gf('shopZip'),
+        shopPrefecture: gf('shopPref'),
+        shopPrefectureKana: af('shop', 'prefk'),
+        shopCity: gf('shopCity'),
+        shopCityKana: af('shop', 'cityk'),
+        shopTown: gf('shopTown'),
+        shopTownKana: af('shop', 'townk'),
+        shopStreetNumber: gf('shopBanchi'),
+        shopStreetNumberKana: af('shop', 'banchik'),
+        shopBuilding: af('shop', 'bldg'),
+        shopBuildingKana: af('shop', 'bldgk'),
+        shopPhone: gf('shopTel'),
+        terminalIcStatus: radioVal('terminalIc'),
+        terminalPossessionStatus: radioVal('terminalStatus'),
+        storeLatitude: gf('storeLatitude'),
+        storeLongitude: gf('storeLongitude'),
+        businessHours1Start: gf('businessHours1Start'),
+        businessHours1End: gf('businessHours1End'),
+        businessHours2Start: gf('businessHours2Start'),
+        businessHours2End: gf('businessHours2End'),
+        closedMonday: !!(document.getElementById('closedMonday') && document.getElementById('closedMonday').checked),
+        closedTuesday: !!(document.getElementById('closedTuesday') && document.getElementById('closedTuesday').checked),
+        closedWednesday: !!(document.getElementById('closedWednesday') && document.getElementById('closedWednesday').checked),
+        closedThursday: !!(document.getElementById('closedThursday') && document.getElementById('closedThursday').checked),
+        closedFriday: !!(document.getElementById('closedFriday') && document.getElementById('closedFriday').checked),
+        closedSaturday: !!(document.getElementById('closedSaturday') && document.getElementById('closedSaturday').checked),
+        closedSunday: !!(document.getElementById('closedSunday') && document.getElementById('closedSunday').checked),
+        closedHoliday: !!(document.getElementById('closedHoliday') && document.getElementById('closedHoliday').checked),
+        closedHolidayEve: !!(document.getElementById('closedHolidayEve') && document.getElementById('closedHolidayEve').checked),
+        shopBusinessPermitNumber: gf('shopBusinessPermitNumber'),
+        mposQuantity: gf('qty'),
+        deliveryZipCode: gf('deliveryZip'),
+        deliveryPrefecture: gf('deliveryPref'),
+        deliveryPrefectureKana: af('delivery', 'prefk'),
+        deliveryCity: gf('deliveryCity'),
+        deliveryCityKana: af('delivery', 'cityk'),
+        deliveryTown: gf('deliveryTown'),
+        deliveryTownKana: af('delivery', 'townk'),
+        deliveryStreetNumber: gf('deliveryBanchi'),
+        deliveryStreetNumberKana: af('delivery', 'banchik'),
+        deliveryBuilding: af('delivery', 'bldg'),
+        deliveryBuildingKana: af('delivery', 'bldgk'),
+        deliveryPhone: gf('deliveryTel'),
+        deliveryReceiver: gf('deliveryReceiver')
+      };
+
+      var pendingPayload = payload;
+
+      var modalConfirm = document.getElementById('modalConfirm');
+      var modalConfirmOk = document.getElementById('modalConfirmOk');
+      modalConfirmOk.disabled = false;
+      modalConfirm.style.display = 'flex';
+
+      document.getElementById('modalConfirmCancel').onclick = function() {
+        modalConfirm.style.display = 'none';
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+      };
+
+      modalConfirmOk.onclick = function() {
+        modalConfirmOk.disabled = true;
+        modalConfirm.style.display = 'none';
+        var errSubmitEl = document.getElementById('err-submit');
+        if (errSubmitEl) errSubmitEl.classList.remove('visible');
+
+        var formData = new FormData();
+        formData.append('data', new Blob([JSON.stringify(pendingPayload)], {type: 'application/json'}));
+
+        var fileInputIds = ['fileBusinessPermit', 'idDocFront', 'idDocBack',
+            'fileOpeningPlan', 'fileProductMaterial', 'fileEventVenue'];
+        fileInputIds.forEach(function(inputId) {
+          var input = document.getElementById(inputId);
+          if (input && input.files) {
+            Array.from(input.files).forEach(function(file) {
+              formData.append(inputId, file);
+            });
+          }
+        });
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        nextBtn.disabled = true;
+        nextBtn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>登録中...';
+
+        var abortCtrl = new AbortController();
+        var timeoutId = setTimeout(function() {
+          abortCtrl.abort();
+        }, 60000);
+
+        fetch('/api/merchant-application/register', {
+          method: 'POST',
+          headers: { 'X-CSRF-TOKEN': csrfToken },
+          body: formData,
+          signal: abortCtrl.signal
+        })
+        .then(function(res) {
+          clearTimeout(timeoutId);
+          if (!res.ok) {
+            return res.json().then(function(data) {
+              throw new Error(data.errorMessage || 'HTTP ' + res.status);
+            });
+          }
+          return res.json();
+        })
+        .then(function(data) {
+          document.getElementById('completeMemberCode').textContent = data.memberCode;
+          var modalComplete = document.getElementById('modalComplete');
+          modalComplete.style.display = 'flex';
+          document.getElementById('modalCompleteClose').onclick = function() {
+            window.location.href = '/';
+          };
+        })
+        .catch(function(err) {
+          clearTimeout(timeoutId);
+          var msg = err.name === 'AbortError'
+            ? '通信がタイムアウトしました。時間をおいて再度お試しください。'
+            : (err.message || '時間をおいて再度お試しください。');
+          var errSubmitEl2 = document.getElementById('err-submit');
+          var errSubmitMsg = document.getElementById('err-submit-msg');
+          if (errSubmitEl2 && errSubmitMsg) {
+            errSubmitMsg.textContent = '登録に失敗しました。' + msg;
+            errSubmitEl2.classList.add('visible');
+            errSubmitEl2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          nextBtn.disabled = false;
+          nextBtn.innerHTML = '<i class="ti ti-check"></i>登録する';
+        });
+      };
+    }
+  });
+
+  // option select highlight
+  document.querySelectorAll('.opt input').forEach(inp => {
+    inp.addEventListener('change', function () {
+      const parent = this.closest('[data-single]');
+      if (parent && this.type === 'radio') {
+        parent.querySelectorAll('.opt').forEach(o => o.classList.remove('checked'));
+        const payItem = this.closest('.pay-method-item');
+        if (payItem) {
+          const firstRadio = payItem.querySelector('input[type="radio"]');
+          payItem.classList.toggle('item-active', firstRadio === this);
+        }
+      }
+      this.closest('.opt').classList.toggle('checked', this.checked);
+    });
+  });
+
+  // file upload state
+  document.querySelectorAll('.drop input[type="file"]').forEach(inp => {
+    inp.addEventListener('change', function () {
+      const drop = this.closest('.drop');
+      const fname = drop.querySelector('.fname');
+      if (this.files.length === 0) {
+        drop.classList.remove('filled');
+        fname.innerHTML = '<i class="ti ti-upload"></i>ファイルを選択';
+        return;
+      }
+      drop.classList.add('filled');
+      const label = this.files.length > 1 ? this.files.length + ' 件選択' : this.files[0].name;
+      fname.innerHTML = '<i class="ti ti-circle-check"></i>' + label;
+    });
+  });
+
+  // 住所ブロックのコピー（本社住所と同じ／代表者住所と同じ）
+  function getAddr(name) { return document.querySelector('.addr[data-addr="' + name + '"]'); }
+  document.querySelectorAll('.addr-copy').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const src = getAddr(this.dataset.from);
+      const dst = getAddr(this.dataset.to);
+      if (!src || !dst) return;
+      src.querySelectorAll('[data-f]').forEach(srcEl => {
+        const key = srcEl.dataset.f;
+        const dstEl = dst.querySelector('[data-f="' + key + '"]');
+        if (dstEl) { dstEl.value = srcEl.value; dstEl.dispatchEvent(new Event('change', { bubbles: true })); }
+      });
+    });
+  });
+
+  // 都道府県 → 半角カタカナ 自動補完
+  var prefKana = {
+    '北海道': 'ﾎｯｶｲﾄﾞｳ', '青森県': 'ｱｵﾓﾘｹﾝ', '岩手県': 'ｲﾜﾃｹﾝ',
+    '宮城県': 'ﾐﾔｷﾞｹﾝ', '秋田県': 'ｱｷﾀｹﾝ', '山形県': 'ﾔﾏｶﾞﾀｹﾝ',
+    '福島県': 'ﾌｸｼﾏｹﾝ', '茨城県': 'ｲﾊﾞﾗｷｹﾝ', '栃木県': 'ﾄﾁｷﾞｹﾝ',
+    '群馬県': 'ｸﾞﾝﾏｹﾝ', '埼玉県': 'ｻｲﾀﾏｹﾝ', '千葉県': 'ﾁﾊﾞｹﾝ',
+    '東京都': 'ﾄｳｷｮｳﾄ', '神奈川県': 'ｶﾅｶﾞﾜｹﾝ', '新潟県': 'ﾆｲｶﾞﾀｹﾝ',
+    '富山県': 'ﾄﾔﾏｹﾝ', '石川県': 'ｲｼｶﾜｹﾝ', '福井県': 'ﾌｸｲｹﾝ',
+    '山梨県': 'ﾔﾏﾅｼｹﾝ', '長野県': 'ﾅｶﾞﾉｹﾝ', '岐阜県': 'ｷﾞﾌｹﾝ',
+    '静岡県': 'ｼｽﾞｵｶｹﾝ', '愛知県': 'ｱｲﾁｹﾝ', '三重県': 'ﾐｴｹﾝ',
+    '滋賀県': 'ｼｶﾞｹﾝ', '京都府': 'ｷｮｳﾄﾌ', '大阪府': 'ｵｵｻｶﾌ',
+    '兵庫県': 'ﾋｮｳｺﾞｹﾝ', '奈良県': 'ﾅﾗｹﾝ', '和歌山県': 'ﾜｶﾔﾏｹﾝ',
+    '鳥取県': 'ﾄｯﾄﾘｹﾝ', '島根県': 'ｼﾏﾈｹﾝ', '岡山県': 'ｵｶﾔﾏｹﾝ',
+    '広島県': 'ﾋﾛｼﾏｹﾝ', '山口県': 'ﾔﾏｸﾞﾁｹﾝ', '徳島県': 'ﾄｸｼﾏｹﾝ',
+    '香川県': 'ｶｶﾞﾜｹﾝ', '愛媛県': 'ｴﾋﾒｹﾝ', '高知県': 'ｺｳﾁｹﾝ',
+    '福岡県': 'ﾌｸｵｶｹﾝ', '佐賀県': 'ｻｶﾞｹﾝ', '長崎県': 'ﾅｶﾞｻｷｹﾝ',
+    '熊本県': 'ｸﾏﾓﾄｹﾝ', '大分県': 'ｵｵｲﾀｹﾝ', '宮崎県': 'ﾐﾔｻﾞｷｹﾝ',
+    '鹿児島県': 'ｶｺﾞｼﾏｹﾝ', '沖縄県': 'ｵｷﾅﾜｹﾝ'
+  };
+  document.querySelectorAll('select[data-f="pref"]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+      var k = this.closest('.addr').querySelector('[data-f="prefk"]');
+      if (k) k.value = prefKana[this.value] || '';
+    });
+  });
+
+  // 法人番号 確認ボタン
+  var houjinLookupBtn = document.getElementById('houjinLookup');
+  if (houjinLookupBtn) {
+    houjinLookupBtn.addEventListener('click', function () {
+      var numberInput = document.getElementById('houjinNumber');
+      var number = numberInput ? numberInput.value.replace(/[^0-9]/g, '') : '';
+      if (number.length !== 13) {
+        alert('法人番号を13桁の数字で入力してください。');
+        return;
+      }
+      houjinLookupBtn.disabled = true;
+      houjinLookupBtn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>検索中...';
+      fetch('/api/corporate/search?number=' + number)
+        .then(function (res) {
+          if (res.status === 404) throw new Error('NOT_FOUND');
+          if (res.status === 503) throw new Error('API_UNAVAILABLE');
+          if (!res.ok) throw new Error('API_ERROR');
+          return res.json();
+        })
+        .then(function (data) {
+          var nameEl = document.getElementById('companyName');
+          var kanaEl = document.getElementById('companyNameKana');
+          if (nameEl && data.name) nameEl.value = data.name;
+          if (kanaEl && data.furigana) kanaEl.value = data.furigana;
+        })
+        .catch(function (err) {
+          if (err.message === 'NOT_FOUND') {
+            alert('入力された法人番号に該当する法人が見つかりませんでした。');
+          } else if (err.message === 'API_UNAVAILABLE') {
+            alert('法人番号検索APIが利用できません。\nアプリケーションIDの登録が必要です。システム管理者にお問い合わせください。');
+          } else {
+            alert('法人情報の取得に失敗しました。時間をおいて再度お試しください。');
+          }
+        })
+        .finally(function () {
+          houjinLookupBtn.disabled = false;
+          houjinLookupBtn.innerHTML = '<i class="ti ti-search"></i>確認';
+        });
+    });
+  }
+
+  // 住所自動入力ボタン
+  document.querySelectorAll('.addr-auto').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var addrBlock = btn.closest('.addr');
+      var zipInput = addrBlock.querySelector('[data-f="zip"]');
+      var zip = zipInput ? zipInput.value.replace(/[^0-9]/g, '') : '';
+      if (zip.length !== 7) {
+        alert('郵便番号を7桁の数字で入力してください。');
+        return;
+      }
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ti ti-loader-2 icon-spin"></i>検索中...';
+      fetch('/api/postal-code/search?zip=' + zip)
+        .then(function (res) {
+          if (res.status === 404) throw new Error('NOT_FOUND');
+          if (!res.ok) throw new Error('API_ERROR');
+          return res.json();
+        })
+        .then(function (data) {
+          fillAddrField(addrBlock, 'pref', data.prefecture);
+          fillAddrField(addrBlock, 'prefk', data.prefectureKana
+              || prefKana[data.prefecture] || '');
+          fillAddrField(addrBlock, 'city', data.city);
+          fillAddrField(addrBlock, 'cityk', data.cityKana);
+          fillAddrField(addrBlock, 'town', data.town);
+          fillAddrField(addrBlock, 'townk', data.townKana);
+        })
+        .catch(function (err) {
+          if (err.message === 'NOT_FOUND') {
+            alert('入力された郵便番号に該当する住所が見つかりませんでした。');
+          } else {
+            alert('住所の取得に失敗しました。時間をおいて再度お試しください。');
+          }
+        })
+        .finally(function () {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-map-pin"></i>住所自動入力';
+        });
+    });
+  });
+
+  function fillAddrField(addrBlock, fieldName, value) {
+    if (!value) return;
+    var el = addrBlock.querySelector('[data-f="' + fieldName + '"]');
+    if (!el) return;
+    el.value = value;
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // 発送申込：mPOS端末の数量に応じて合計金額（単価 × 数量）を再計算する
+  const qtyInput = document.getElementById('qty');
+  if (qtyInput) {
+    const unitPrice = parseInt(
+        document.getElementById('unitPrice').dataset.price, 10);
+    const calcText = document.getElementById('calcText');
+    const totalAmount = document.getElementById('totalAmount');
+    const qtyMinus = document.getElementById('qtyMinus');
+    const qtyPlus = document.getElementById('qtyPlus');
+
+    function updateSubtotal() {
+      let qty = parseInt(qtyInput.value, 10);
+      if (isNaN(qty) || qty < 1) qty = 1;
+      if (qty > 99) qty = 99;
+      qtyInput.value = qty;
+      const total = unitPrice * qty;
+      calcText.textContent =
+          unitPrice.toLocaleString() + '円 × ' + qty + '台';
+      totalAmount.textContent = total.toLocaleString();
+    }
+
+    qtyMinus.addEventListener('click', () => {
+      qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+      updateSubtotal();
+    });
+    qtyPlus.addEventListener('click', () => {
+      qtyInput.value = Math.min(99, (parseInt(qtyInput.value, 10) || 1) + 1);
+      updateSubtotal();
+    });
+    qtyInput.addEventListener('input', updateSubtotal);
+    qtyInput.addEventListener('change', updateSubtotal);
+    updateSubtotal();
+  }
+
+  render();
+
+</script>
+</body>
+</html>

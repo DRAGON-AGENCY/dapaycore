@@ -3,6 +3,7 @@ package jp.co.dragonagency.dapaycore.controller;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jp.co.dragonagency.dapaycore.service.TransferFeeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -48,6 +49,9 @@ class CsrfMetaTagRenderingTest {
 
     @MockBean
     private FeeRateService feeRateService;
+
+    @MockBean
+    private TransferFeeService transferFeeService;
 
     // =========================================================
     // 項番82：CSRF meta タグに th:content でトークンが埋め込まれる

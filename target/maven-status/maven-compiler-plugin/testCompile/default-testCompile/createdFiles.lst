@@ -1,0 +1,12 @@
+jp\co\dragonagency\dapaycore\service\MerchantApplicationServiceTest.class
+jp\co\dragonagency\dapaycore\controller\MerchantApplicationDocumentControllerTest.class
+jp\co\dragonagency\dapaycore\advice\CsrfTokenControllerAdviceTest.class
+jp\co\dragonagency\dapaycore\service\FeeRateServiceTest.class
+jp\co\dragonagency\dapaycore\controller\api\FeeRateApiControllerTest.class
+jp\co\dragonagency\dapaycore\controller\EmployeeControllerTest.class
+jp\co\dragonagency\dapaycore\service\LocalDocumentStorageServiceTest.class
+jp\co\dragonagency\dapaycore\AppTest.class
+jp\co\dragonagency\dapaycore\service\EmployeeServiceTest.class
+jp\co\dragonagency\dapaycore\controller\EmployeePageControllerTest.class
+jp\co\dragonagency\dapaycore\controller\PageControllerTest.class
+jp\co\dragonagency\dapaycore\controller\CsrfMetaTagRenderingTest.class

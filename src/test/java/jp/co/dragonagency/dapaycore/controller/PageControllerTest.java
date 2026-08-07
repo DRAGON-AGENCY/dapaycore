@@ -2,9 +2,11 @@ package jp.co.dragonagency.dapaycore.controller;
 
 import jp.co.dragonagency.dapaycore.dto.FeeRateListItemDto;
 import jp.co.dragonagency.dapaycore.dto.MemberListItemDto;
+import jp.co.dragonagency.dapaycore.dto.TransferFeeListItemDto;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jp.co.dragonagency.dapaycore.service.TransferFeeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +34,9 @@ class PageControllerTest {
 
     @Mock
     private FeeRateService feeRateService;
+
+    @Mock
+    private TransferFeeService transferFeeService;
 
     @InjectMocks
     private PageController controller;
@@ -127,6 +132,56 @@ class PageControllerTest {
         String viewName = controller.showOperationFeeEdit();
 
         assertEquals("operation_fee_edit", viewName);
+    }
+
+    // ===== 項番01: showOperationTransferFeeList - transferFees がモデルに設定される =====
+
+    @Test
+    void T01_showOperationTransferFeeList_transferFeesAttributeIsFindAllForListResult() {
+        TransferFeeListItemDto item = new TransferFeeListItemDto();
+        item.setBankCode("0310");
+        item.setTransferFee(200);
+        List<TransferFeeListItemDto> expected = List.of(item);
+        when(transferFeeService.findAllForList()).thenReturn(expected);
+        Model model = new ExtendedModelMap();
+
+        controller.showOperationTransferFeeList(model);
+
+        assertEquals(expected, model.getAttribute("transferFees"));
+        verify(transferFeeService).findAllForList();
+    }
+
+    // ===== 項番02: showOperationTransferFeeList - データなしのとき transferFees が空リスト =====
+
+    @Test
+    void T02_showOperationTransferFeeList_transferFeesAttributeIsEmptyListWhenNoData() {
+        when(transferFeeService.findAllForList()).thenReturn(Collections.emptyList());
+        Model model = new ExtendedModelMap();
+
+        controller.showOperationTransferFeeList(model);
+
+        assertEquals(Collections.emptyList(), model.getAttribute("transferFees"));
+    }
+
+    // ===== 項番03: showOperationTransferFeeList - ビュー名 "operation_transfer_fee_list" を返す =====
+
+    @Test
+    void T03_showOperationTransferFeeList_returnsViewNameOperationTransferFeeList() {
+        when(transferFeeService.findAllForList()).thenReturn(Collections.emptyList());
+        Model model = new ExtendedModelMap();
+
+        String viewName = controller.showOperationTransferFeeList(model);
+
+        assertEquals("operation_transfer_fee_list", viewName);
+    }
+
+    // ===== 項番04: showOperationTransferFeeEdit - ビュー名 "operation_transfer_fee_edit" を返す =====
+
+    @Test
+    void T04_showOperationTransferFeeEdit_returnsViewNameOperationTransferFeeEdit() {
+        String viewName = controller.showOperationTransferFeeEdit();
+
+        assertEquals("operation_transfer_fee_edit", viewName);
     }
 
     @Test

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問い合わせ履歴 | 運用管理ポータル</title>
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+    media="print" onload="this.media='all'">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-card: #ffffff;
+    --bg-search: #f3f7fc;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --bg-hover: #f4f6fa;
+    --border-color: rgba(20,45,80,0.10);
+    --border-input: rgba(20,45,80,0.24);
+    --border-table: rgba(20,45,80,0.10);
+    --text-main: #1b2733;
+    --text-sub: #5a6675;
+    --text-muted: #93a0af;
+    --accent: #0b5fd0;
+    --accent-strong: #0c447c;
+    --ok-soft: #e3f4ee;
+    --warn-soft: #fdf0dd;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --container-min: 1200px;
+    --container-max: 1760px;
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100vh; }
+  body {
+    font-family: "Inter", "Noto Sans JP", sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    font-size: var(--fs-base);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: auto;
+  }
+
+  .container {
+    min-width: var(--container-min);
+    max-width: var(--container-max);
+    width: 100%;
+    margin: 0 auto;
+    background-color: var(--bg-card);
+    padding: 10px 32px 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* topbar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    padding: 14px 0 12px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 18px;
+  }
+  .topbar .t {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar .t i { color: var(--accent); font-size: 20px; }
+
+  /* search box */
+  .search-box {
+    background: var(--bg-search);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .search-targets {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-size: var(--fs-xs);
+    color: var(--text-sub);
+  }
+  .search-targets .label { font-weight: 600; margin-right: 4px; }
+  .search-targets .check {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-card);
+    font-size: var(--fs-xs);
+    color: var(--text-sub);
+    transition: background .15s, border-color .15s, color .15s;
+    user-select: none;
+  }
+  .search-targets .check input { display: none; }
+  .search-targets .check.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #search-keyword {
+    flex: 1;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg-card);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  #search-keyword:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(11,95,208,0.12);
+  }
+  .btn-search, .btn-clear {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .btn-search { background: var(--accent); color: #fff; }
+  .btn-search:hover { background: var(--accent-strong); }
+  .btn-clear { background: var(--bg-card); color: var(--text-sub); border-color: var(--border-input); }
+  .btn-clear:hover { background: var(--bg-hover); }
+
+  /* pagination */
+  .pager-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: var(--fs-xs);
+    color: var(--text-sub);
+  }
+  .pager-btns { display: flex; gap: 4px; }
+  .pager-btns button {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-input);
+    background: var(--bg-card);
+    color: var(--text-sub);
+    font-size: var(--fs-xs);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .pager-btns button:hover { background: var(--bg-hover); }
+  .pager-btns button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .pager-btns button:disabled { opacity: 0.4; cursor: default; }
+
+  /* table */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-table); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--fs-xs);
+    min-width: 1100px;
+  }
+  colgroup col.c-no     { width: 120px; }
+  colgroup col.c-code   { width: 110px; }
+  colgroup col.c-kana   { width: 160px; }
+  colgroup col.c-date   { width: 140px; }
+  colgroup col.c-cat    { width: 120px; }
+  colgroup col.c-subj   { width: auto; }
+  colgroup col.c-status { width: 100px; }
+  colgroup col.c-upd    { width: 140px; }
+  colgroup col.c-action { width: 36px; }
+
+  thead th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    text-align: left;
+    padding: 11px 14px;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.25);
+  }
+  thead th:last-child { border-right: none; }
+  thead th.c-action { padding: 0; width: 36px; min-width: 36px; }
+
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--border-table);
+    border-right: 1px solid var(--border-table);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  tbody td:last-child { border-right: none; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
+  tbody tr.data-row { cursor: pointer; }
+  tbody tr.data-row:hover td { background: var(--bg-soft); }
+
+  tbody td.c-action { text-align: center; padding: 0; }
+  tbody td.c-action::after {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-right: 2px solid rgba(11,95,208,0.32);
+    border-top: 2px solid rgba(11,95,208,0.32);
+    transform: rotate(45deg);
+    vertical-align: middle;
+    transition: border-color .15s;
+  }
+  tbody tr.data-row:hover td.c-action::after {
+    border-right-color: var(--accent);
+    border-top-color: var(--accent);
+  }
+
+  td.c-subj { max-width: 0; }
+
+  .empty-cell {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+    font-size: var(--fs-sm);
+  }
+
+  /* status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    min-width: 5em;
+  }
+  .badge i { font-size: 13px; flex: 0 0 auto; }
+  .badge-received   { background: var(--bg-soft);    color: var(--accent-strong); border-color: rgba(11,95,208,0.30); }
+  .badge-inprogress { background: var(--warn-soft);  color: #8a5410;              border-color: rgba(216,105,78,0.40); }
+  .badge-answered   { background: var(--ok-soft);    color: #1f6a50;              border-color: rgba(42,165,131,0.40); }
+  .badge-closed     { background: var(--bg-hover);   color: var(--text-muted);    border-color: var(--border-input); }
+
+  /* modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,25,50,0.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    width: 700px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--accent);
+  }
+  .modal-head .title {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-head .title i { font-size: 18px; }
+  .btn-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.80);
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color .15s;
+  }
+  .btn-close:hover { color: #fff; }
+  .modal-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    border: 1px solid var(--border-table);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 16px;
+    font-size: var(--fs-xs);
+  }
+  .detail-grid dt {
+    background: var(--bg-soft);
+    color: var(--text-sub);
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-table);
+    border-right: 1px solid var(--border-table);
+    display: flex;
+    align-items: center;
+  }
+  .detail-grid dt:last-of-type,
+  .detail-grid dd:last-of-type { border-bottom: none; }
+  .detail-grid dd {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-table);
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+  }
+  .body-label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+  }
+  .body-text {
+    font-size: var(--fs-xs);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--bg-search);
+    border: 1px solid var(--border-table);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text-main);
+    max-height: 240px;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <span class="t"><i class="ti ti-message-question"></i>お問い合わせ履歴</span>
+  </div>
+
+  <!-- 絞込み -->
+  <div class="search-box">
+    <div class="search-targets">
+      <span class="label">絞込み対象</span>
+      <label class="check active" id="chk-no">
+        <input type="checkbox" checked>受付番号
+      </label>
+      <label class="check" id="chk-code">
+        <input type="checkbox">会員コード
+      </label>
+      <label class="check" id="chk-kana">
+        <input type="checkbox">法人名（カナ）
+      </label>
+      <label class="check" id="chk-cat">
+        <input type="checkbox">カテゴリ
+      </label>
+      <label class="check" id="chk-subj">
+        <input type="checkbox">件名
+      </label>
+    </div>
+    <div class="search-row">
+      <input type="text" id="search-keyword" placeholder="受付番号で絞込み">
+      <button type="button" class="btn-search" id="btn-search">
+        <i class="ti ti-filter"></i>絞込み
+      </button>
+      <button type="button" class="btn-clear" id="btn-clear">
+        <i class="ti ti-x"></i>クリア
+      </button>
+    </div>
+  </div>
+
+  <!-- ページャー -->
+  <div class="pager-bar">
+    <span id="pager-info"></span>
+    <div class="pager-btns" id="pager-btns"></div>
+  </div>
+
+  <!-- 一覧テーブル -->
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="c-no">
+        <col class="c-code">
+        <col class="c-kana">
+        <col class="c-date">
+        <col class="c-cat">
+        <col class="c-subj">
+        <col class="c-status">
+        <col class="c-upd">
+        <col class="c-action">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>受付番号</th>
+          <th>会員コード</th>
+          <th>法人名（カナ）</th>
+          <th>受付日時</th>
+          <th>カテゴリ</th>
+          <th>件名</th>
+          <th>ステータス</th>
+          <th>更新日時</th>
+          <th class="c-action"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr class="data-row"
+            th:each="inq : ${inquiries}"
+            th:attr="data-no=${inq.inquiryNumber},
+                     data-code=${inq.memberCode},
+                     data-kana=${inq.corporateNameKana},
+                     data-created=${#temporals.format(inq.createdAt, 'yyyy/MM/dd HH:mm')},
+                     data-cat=${inq.category},
+                     data-subj=${inq.subject},
+                     data-status=${inq.status},
+                     data-updated=${#temporals.format(inq.updatedAt, 'yyyy/MM/dd HH:mm')},
+                     data-body=${inq.body}">
+          <td th:text="${inq.inquiryNumber}"></td>
+          <td th:text="${inq.memberCode}"></td>
+          <td th:text="${inq.corporateNameKana}"></td>
+          <td th:text="${#temporals.format(inq.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+          <td th:text="${inq.category}"></td>
+          <td class="c-subj" th:text="${inq.subject}"></td>
+          <td>
+            <span class="badge badge-received"   th:if="${inq.status == 'RECEIVED'}">
+              <i class="ti ti-inbox"></i>受付中
+            </span>
+            <span class="badge badge-inprogress" th:if="${inq.status == 'IN_PROGRESS'}">
+              <i class="ti ti-loader"></i>対応中
+            </span>
+            <span class="badge badge-answered"   th:if="${inq.status == 'ANSWERED'}">
+              <i class="ti ti-circle-check"></i>回答済み
+            </span>
+            <span class="badge badge-closed"     th:if="${inq.status == 'CLOSED'}">
+              <i class="ti ti-circle-off"></i>クローズ
+            </span>
+          </td>
+          <td th:text="${#temporals.format(inq.updatedAt, 'yyyy/MM/dd HH:mm')}"></td>
+          <td class="c-action"></td>
+        </tr>
+        <tr id="empty-row">
+          <td class="empty-cell" colspan="9">該当するお問い合わせがありません。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- 詳細モーダル -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <span class="title" id="modal-title">
+        <i class="ti ti-message-question"></i>お問い合わせ詳細
+      </span>
+      <button type="button" class="btn-close" id="btn-modal-close" aria-label="閉じる">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <dl class="detail-grid">
+        <dt>受付番号</dt>      <dd id="d-no"></dd>
+        <dt>会員コード</dt>    <dd id="d-code"></dd>
+        <dt>法人名（カナ）</dt><dd id="d-kana"></dd>
+        <dt>受付日時</dt>      <dd id="d-created"></dd>
+        <dt>カテゴリ</dt>      <dd id="d-cat"></dd>
+        <dt>件名</dt>          <dd id="d-subj"></dd>
+        <dt>ステータス</dt>    <dd id="d-status"></dd>
+        <dt>更新日時</dt>      <dd id="d-updated"></dd>
+      </dl>
+      <div class="body-label">お問い合わせ内容</div>
+      <div class="body-text" id="d-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var PAGE_SIZE = 20;
+  var allRows = Array.from(document.querySelectorAll('tr.data-row'));
+  var filteredRows = allRows.slice();
+  var currentPage = 1;
+
+  var chkNo   = document.getElementById('chk-no');
+  var chkCode = document.getElementById('chk-code');
+  var chkKana = document.getElementById('chk-kana');
+  var chkCat  = document.getElementById('chk-cat');
+  var chkSubj = document.getElementById('chk-subj');
+  var checks  = [chkNo, chkCode, chkKana, chkCat, chkSubj];
+  var keyword  = document.getElementById('search-keyword');
+  var emptyRow = document.getElementById('empty-row');
+
+  var checkKeys   = { 'chk-no': 'no', 'chk-code': 'code', 'chk-kana': 'kana',
+                      'chk-cat': 'cat', 'chk-subj': 'subj' };
+  var checkLabels = { 'chk-no': '受付番号', 'chk-code': '会員コード',
+                      'chk-kana': '法人名（カナ）', 'chk-cat': 'カテゴリ', 'chk-subj': '件名' };
+
+  function normalize(s) {
+    return s.replace(/\s+/g, '').toLowerCase();
+  }
+
+  function activeTargets() {
+    return checks
+        .filter(function (c) { return c.classList.contains('active'); })
+        .map(function (c) { return checkKeys[c.id]; });
+  }
+
+  function updatePlaceholder() {
+    var labels = checks
+        .filter(function (c) { return c.classList.contains('active'); })
+        .map(function (c) { return checkLabels[c.id]; });
+    keyword.placeholder =
+        (labels.length ? labels.join('・') : '絞込み対象を選択') + 'で絞込み';
+  }
+
+  checks.forEach(function (chk) {
+    chk.addEventListener('click', function () {
+      var isActive = chk.classList.contains('active');
+      var otherActive = checks.some(
+          function (c) { return c !== chk && c.classList.contains('active'); });
+      if (isActive && !otherActive) return;
+      chk.classList.toggle('active');
+      updatePlaceholder();
+      doFilter();
+    });
+  });
+
+  function doFilter() {
+    var kw = normalize(keyword.value);
+    var targets = activeTargets();
+    filteredRows = allRows.filter(function (row) {
+      if (!kw) return true;
+      return targets.some(function (t) {
+        return normalize(row.dataset[t] || '').includes(kw);
+      });
+    });
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderTable() {
+    var total = filteredRows.length;
+    var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var end   = Math.min(start + PAGE_SIZE, total);
+
+    allRows.forEach(function (row) { row.style.display = 'none'; });
+    for (var i = start; i < end; i++) {
+      filteredRows[i].style.display = '';
+    }
+
+    emptyRow.style.display = total === 0 ? '' : 'none';
+
+    document.getElementById('pager-info').textContent =
+        total > 0
+        ? (start + 1) + '〜' + end + ' 件目（全 ' + total + ' 件）'
+        : '0 件';
+
+    var btns = document.getElementById('pager-btns');
+    btns.innerHTML = '';
+
+    var prev = document.createElement('button');
+    prev.textContent = '‹';
+    prev.disabled = currentPage === 1;
+    prev.addEventListener('click', function () { currentPage--; renderTable(); });
+    btns.appendChild(prev);
+
+    buildRange(currentPage, totalPages).forEach(function (p) {
+      if (p === '…') {
+        var sp = document.createElement('button');
+        sp.textContent = '…';
+        sp.disabled = true;
+        btns.appendChild(sp);
+      } else {
+        var btn = document.createElement('button');
+        btn.textContent = p;
+        if (p === currentPage) btn.classList.add('active');
+        btn.addEventListener('click', (function (pg) {
+          return function () { currentPage = pg; renderTable(); };
+        })(p));
+        btns.appendChild(btn);
+      }
+    });
+
+    var next = document.createElement('button');
+    next.textContent = '›';
+    next.disabled = currentPage === totalPages;
+    next.addEventListener('click', function () { currentPage++; renderTable(); });
+    btns.appendChild(next);
+  }
+
+  function buildRange(cur, total) {
+    if (total <= 7) {
+      var r = [];
+      for (var i = 1; i <= total; i++) r.push(i);
+      return r;
+    }
+    var pages = [1];
+    if (cur > 3) pages.push('…');
+    for (var p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) {
+      pages.push(p);
+    }
+    if (cur < total - 2) pages.push('…');
+    pages.push(total);
+    return pages;
+  }
+
+  document.getElementById('btn-search').addEventListener('click', doFilter);
+  keyword.addEventListener('keydown', function (e) { if (e.key === 'Enter') doFilter(); });
+  document.getElementById('btn-clear').addEventListener('click', function () {
+    keyword.value = '';
+    checks.forEach(function (c) { c.classList.remove('active'); });
+    chkNo.classList.add('active');
+    updatePlaceholder();
+    doFilter();
+  });
+
+  // 行クリック → モーダル
+  var overlay  = document.getElementById('modal-overlay');
+  var btnClose = document.getElementById('btn-modal-close');
+  var statusLabels = {
+    RECEIVED:
+        '<span class="badge badge-received"><i class="ti ti-inbox"></i>受付中</span>',
+    IN_PROGRESS:
+        '<span class="badge badge-inprogress"><i class="ti ti-loader"></i>対応中</span>',
+    ANSWERED:
+        '<span class="badge badge-answered"><i class="ti ti-circle-check"></i>回答済み</span>',
+    CLOSED:
+        '<span class="badge badge-closed"><i class="ti ti-circle-off"></i>クローズ</span>'
+  };
+
+  allRows.forEach(function (row) {
+    row.addEventListener('click', function () {
+      document.getElementById('d-no').textContent      = row.dataset.no;
+      document.getElementById('d-code').textContent    = row.dataset.code || '—';
+      document.getElementById('d-kana').textContent    = row.dataset.kana || '—';
+      document.getElementById('d-created').textContent = row.dataset.created;
+      document.getElementById('d-cat').textContent     = row.dataset.cat;
+      document.getElementById('d-subj').textContent    = row.dataset.subj;
+      document.getElementById('d-status').innerHTML    =
+          statusLabels[row.dataset.status] || row.dataset.status;
+      document.getElementById('d-updated').textContent = row.dataset.updated;
+      document.getElementById('d-body').textContent    = row.dataset.body;
+      overlay.classList.add('open');
+    });
+  });
+
+  function closeModal() { overlay.classList.remove('open'); }
+  btnClose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  updatePlaceholder();
+  renderTable();
+</script>
+</body>
+</html>

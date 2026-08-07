@@ -1,0 +1,1 @@
+バッチで一括実行する場合は、外部キー制約があるため m_merchant_application.sql → m_merchant_application_document.sql の順で実行してください。
