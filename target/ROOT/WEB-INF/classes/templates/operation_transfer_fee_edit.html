@@ -295,6 +295,10 @@
     margin-bottom: 10px;
   }
 
+  .dialog-title.dialog-title-primary {
+    color: var(--text-soft);
+  }
+
   .dialog-body {
     font-size: var(--fs-sm);
     color: var(--text-sub);
@@ -306,6 +310,11 @@
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+  }
+
+  .dialog-actions .btn {
+    width: 128px;
+    justify-content: center;
   }
 </style>
 </head>
@@ -366,11 +375,25 @@
     <div class="dialog">
       <div class="dialog-title">削除の確認</div>
       <div class="dialog-body">
-        この振込手数料を削除します。削除した内容は元に戻せませんが、よろしいですか？
+        この振込手数料を削除しますが、よろしいですか？
       </div>
       <div class="dialog-actions">
         <button class="btn btn-secondary" type="button" id="dialog-cancel">キャンセル</button>
         <button class="btn btn-danger" type="button" id="dialog-confirm">削除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登録・更新確認ダイアログ -->
+  <div class="dialog-overlay" id="save-dialog" hidden>
+    <div class="dialog">
+      <div class="dialog-title dialog-title-primary" id="save-dialog-title">更新の確認</div>
+      <div class="dialog-body" id="save-dialog-body">
+        この内容で更新します。よろしいですか？
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" type="button" id="save-dialog-cancel">キャンセル</button>
+        <button class="btn btn-primary" type="button" id="save-dialog-confirm">OK</button>
       </div>
     </div>
   </div>
@@ -387,6 +410,9 @@
     var backBtn = document.getElementById('back-btn');
     var errorBox = document.getElementById('error-box');
     var deleteDialog = document.getElementById('delete-dialog');
+    var saveDialog = document.getElementById('save-dialog');
+    var saveDialogTitle = document.getElementById('save-dialog-title');
+    var saveDialogBody = document.getElementById('save-dialog-body');
     var bankCodeInput = document.getElementById('bank-code');
     var noticeText = document.getElementById('notice-text');
 
@@ -402,6 +428,8 @@
       modeBadge.removeAttribute('hidden');
       saveBtn.textContent = '登録';
       noticeText.textContent = '登録時のご注意: ' + NOTICE_NEW;
+      saveDialogTitle.textContent = '登録の確認';
+      saveDialogBody.textContent = 'この内容で登録します。よろしいですか？';
     } else {
       modeBadge.setAttribute('hidden', '');
       saveBtn.textContent = '更新';
@@ -409,6 +437,8 @@
       bankCodeInput.readOnly = true;
       deleteBtn.removeAttribute('hidden');
       loadRecord(bankCodeParam);
+      saveDialogTitle.textContent = '更新の確認';
+      saveDialogBody.textContent = 'この内容で更新します。よろしいですか？';
     }
 
     backBtn.addEventListener('click', function () {
@@ -430,6 +460,15 @@
 
     saveBtn.addEventListener('click', function () {
       if (!validateForm()) { return; }
+      saveDialog.removeAttribute('hidden');
+    });
+
+    document.getElementById('save-dialog-cancel').addEventListener('click', function () {
+      saveDialog.setAttribute('hidden', '');
+    });
+
+    document.getElementById('save-dialog-confirm').addEventListener('click', function () {
+      saveDialog.setAttribute('hidden', '');
       submitSave();
     });
 
@@ -499,7 +538,9 @@
         window.location.href = '/operation_transfer_fee_list.html';
       })
       .catch(function (err) {
-        var msg = (err && err.message) ? err.message : '登録に失敗しました。内容を確認してください。';
+        var msg = (err && err.message)
+            ? err.message
+            : (isNew ? '登録に失敗しました。内容を確認してください。' : '更新に失敗しました。内容を確認してください。');
         errorBox.textContent = msg;
         errorBox.className = 'error-box visible';
         errorBox.style.whiteSpace = 'pre-line';

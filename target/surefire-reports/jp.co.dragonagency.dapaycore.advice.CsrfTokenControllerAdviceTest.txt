@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: jp.co.dragonagency.dapaycore.advice.CsrfTokenControllerAdviceTest
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.952 s -- in jp.co.dragonagency.dapaycore.advice.CsrfTokenControllerAdviceTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.969 s -- in jp.co.dragonagency.dapaycore.advice.CsrfTokenControllerAdviceTest

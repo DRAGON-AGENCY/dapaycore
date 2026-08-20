@@ -3,6 +3,8 @@ package jp.co.dragonagency.dapaycore.controller;
 import jp.co.dragonagency.dapaycore.dto.FeeRateListItemDto;
 import jp.co.dragonagency.dapaycore.dto.MemberListItemDto;
 import jp.co.dragonagency.dapaycore.dto.TransferFeeListItemDto;
+import jp.co.dragonagency.dapaycore.model.MerchantApplication;
+import jp.co.dragonagency.dapaycore.model.MerchantApplicationDocument;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
@@ -18,8 +20,10 @@ import org.springframework.ui.Model;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -182,6 +186,83 @@ class PageControllerTest {
         String viewName = controller.showOperationTransferFeeEdit();
 
         assertEquals("operation_transfer_fee_edit", viewName);
+    }
+
+    // ===== 項番1〜7: showMerchantApplicationInquiry =====
+
+    @Test
+    void T01_showMerchantApplicationInquiry_transactionCodeがnullのときmerchantAppがnullでモデルに設定される() {
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry(null, model);
+
+        assertNull(model.getAttribute("merchantApp"));
+    }
+
+    @Test
+    void T02_showMerchantApplicationInquiry_transactionCodeがnullのときdocMapがモデルに追加されない() {
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry(null, model);
+
+        assertNull(model.getAttribute("docMap"));
+    }
+
+    @Test
+    void T03_showMerchantApplicationInquiry_transactionCodeが空文字のときmerchantAppがnullでモデルに設定される() {
+        when(inquiryService.findApplication("")).thenReturn(null);
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry("", model);
+
+        assertNull(model.getAttribute("merchantApp"));
+    }
+
+    @Test
+    void T04_showMerchantApplicationInquiry_deleteFlagFalseで存在するtransactionCodeのときmerchantAppがモデルに設定される() {
+        MerchantApplication expected = new MerchantApplication();
+        expected.setMemberCode("TEST0001");
+        when(inquiryService.findApplication("TEST0001")).thenReturn(expected);
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry("TEST0001", model);
+
+        assertEquals(expected, model.getAttribute("merchantApp"));
+    }
+
+    @Test
+    void T05_showMerchantApplicationInquiry_deleteFlagFalseで存在するtransactionCodeのときdocMapがモデルに設定される() {
+        MerchantApplication app = new MerchantApplication();
+        app.setMemberCode("TEST0001");
+        Map<String, MerchantApplicationDocument> expected =
+                Map.of(MerchantApplicationDocument.TYPE_BUSINESS_PERMIT, new MerchantApplicationDocument());
+        when(inquiryService.findApplication("TEST0001")).thenReturn(app);
+        when(inquiryService.findDocumentMap("TEST0001")).thenReturn(expected);
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry("TEST0001", model);
+
+        assertEquals(expected, model.getAttribute("docMap"));
+    }
+
+    @Test
+    void T06_showMerchantApplicationInquiry_deleteFlagTrueのtransactionCodeのときmerchantAppがnullでモデルに設定される() {
+        when(inquiryService.findApplication("DELETED0001")).thenReturn(null);
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry("DELETED0001", model);
+
+        assertNull(model.getAttribute("merchantApp"));
+    }
+
+    @Test
+    void T07_showMerchantApplicationInquiry_存在しないtransactionCodeのときmerchantAppがnullでモデルに設定される() {
+        when(inquiryService.findApplication("NOTFOUND")).thenReturn(null);
+        Model model = new ExtendedModelMap();
+
+        controller.showMerchantApplicationInquiry("NOTFOUND", model);
+
+        assertNull(model.getAttribute("merchantApp"));
     }
 
     @Test

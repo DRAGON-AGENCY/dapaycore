@@ -585,6 +585,34 @@ tbody tr.data-row:hover td.c-action::after {
 
 ---
 
+## 確認ダイアログ（OK／キャンセル等）のボタンサイズ標準
+
+確認ダイアログ（削除確認・登録確認・更新確認など、`.dialog-overlay` → `.dialog` →
+`.dialog-actions` の構成で実装するモーダル）のボタンは、ラベルの文字数が異なっても
+**同じ幅に揃える**。「キャンセル」（5文字）と「OK」「削除」（2〜3文字）のように
+文字数の差があるラベルを同じ `padding` だけで並べると、見た目の横幅がラベルの
+長さに引きずられて不揃いになる。**`min-width` だけでは、長いラベル側の内容幅が
+その値を上回った時点で結局そちらだけ広がってしまい揃わない**ため、固定の
+`width` を指定して幅そのものを固定し、中央揃えにする。
+
+```css
+.dialog-actions .btn {
+  width: 128px;
+  justify-content: center;
+}
+```
+
+- `width` の値はダイアログ内で最も長いラベル（「キャンセル」等、全角5文字程度）が
+  1行で収まる幅を基準にする（目安: 120〜130px。`padding: 9px 20px` を含めて算出）。
+- ラベルがこの幅に対して短すぎる／長すぎる場合は、`width` の値をラベルに合わせて
+  再計算すること（`min-width` に戻さない）。
+- 新規にダイアログを追加する画面でも、`.dialog-actions .btn` に対して
+  同様の `width` 指定を行うこと。
+- 実装例: `src/main/resources/templates/operation_transfer_fee_edit.html`
+  の削除確認ダイアログ・登録／更新確認ダイアログ。
+
+---
+
 ## 画面名とタブ名（`<title>` タグ）の統一
 
 **`<title>` タグには、画面内の見出し（topbar の `<span class="t">` または `<h1 class="page-title">`）と

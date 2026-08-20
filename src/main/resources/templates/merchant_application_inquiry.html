@@ -952,10 +952,22 @@
 <div class="modal-overlay" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
   <div class="modal-box">
     <h3 id="deleteModalTitle"><i class="ti ti-alert-triangle" style="color:var(--danger);margin-right:6px;"></i>申込情報の削除</h3>
-    <p>この申込情報を削除します。<br>削除後は復元できません。本当に削除しますか？</p>
+    <p>この申込情報を削除しますが、よろしいですか？</p>
     <div class="modal-btns">
       <button type="button" class="btn btn-ghost" id="deleteModalCancel">キャンセル</button>
       <button type="button" class="btn btn-danger" id="deleteModalConfirm"><i class="ti ti-trash"></i>削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 保存確認モーダル -->
+<div class="modal-overlay" id="saveModal" role="dialog" aria-modal="true" aria-labelledby="saveModalTitle">
+  <div class="modal-box">
+    <h3 id="saveModalTitle"><i class="ti ti-device-floppy" style="margin-right:6px;"></i>変更内容の保存</h3>
+    <p>この内容で保存しますが、よろしいですか？</p>
+    <div class="modal-btns">
+      <button type="button" class="btn btn-ghost" id="saveModalCancel">キャンセル</button>
+      <button type="button" class="btn btn-primary" id="saveModalConfirm"><i class="ti ti-device-floppy"></i>保存する</button>
     </div>
   </div>
 </div>
@@ -1040,7 +1052,11 @@
   var btnSave   = document.getElementById('btn-save');
 
   if (btnEdit) btnEdit.addEventListener('click', function () { setMode('edit'); });
-  if (btnCancel) btnCancel.addEventListener('click', function () { setMode('view'); });
+  if (btnCancel) btnCancel.addEventListener('click', function () {
+    // 編集欄の入力値はDOMに残ったままになるため、再度編集を開いたときに
+    // 未保存の変更が残らないよう、サーバー側の最新データで再読み込みする。
+    location.reload();
+  });
 
   /* ---- delete modal ---- */
   var deleteModal   = document.getElementById('deleteModal');
@@ -1310,6 +1326,11 @@
   }
 
   /* ---- save ---- */
+  var saveModal        = document.getElementById('saveModal');
+  var btnSaveModalCancel  = document.getElementById('saveModalCancel');
+  var btnSaveModalConfirm = document.getElementById('saveModalConfirm');
+  var pendingSaveData   = null;
+
   if (btnSave) {
     btnSave.addEventListener('click', function () {
       var data = collectData();
@@ -1319,6 +1340,22 @@
         focusFirstErr();
         return;
       }
+      pendingSaveData = data;
+      saveModal.classList.add('show');
+    });
+  }
+  if (btnSaveModalCancel) {
+    btnSaveModalCancel.addEventListener('click', function () {
+      saveModal.classList.remove('show');
+    });
+  }
+  saveModal.addEventListener('click', function (e) {
+    if (e.target === saveModal) saveModal.classList.remove('show');
+  });
+  if (btnSaveModalConfirm) {
+    btnSaveModalConfirm.addEventListener('click', function () {
+      var data = pendingSaveData;
+      saveModal.classList.remove('show');
       btnSave.disabled = true;
       btnSave.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i>保存中...';
       fetch('/api/merchant-application-inquiry/update', {
