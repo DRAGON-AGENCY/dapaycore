@@ -3,6 +3,7 @@ package jp.co.dragonagency.dapaycore.controller;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jp.co.dragonagency.dapaycore.service.NetStarsSettlementImportService;
 import jp.co.dragonagency.dapaycore.service.TransferFeeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -22,16 +23,19 @@ public class PageController {
     private final MerchantApplicationInquiryService inquiryService;
     private final FeeRateService feeRateService;
     private final TransferFeeService transferFeeService;
+    private final NetStarsSettlementImportService netStarsSettlementImportService;
 
     public PageController(
             MemberListService memberListService,
             MerchantApplicationInquiryService inquiryService,
             FeeRateService feeRateService,
-            TransferFeeService transferFeeService) {
+            TransferFeeService transferFeeService,
+            NetStarsSettlementImportService netStarsSettlementImportService) {
         this.memberListService = memberListService;
         this.inquiryService = inquiryService;
         this.feeRateService = feeRateService;
         this.transferFeeService = transferFeeService;
+        this.netStarsSettlementImportService = netStarsSettlementImportService;
     }
 
     /**
@@ -162,12 +166,19 @@ public class PageController {
     }
 
     /**
-     * 精算データ登録画面を表示する。
-     * 運用管理ポータルの「精算データ登録」から表示する。
+     * 還元データ取込履歴照会画面を表示する。
+     * 運用管理ポータルの「還元データ取込履歴照会」から表示する。
+     * ネットスターズ還元データ（取引明細）の取込履歴と受信稼働状態を取得してモデルへ渡す。
      */
-    @GetMapping("/operation_settlement.html")
-    public String showOperationSettlement() {
-        return "operation_settlement";
+    @GetMapping("/operation_netstars_import.html")
+    public String showOperationNetStarsImport(Model model) {
+        model.addAttribute(
+                "importHistories",
+                netStarsSettlementImportService.findHistoryForList());
+        model.addAttribute(
+                "importControl",
+                netStarsSettlementImportService.getControlView());
+        return "operation_netstars_import";
     }
 
     /**

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryServiceTest
--------------------------------------------------------------------------------
-Tests run: 68, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.127 s -- in jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryServiceTest

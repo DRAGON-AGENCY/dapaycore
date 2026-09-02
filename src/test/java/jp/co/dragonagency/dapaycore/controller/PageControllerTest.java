@@ -5,9 +5,12 @@ import jp.co.dragonagency.dapaycore.dto.MemberListItemDto;
 import jp.co.dragonagency.dapaycore.dto.TransferFeeListItemDto;
 import jp.co.dragonagency.dapaycore.model.MerchantApplication;
 import jp.co.dragonagency.dapaycore.model.MerchantApplicationDocument;
+import jp.co.dragonagency.dapaycore.dto.NetStarsImportControlView;
+import jp.co.dragonagency.dapaycore.dto.NetStarsImportHistoryListItemDto;
 import jp.co.dragonagency.dapaycore.service.FeeRateService;
 import jp.co.dragonagency.dapaycore.service.MemberListService;
 import jp.co.dragonagency.dapaycore.service.MerchantApplicationInquiryService;
+import jp.co.dragonagency.dapaycore.service.NetStarsSettlementImportService;
 import jp.co.dragonagency.dapaycore.service.TransferFeeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +45,9 @@ class PageControllerTest {
 
     @Mock
     private TransferFeeService transferFeeService;
+
+    @Mock
+    private NetStarsSettlementImportService netStarsSettlementImportService;
 
     @InjectMocks
     private PageController controller;
@@ -186,6 +193,55 @@ class PageControllerTest {
         String viewName = controller.showOperationTransferFeeEdit();
 
         assertEquals("operation_transfer_fee_edit", viewName);
+    }
+
+    // ===== showOperationNetStarsImport（単体テスト仕様書_還元データ取込履歴照会 T46〜T48） =====
+
+    @Test
+    void T46_showOperationNetStarsImport_importHistoriesとimportControlがモデルに設定される() {
+        NetStarsImportHistoryListItemDto item = new NetStarsImportHistoryListItemDto();
+        item.setId(1L);
+        List<NetStarsImportHistoryListItemDto> expected = List.of(item);
+        NetStarsImportControlView control =
+                new NetStarsImportControlView(true, true, false, "", "");
+        when(netStarsSettlementImportService.findHistoryForList()).thenReturn(expected);
+        when(netStarsSettlementImportService.getControlView()).thenReturn(control);
+        Model model = new ExtendedModelMap();
+
+        controller.showOperationNetStarsImport(model);
+
+        assertEquals(expected, model.getAttribute("importHistories"));
+        assertEquals(control, model.getAttribute("importControl"));
+        verify(netStarsSettlementImportService).findHistoryForList();
+    }
+
+    @Test
+    void T47_showOperationNetStarsImport_データなしのときimportHistoriesが空リスト() {
+        when(netStarsSettlementImportService.findHistoryForList())
+                .thenReturn(Collections.emptyList());
+        when(netStarsSettlementImportService.getControlView())
+                .thenReturn(new NetStarsImportControlView(false, false, false,
+                        "2026/09/01 10:00", "2026/09/06"));
+        Model model = new ExtendedModelMap();
+
+        controller.showOperationNetStarsImport(model);
+
+        assertEquals(Collections.emptyList(), model.getAttribute("importHistories"));
+        assertFalse(((NetStarsImportControlView)
+                model.getAttribute("importControl")).enabled());
+    }
+
+    @Test
+    void T48_showOperationNetStarsImport_ビュー名operation_netstars_importを返す() {
+        when(netStarsSettlementImportService.findHistoryForList())
+                .thenReturn(Collections.emptyList());
+        when(netStarsSettlementImportService.getControlView())
+                .thenReturn(new NetStarsImportControlView(true, false, false, "", ""));
+        Model model = new ExtendedModelMap();
+
+        String viewName = controller.showOperationNetStarsImport(model);
+
+        assertEquals("operation_netstars_import", viewName);
     }
 
     // ===== 項番1〜7: showMerchantApplicationInquiry =====

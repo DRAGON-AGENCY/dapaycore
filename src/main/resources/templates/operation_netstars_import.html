@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" th:content="${csrfToken}" content="">
+<title>還元データ取込履歴照会 | 運用管理ポータル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    media="print" onload="this.media='all'">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"
+    media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</noscript>
+<style>
+  :root {
+    --bg-page: #eef2f7;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f4f6fa;
+    --bg-soft: #e9f1fb;
+    --bg-soft-2: #f3f7fc;
+    --text-primary: #1b2733;
+    --text-secondary: #5a6675;
+    --text-tertiary: #93a0af;
+    --text-soft: #0c447c;
+    --text-ok: #1f8a6d;
+    --text-danger: #c0392b;
+    --border: rgba(20,45,80,0.10);
+    --border-strong: rgba(20,45,80,0.24);
+    --accent: #0b5fd0;
+    --accent-strong: #0b3f86;
+    --ok: #2aa583;
+    --ok-soft: #e3f4ee;
+    --ok-border: rgba(42,165,131,0.28);
+    --warn-strong: #8f6315;
+    --warn-soft: #f9f1dd;
+    --warn-line: #e7d4a6;
+    --warn-text: #5d4a2a;
+    --danger: #c0392b;
+    --danger-soft: #fbecea;
+    --danger-line: #edc7c1;
+    --shadow-sm: 0 1px 2px rgba(16,40,70,0.06);
+    --shadow-md: 0 6px 22px rgba(16,40,70,0.10);
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 22px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #0f141a; --bg-surface: #19202a; --bg-secondary: #1f2832;
+      --bg-soft: #14283f; --bg-soft-2: #16202c;
+      --text-primary: #eef2f7; --text-secondary: #aeb9c6; --text-tertiary: #7a8694;
+      --text-soft: #9cc6f2; --text-ok: #5ccfac; --text-danger: #ec8478;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.22);
+      --accent: #3d8ddd; --accent-strong: #0c447c;
+      --ok: #36b78f; --ok-soft: #16322a; --ok-border: rgba(54,183,143,0.28);
+      --warn-strong: #e0b463; --warn-soft: #2e2412; --warn-line: #4a3a1c; --warn-text: #d8c6a2;
+      --danger: #ec8478; --danger-soft: #2e1a17; --danger-line: #4a2a24;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3); --shadow-md: 0 8px 26px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg-page); color: var(--text-primary);
+    font-family: "Noto Sans JP", system-ui, sans-serif; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { width: 100%; min-width: 1200px; max-width: 1760px; margin: 0 auto; padding: 26px 28px 48px; }
+  .shell {
+    background: var(--bg-surface); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);
+  }
+
+  .topbar { padding: 16px 28px 14px; border-bottom: 0.5px solid var(--border); }
+  .titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .titlerow .t { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 8px; }
+  .titlerow .t i { font-size: var(--fs-lg); color: var(--accent); }
+
+  .content { padding: 22px 28px 26px; }
+
+  .card { border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-surface); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; }
+  .card:last-child { margin-bottom: 0; }
+  .card-h { display: flex; align-items: center; gap: 9px; padding: 13px 16px; background: var(--accent); color: #ffffff; font-size: var(--fs-base); font-weight: 700; }
+  .card-h i { font-size: var(--fs-md); color: #ffffff; }
+  .card-b { padding: 18px 16px; }
+
+  .btn { font-family: inherit; font-size: var(--fs-base); font-weight: 500; height: 42px; padding: 0 20px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; border: 1px solid transparent; transition: background .15s; white-space: nowrap; }
+  .btn i { font-size: var(--fs-md); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-strong); }
+  .btn-ghost { background: var(--bg-surface); color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-ghost:hover:not(:disabled) { background: var(--bg-secondary); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover:not(:disabled) { filter: brightness(0.92); }
+
+  /* 受信状態（見出し・枠なしの行） */
+  .status-bar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin: 4px 2px 18px;
+  }
+  .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; font-size: var(--fs-sm); font-weight: 700; }
+  .status-pill i { font-size: var(--fs-md); }
+  .status-on { background: var(--ok-soft); color: var(--text-ok); border: 1px solid var(--ok-border); }
+  .status-off { background: var(--warn-soft); color: var(--warn-text); border: 1px solid var(--warn-line); }
+  .status-detail { font-size: var(--fs-sm); color: var(--text-secondary); }
+  .status-actions { margin-left: auto; }
+
+  /* 状態バナー */
+  .banner { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); font-size: var(--fs-sm); margin-bottom: 16px; border: 1px solid transparent; }
+  .banner i { font-size: var(--fs-md); flex: 0 0 auto; margin-top: 1px; }
+  .banner[hidden] { display: none !important; }
+  .banner-warn { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn-text); }
+  .banner-warn i { color: var(--warn-strong); }
+  .banner-ok { background: var(--ok-soft); border-color: var(--ok-border); color: var(--text-ok); }
+  .banner-ok i { color: var(--ok); }
+  .banner-danger { background: var(--danger-soft); border-color: var(--danger-line); color: var(--text-danger); }
+  .banner-danger i { color: var(--text-danger); }
+
+  /* テーブル */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); table-layout: fixed; min-width: 1440px; }
+  col.c-started  { width: 16%; }
+  col.c-type     { width: 7%; }
+  col.c-status   { width: 8%; }
+  col.c-period   { width: 19%; }
+  col.c-fetched  { width: 7%; }
+  col.c-inserted { width: 7%; }
+  col.c-updated  { width: 7%; }
+  col.c-finished { width: 16%; }
+  col.c-message  { width: 13%; }
+  thead th { background: var(--accent); color: #ffffff; font-weight: 700; text-align: left; padding: 11px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.25); letter-spacing: 0.02em; }
+  thead th:last-child { border-right: none; }
+  tbody td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; color: var(--text-primary); font-size: var(--fs-sm); vertical-align: middle; }
+  tbody td:last-child { border-right: none; }
+  /* メッセージ列のみ見切れを許容し、全文はマウスオーバー（title）で表示する */
+  tbody td.msg { overflow: hidden; text-overflow: ellipsis; }
+  tbody tr:nth-child(even) td { background: var(--bg-soft-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-secondary); }
+  td.amt { text-align: right; font-variant-numeric: tabular-nums; }
+  td.mono { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  td.empty-cell { text-align: center; color: var(--text-tertiary); padding: 28px 16px; white-space: normal; }
+
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 4em; padding: 2px 8px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+  .badge-success { background: var(--ok-soft); color: var(--text-ok); border: 1px solid var(--ok-border); }
+  .badge-failed  { background: var(--danger-soft); color: var(--text-danger); border: 1px solid var(--danger-line); }
+  .badge-skipped { background: var(--warn-soft); color: var(--warn-text); border: 1px solid var(--warn-line); }
+  .badge-running { background: var(--bg-soft); color: var(--accent-strong); border: 1px solid var(--border-strong); }
+
+  .notice-list { list-style: none; counter-reset: n; margin: 0; padding: 0; }
+  .notice-list li { counter-increment: n; position: relative; padding-left: 26px; margin-bottom: 10px; font-size: var(--fs-sm); color: var(--warn-text); line-height: 1.7; }
+  .notice-list li:last-child { margin-bottom: 0; }
+  .notice-list li::before { content: counter(n) "."; position: absolute; left: 4px; top: 1px; color: var(--warn-strong); font-size: var(--fs-sm); font-weight: 700; }
+  .card-warn { background: var(--warn-soft); border-color: var(--warn-line); box-shadow: none; }
+  .card-warn .card-h { background: transparent; color: var(--warn-strong); padding: 14px 18px 2px; }
+  .card-warn .card-h i { color: var(--warn-strong); }
+  .card-warn .card-b { background: transparent; padding: 8px 18px 16px; }
+
+  /* 確認ダイアログ */
+  .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .dialog-overlay[hidden] { display: none !important; }
+  .dialog { background: var(--bg-surface); border-radius: 12px; padding: 30px 34px; max-width: 460px; width: 92%; box-shadow: 0 12px 40px rgba(16,40,70,0.20); }
+  .dialog-title { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .dialog-title i { color: var(--accent); font-size: 22px; }
+  .dialog-body { font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.9; margin-bottom: 22px; }
+  .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .dialog-actions .btn { width: 128px; justify-content: center; }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 0; }
+    .shell { border-radius: 0; border: none; }
+    .topbar, .content { padding-left: 16px; padding-right: 16px; }
+    .status-actions { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="shell">
+
+    <div class="topbar">
+      <div class="titlerow">
+        <span class="t"><i class="ti ti-cloud-download" aria-hidden="true"></i>還元データ取込履歴照会</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- API 接続情報 -->
+      <div class="banner banner-warn" th:if="${!importControl.apiConfigured}">
+        <i class="ti ti-plug-connected-x" aria-hidden="true"></i>
+        <span>ネットスターズ還元データ API の接続情報（ドメイン・企業コード・key）が未設定です。
+          設定されるまで、日次の自動取込は接続せずスキップされます。</span>
+      </div>
+
+      <!-- 操作結果 -->
+      <div class="banner banner-ok" id="result-banner" hidden>
+        <i class="ti ti-circle-check" aria-hidden="true"></i>
+        <span id="result-text"></span>
+      </div>
+
+      <!-- 受信状態 -->
+      <div class="status-bar">
+        <span class="status-pill status-on" th:if="${importControl.enabled}">
+          <i class="ti ti-player-play" aria-hidden="true"></i>稼働中
+        </span>
+        <span class="status-pill status-off" th:unless="${importControl.enabled}">
+          <i class="ti ti-player-pause" aria-hidden="true"></i>停止中
+        </span>
+
+        <span class="status-detail" th:if="${importControl.enabled}">
+          毎日 10:00（日本時間）に自動取込を実行します。
+        </span>
+        <span class="status-detail" th:unless="${importControl.enabled}">
+          <span th:if="${!#strings.isEmpty(importControl.stoppedAtText)}"
+                th:text="${importControl.stoppedAtText} + ' に停止しました。'"></span>
+          <span th:if="${!#strings.isEmpty(importControl.autoResumeText)}"
+                th:text="'再開しない場合は ' + ${importControl.autoResumeText} + ' 頃に自動で再開します。'"></span>
+        </span>
+
+        <div class="status-actions">
+          <button type="button" class="btn btn-danger" id="stop-btn"
+                  th:if="${importControl.enabled}">
+            <i class="ti ti-player-stop" aria-hidden="true"></i>受信を停止（STOP）
+          </button>
+          <button type="button" class="btn btn-primary" id="restart-btn"
+                  th:unless="${importControl.enabled}">
+            <i class="ti ti-player-play" aria-hidden="true"></i>受信を再開（RESTART）
+          </button>
+        </div>
+      </div>
+
+      <!-- 取込履歴 -->
+      <div class="card">
+        <div class="card-h"><i class="ti ti-history" aria-hidden="true"></i>取込履歴</div>
+        <div class="card-b">
+          <div class="table-scroll">
+            <table>
+              <colgroup>
+                <col class="c-started">
+                <col class="c-type">
+                <col class="c-status">
+                <col class="c-period">
+                <col class="c-fetched">
+                <col class="c-inserted">
+                <col class="c-updated">
+                <col class="c-finished">
+                <col class="c-message">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>実行日時</th>
+                  <th>種別</th>
+                  <th>状態</th>
+                  <th>対象期間</th>
+                  <th class="amt">取得</th>
+                  <th class="amt">新規</th>
+                  <th class="amt">更新</th>
+                  <th>完了日時</th>
+                  <th>メッセージ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="item : ${importHistories}">
+                  <td class="mono" th:text="${item.startedAt}"></td>
+                  <td th:text="${item.importTypeLabel}"></td>
+                  <td>
+                    <span class="badge"
+                          th:classappend="${item.statusCode == 'SUCCESS' ? 'badge-success' : (item.statusCode == 'FAILED' ? 'badge-failed' : (item.statusCode == 'SKIPPED' ? 'badge-skipped' : 'badge-running'))}"
+                          th:text="${item.statusLabel}"></span>
+                  </td>
+                  <td th:text="${item.targetPeriod}"></td>
+                  <td class="amt" th:text="${item.fetchedCount}"></td>
+                  <td class="amt" th:text="${item.insertedCount}"></td>
+                  <td class="amt" th:text="${item.updatedCount}"></td>
+                  <td class="mono" th:text="${item.finishedAt}"></td>
+                  <td class="msg" th:text="${item.errorMessage}" th:title="${item.errorMessage}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(importHistories)}">
+                  <td class="empty-cell" colspan="9">取込履歴はありません。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 注意書き -->
+      <div class="card card-warn">
+        <div class="card-h"><i class="ti ti-alert-circle" aria-hidden="true"></i>還元データ取込について</div>
+        <div class="card-b">
+          <ol class="notice-list">
+            <li>取り込むのはネットスターズ StarPay の「還元データ」（取引明細）です。支払・返金の全取引を含みます。</li>
+            <li>受信はアプリケーションが管理します。毎日 10:00（日本時間）に自動取込が実行され、前回成功した日の翌日から前日までを取得します。この画面はその履歴を確認するためのものです。</li>
+            <li>還元データは仮確定データのため、後日「差分（確定分）」により内容が変わることがあります。取消・返金は元取引とは別レコードとして取り込まれ、いったん取り込んだレコードは削除されません。</li>
+            <li>トラブル時は「受信を停止（STOP）」で取込を止められます。停止から 5 日が経過すると自動で再開します。手動・自動いずれの再開時も、停止していた期間をまとめて取得します（API の制限によりさかのぼれるのは 10 日前まで）。</li>
+            <li>Tomcat 停止などで取りこぼした場合も、次回実行時に取得期間をさかのぼって自動で補完します。10 日前を超える取りこぼしはシステム管理者へ連絡してください。</li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- STOP 確認ダイアログ -->
+<div class="dialog-overlay" id="stop-dialog" hidden>
+  <div class="dialog">
+    <div class="dialog-title"><i class="ti ti-player-stop" aria-hidden="true"></i>受信の停止（STOP）</div>
+    <div class="dialog-body">
+      還元データの自動取込を停止します。停止中は日次取込が実行されません。<br>
+      停止から 5 日が経過すると自動で再開し、停止していた期間をまとめて取得します。<br>
+      よろしいですか？
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" data-close>キャンセル</button>
+      <button class="btn btn-danger" type="button" id="stop-confirm">停止する</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESTART 確認ダイアログ -->
+<div class="dialog-overlay" id="restart-dialog" hidden>
+  <div class="dialog">
+    <div class="dialog-title"><i class="ti ti-player-play" aria-hidden="true"></i>受信の再開（RESTART）</div>
+    <div class="dialog-body">
+      還元データの自動取込を再開します。<br>
+      あわせて、停止していた期間（前回成功日の翌日〜前日）の取込を開始します。<br>
+      よろしいですか？
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" data-close>キャンセル</button>
+      <button class="btn btn-primary" type="button" id="restart-confirm">再開する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var csrfToken = document
+        .querySelector('meta[name="csrf-token"]').getAttribute('content') || '';
+
+    var stopButton = document.getElementById('stop-btn');
+    var restartButton = document.getElementById('restart-btn');
+    var stopDialog = document.getElementById('stop-dialog');
+    var restartDialog = document.getElementById('restart-dialog');
+    var stopConfirm = document.getElementById('stop-confirm');
+    var restartConfirm = document.getElementById('restart-confirm');
+    var resultBanner = document.getElementById('result-banner');
+    var resultText = document.getElementById('result-text');
+
+    function showResult(kind, message) {
+      resultBanner.hidden = false;
+      resultBanner.className = 'banner banner-' + kind;
+      resultText.textContent = message;
+    }
+
+    function closeDialogs() {
+      stopDialog.hidden = true;
+      restartDialog.hidden = true;
+    }
+
+    document.querySelectorAll('[data-close]').forEach(function (el) {
+      el.addEventListener('click', closeDialogs);
+    });
+
+    if (stopButton) {
+      stopButton.addEventListener('click', function () { stopDialog.hidden = false; });
+    }
+    if (restartButton) {
+      restartButton.addEventListener('click', function () { restartDialog.hidden = false; });
+    }
+
+    function post(path, confirmButton, otherButton) {
+      closeDialogs();
+      confirmButton.disabled = true;
+      showResult('ok', '処理しています…');
+
+      fetch(path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        }
+      })
+      .then(function (res) {
+        return res.json().then(function (body) {
+          return { ok: res.ok, body: body };
+        });
+      })
+      .then(function (result) {
+        if (!result.ok) {
+          throw new Error(result.body.message || '処理に失敗しました。');
+        }
+        showResult('ok', result.body.message || '処理が完了しました。');
+        setTimeout(function () { window.location.reload(); }, 1800);
+      })
+      .catch(function (err) {
+        showResult('danger', err.message || '処理に失敗しました。');
+        confirmButton.disabled = false;
+      });
+    }
+
+    if (stopConfirm) {
+      stopConfirm.addEventListener('click', function () {
+        post('/api/netstars-import/stop', stopConfirm);
+      });
+    }
+    if (restartConfirm) {
+      restartConfirm.addEventListener('click', function () {
+        post('/api/netstars-import/restart', restartConfirm);
+      });
+    }
+  })();
+</script>
+</body>
+</html>
