@@ -528,7 +528,9 @@
 
       function normalize(text) {
         if (!text) { return ''; }
-        return text.replace(/[\s　]+/g, '').toLowerCase();
+        // 全角／半角を同一視する（NFKC: 全角英数字→半角、半角カナ→全角カナ 等）。
+        // そのうえで空白（全角含む）を除去し、英字を小文字化する。
+        return text.normalize('NFKC').replace(/[\s　]+/g, '').toLowerCase();
       }
 
       function getTotalPages() {
@@ -627,6 +629,9 @@
 
       function clearFilter() {
         keywordInput.value = '';
+        // 表示件数を初期値（先頭の選択肢 = 10 件）へ戻す
+        perPageSelect.value = perPageSelect.options[0].value;
+        perPage = parseInt(perPageSelect.value, 10);
         filteredRows = allRows.slice();
         currentPage = 1;
         render();

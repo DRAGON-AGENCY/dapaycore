@@ -52,8 +52,13 @@ class PageControllerTest {
     @InjectMocks
     private PageController controller;
 
+    // =========================================================
+    // 単体テスト仕様書_会員一覧_v1.00 項番 T14〜T16（PageController#showMemberList）
+    // INPUT: C:\work\自社mPOS精算システム\単体テスト\単体テストINPUTデータ_会員一覧_v1.00.xlsx
+    // =========================================================
+
     @Test
-    void showMemberList_membersAttributeIsFindAllResult() {
+    void T14_showMemberList_membersにサービスの戻り値が設定される() {
         List<MemberListItemDto> expected = List.of(
                 new MemberListItemDto(
                         "M001", "テスト株式会社", "山田", "太郎",
@@ -68,7 +73,7 @@ class PageControllerTest {
     }
 
     @Test
-    void showMemberList_returnsViewNameMemberList() {
+    void T16_showMemberList_ビュー名member_listを返す() {
         when(memberListService.findAll()).thenReturn(Collections.emptyList());
         Model model = new ExtendedModelMap();
 
@@ -78,7 +83,7 @@ class PageControllerTest {
     }
 
     @Test
-    void showMemberList_membersAttributeIsEmptyListWhenNoData() {
+    void T15_showMemberList_データなしのときmembersが空リスト() {
         when(memberListService.findAll()).thenReturn(Collections.emptyList());
         Model model = new ExtendedModelMap();
 

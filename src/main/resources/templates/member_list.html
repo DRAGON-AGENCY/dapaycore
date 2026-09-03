@@ -342,9 +342,9 @@
   }
 
   .data-scroll {
+    /* テーブルが幅にあふれたときのみ横スクロール。縦は表示件数分すべて表示し、
+       高さ制限やテーブル内スクロールは設けない（ページ全体でスクロールする）。 */
     overflow-x: auto;
-    overflow-y: auto;
-    max-height: 560px;
   }
 
   .data-scroll::-webkit-scrollbar {
@@ -685,7 +685,9 @@
         if (!text) {
           return '';
         }
-        return text.replace(/[\s　]+/g, '').toLowerCase();
+        // 全角／半角を同一視する（NFKC: 全角英数字→半角、半角カナ→全角カナ 等）。
+        // そのうえで空白（全角含む）を除去し、英字を小文字化する。
+        return text.normalize('NFKC').replace(/[\s　]+/g, '').toLowerCase();
       }
 
       // 総ページ数 (最低1ページ)
@@ -842,6 +844,9 @@
         keywordInput.value = '';
         targetCodeCheckbox.checked = true;
         targetNameCheckbox.checked = false;
+        // 表示件数を初期値（先頭の選択肢 = 10 件）へ戻す
+        perPageSelect.value = perPageSelect.options[0].value;
+        perPage = parseInt(perPageSelect.value, 10);
         updateKeywordPlaceholder();
         filteredRows = allRows.slice();
         currentPage = 1;

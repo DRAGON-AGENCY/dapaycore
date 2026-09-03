@@ -556,7 +556,9 @@
                       'chk-kana': '法人名（カナ）', 'chk-cat': 'カテゴリ', 'chk-subj': '件名' };
 
   function normalize(s) {
-    return s.replace(/\s+/g, '').toLowerCase();
+    // 全角／半角を同一視する（NFKC: 全角英数字→半角、半角カナ→全角カナ 等）。
+    // そのうえで空白（全角含む）を除去し、英字を小文字化する。
+    return s.normalize('NFKC').replace(/\s+/g, '').toLowerCase();
   }
 
   function activeTargets() {
